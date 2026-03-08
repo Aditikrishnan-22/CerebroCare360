@@ -1,0 +1,152 @@
+
+{% extends "base.html" %}
+{% block title %}Find Care — CerebroCare360{% endblock %}
+{% block extra_css %}
+<style>
+  .search-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem 1.5rem;
+    display: flex; gap: 12px; flex-wrap: wrap;
+    align-items: flex-end;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 1.75rem;
+  }
+  .search-bar .cc-form-group { margin-bottom: 0; flex: 1; min-width: 160px; }
+  .hospital-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: all 0.2s;
+    height: 100%;
+  }
+  .hospital-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--primary);
+  }
+  .hospital-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 1rem;
+  }
+  .hospital-name { font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem; }
+  .hospital-detail {
+    font-size: 13px; color: var(--text-secondary);
+    display: flex; align-items: flex-start;
+    gap: 7px; margin-top: 6px;
+  }
+  .hospital-detail i { flex-shrink: 0; margin-top: 2px; color: var(--text-muted); }
+  .accred-badge {
+    display: inline-block;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+  .no-results {
+    text-align: center; padding: 3rem;
+    color: var(--text-muted);
+  }
+  .no-results i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="mb-4">
+    <h1 class="cc-section-title">Find Specialist Care</h1>
+    <p class="cc-section-sub">Search verified hospitals with neurology and oncology departments</p>
+  </div>
+
+  <form method="GET" action="/hospital/find">
+    <div class="search-bar">
+      <div class="cc-form-group">
+        <label class="cc-label">City</label>
+        <div style="position:relative;">
+          <i class="bi bi-geo-alt" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
+          <input type="text" name="city" class="cc-input" style="padding-left:36px;"
+                 placeholder="e.g. Mumbai" value="{{ request.args.get('city', '') }}" />
+        </div>
+      </div>
+      <div class="cc-form-group">
+        <label class="cc-label">Specialty</label>
+        <select name="specialty" class="cc-input">
+          <option value="">All Specialties</option>
+          <option value="Neurology" {% if request.args.get('specialty') == 'Neurology' %}selected{% endif %}>Neurology</option>
+          <option value="Oncology" {% if request.args.get('specialty') == 'Oncology' %}selected{% endif %}>Oncology</option>
+          <option value="Neurosurgery" {% if request.args.get('specialty') == 'Neurosurgery' %}selected{% endif %}>Neurosurgery</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-cc-primary" style="padding:11px 24px;">
+        <i class="bi bi-search"></i> Search
+      </button>
+    </div>
+  </form>
+
+  {% if hospitals %}
+  <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:1.25rem;">
+    Found <strong>{{ hospitals | length }}</strong> hospital{{ 's' if hospitals | length != 1 }}
+  </p>
+  <div class="row g-4">
+    {% for h in hospitals %}
+    <div class="col-md-6 col-lg-4">
+      <div class="hospital-card">
+        <div class="hospital-icon"><i class="bi bi-hospital"></i></div>
+        <div class="hospital-name">{{ h.name }}</div>
+        <div class="hospital-detail">
+          <i class="bi bi-geo-alt"></i>
+          <span>{{ h.address }}, {{ h.city }}{% if h.state %}, {{ h.state }}{% endif %}</span>
+        </div>
+        {% if h.phone %}
+        <div class="hospital-detail">
+          <i class="bi bi-telephone"></i>
+          <span>{{ h.phone }}</span>
+        </div>
+        {% endif %}
+        {% if h.email %}
+        <div class="hospital-detail">
+          <i class="bi bi-envelope"></i>
+          <span>{{ h.email }}</span>
+        </div>
+        {% endif %}
+        <div class="hospital-detail">
+          <i class="bi bi-heart-pulse"></i>
+          <span>{{ h.specialty }}</span>
+        </div>
+        {% if h.accreditation %}
+        <div class="accred-badge">
+          <i class="bi bi-patch-check"></i> {{ h.accreditation }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% elif request.args %}
+  <div class="cc-card">
+    <div class="no-results">
+      <i class="bi bi-hospital"></i>
+      <h5 style="font-weight:600;">No hospitals found</h5>
+      <p style="font-size:14px;">Try a different city or specialty filter.</p>
+    </div>
+  </div>
+  {% else %}
+  <div class="cc-card">
+    <div class="no-results">
+      <i class="bi bi-search"></i>
+      <h5 style="font-weight:600;">Search for hospitals</h5>
+      <p style="font-size:14px;">Enter a city name or specialty above to find hospitals near you.</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

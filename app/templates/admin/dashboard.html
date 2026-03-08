@@ -1,0 +1,228 @@
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADMIN DASHBOARD  —  templates/admin/dashboard.html
+     ═══════════════════════════════════════════════════════════ -->
+{% extends "base.html" %}
+{% block title %}Admin — CerebroCare360{% endblock %}
+{% block extra_css %}
+<style>
+  .admin-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    display: flex; align-items: center; gap: 1.25rem;
+  }
+  .admin-stat-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .admin-stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 1.9rem; font-weight: 600;
+    background: var(--gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .admin-stat-label { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .admin-table th {
+    text-align: left; padding: 10px 14px;
+    font-size: 11.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .admin-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table tr:hover td { background: var(--surface-2); }
+  .action-btn {
+    padding: 5px 12px; border-radius: 7px; font-size: 12.5px;
+    font-weight: 500; cursor: pointer; border: 1.5px solid;
+    transition: all 0.15s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-edit {
+    border-color: var(--primary); color: var(--primary); background: var(--primary-light);
+  }
+  .btn-edit:hover { background: var(--primary); color: white; }
+  .btn-delete {
+    border-color: var(--danger); color: var(--danger); background: #fef2f2;
+  }
+  .btn-delete:hover { background: var(--danger); color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <h1 class="cc-section-title">Admin Panel</h1>
+      <p class="cc-section-sub mb-0">Manage hospitals, symptom rules, and monitor platform data</p>
+    </div>
+    <span class="cc-badge-role badge-admin">ADMIN</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-4 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="admin-stat">
+        <div class="admin-stat-icon"><i class="bi bi-people"></i></div>
+        <div>
+          <div class="admin-stat-value">{{ stats.total_users }}</div>
+          <div class="admin-stat-label">Registered Users</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="admin-stat">
+        <div class="admin-stat-icon"><i class="bi bi-file-earmark-medical"></i></div>
+        <div>
+          <div class="admin-stat-value">{{ stats.total_scans }}</div>
+          <div class="admin-stat-label">Total Scans</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="admin-stat">
+        <div class="admin-stat-icon"><i class="bi bi-hospital"></i></div>
+        <div>
+          <div class="admin-stat-value">{{ stats.total_hospitals }}</div>
+          <div class="admin-stat-label">Hospitals</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="admin-stat">
+        <div class="admin-stat-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+        <div>
+          <div class="admin-stat-value">{{ stats.total_reports }}</div>
+          <div class="admin-stat-label">Reports Generated</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hospital Management -->
+  <div class="cc-card mb-4">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-hospital"></i></div>
+      <div class="cc-card-title">Hospital Records</div>
+      <a href="/admin/hospitals/add" class="btn-cc-primary ms-auto" style="padding:8px 18px;font-size:13px;">
+        <i class="bi bi-plus-lg"></i> Add Hospital
+      </a>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Hospital Name</th>
+            <th>City</th>
+            <th>Specialty</th>
+            <th>Accreditation</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in hospitals %}
+          <tr>
+            <td><strong>{{ h.name }}</strong></td>
+            <td>{{ h.city }}</td>
+            <td>{{ h.specialty }}</td>
+            <td>
+              {% if h.accreditation %}
+                <span style="background:var(--primary-light);color:var(--primary);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">
+                  {{ h.accreditation }}
+                </span>
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if h.is_active %}
+                <span style="background:#d1fae5;color:#059669;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">Active</span>
+              {% else %}
+                <span style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">Inactive</span>
+              {% endif %}
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <a href="/admin/hospitals/edit/{{ h.id }}" class="action-btn btn-edit">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="/admin/hospitals/delete/{{ h.id }}" class="action-btn btn-delete"
+                   onclick="return confirm('Delete {{ h.name }}?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Symptom Rules -->
+  <div class="cc-card">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+      <div class="cc-card-title">Symptom Rules</div>
+      <a href="/admin/rules/add" class="btn-cc-primary ms-auto" style="padding:8px 18px;font-size:13px;">
+        <i class="bi bi-plus-lg"></i> Add Rule
+      </a>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Symptoms</th>
+            <th>Condition</th>
+            <th>Department</th>
+            <th>Urgency</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rule in rules %}
+          <tr>
+            <td>
+              {% for sym in rule.symptom_keys | from_json %}
+                <span style="background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:12px;margin-right:4px;">
+                  {{ sym }}
+                </span>
+              {% endfor %}
+            </td>
+            <td>{{ rule.condition }}</td>
+            <td>{{ rule.department }}</td>
+            <td>
+              {% set uc = {'high':'#dc2626','medium':'#d97706','low':'#059669'} %}
+              {% set ub = {'high':'#fee2e2','medium':'#fffbeb','low':'#d1fae5'} %}
+              <span style="background:{{ ub[rule.urgency] }};color:{{ uc[rule.urgency] }};border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;text-transform:uppercase;">
+                {{ rule.urgency }}
+              </span>
+            </td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <a href="/admin/rules/edit/{{ rule.id }}" class="action-btn btn-edit">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="/admin/rules/delete/{{ rule.id }}" class="action-btn btn-delete"
+                   onclick="return confirm('Delete this rule?')">
+                  <i class="bi bi-trash"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

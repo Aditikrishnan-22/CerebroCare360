@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}My Profile — CerebroCare360{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:600px;">
+  <div class="mb-4">
+    <h1 class="cc-section-title">My Profile</h1>
+    <p class="cc-section-sub">Update your account details</p>
+  </div>
+
+  <div class="cc-card mb-4">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-person"></i></div>
+      <div class="cc-card-title">Personal Information</div>
+    </div>
+    <div class="cc-card-body">
+      <form method="POST" action="/auth/profile">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="action" value="update_info" />
+        <div class="cc-form-group">
+          <label class="cc-label">Full Name</label>
+          <input type="text" name="full_name" class="cc-input"
+                 value="{{ current_user.full_name }}" required />
+        </div>
+        <div class="cc-form-group">
+          <label class="cc-label">Email Address</label>
+          <input type="email" name="email" class="cc-input"
+                 value="{{ current_user.email }}" required />
+        </div>
+        <button type="submit" class="btn-cc-primary">
+          <i class="bi bi-check-lg"></i> Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="cc-card mb-4">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-key"></i></div>
+      <div class="cc-card-title">Change Password</div>
+    </div>
+    <div class="cc-card-body">
+      <form method="POST" action="/auth/profile">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="action" value="change_password" />
+        <div class="cc-form-group">
+          <label class="cc-label">Current Password</label>
+          <input type="password" name="current_password" class="cc-input"
+                 placeholder="Enter current password" required />
+        </div>
+        <div class="cc-form-group">
+          <label class="cc-label">New Password</label>
+          <input type="password" name="new_password" class="cc-input"
+                 placeholder="Minimum 8 characters" required />
+        </div>
+        <div class="cc-form-group">
+          <label class="cc-label">Confirm New Password</label>
+          <input type="password" name="confirm_password" class="cc-input"
+                 placeholder="Re-enter new password" required />
+        </div>
+        <button type="submit" class="btn-cc-primary">
+          <i class="bi bi-shield-lock"></i> Update Password
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Account stats -->
+  <div class="cc-card">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-bar-chart"></i></div>
+      <div class="cc-card-title">Account Stats</div>
+    </div>
+    <div class="cc-card-body">
+      <div class="row g-3">
+        <div class="col-4">
+          <div class="cc-stat">
+            <div class="cc-stat-value">{{ scan_count }}</div>
+            <div class="cc-stat-label">Total Scans</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="cc-stat">
+            <div class="cc-stat-value">{{ report_count }}</div>
+            <div class="cc-stat-label">Reports</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="cc-stat">
+            <div class="cc-stat-value">{{ current_user.role | upper }}</div>
+            <div class="cc-stat-label">Role</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

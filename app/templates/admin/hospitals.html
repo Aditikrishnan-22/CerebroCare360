@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{% if hospital %}Edit Hospital{% else %}Add Hospital{% endif %} — CerebroCare360{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:640px;">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/admin/dashboard" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <h1 class="cc-section-title mb-0">
+      {% if hospital %}Edit Hospital{% else %}Add Hospital{% endif %}
+    </h1>
+  </div>
+
+  <div class="cc-card">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-hospital"></i></div>
+      <div class="cc-card-title">Hospital Details</div>
+    </div>
+    <div class="cc-card-body">
+      <form method="POST">
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Hospital Name *</label>
+              <input type="text" name="name" class="cc-input"
+                     value="{{ hospital.name if hospital else '' }}" required />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Address</label>
+              <input type="text" name="address" class="cc-input"
+                     value="{{ hospital.address if hospital else '' }}" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">City *</label>
+              <input type="text" name="city" class="cc-input"
+                     value="{{ hospital.city if hospital else '' }}" required />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">State</label>
+              <input type="text" name="state" class="cc-input"
+                     value="{{ hospital.state if hospital else '' }}" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Phone</label>
+              <input type="text" name="phone" class="cc-input"
+                     value="{{ hospital.phone if hospital else '' }}" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Email</label>
+              <input type="email" name="email" class="cc-input"
+                     value="{{ hospital.email if hospital else '' }}" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Specialty *</label>
+              <select name="specialty" class="cc-input" required>
+                <option value="">Select specialty</option>
+                {% for s in ['Neurology', 'Oncology', 'Neurosurgery', 'General Medicine'] %}
+                <option value="{{ s }}"
+                  {% if hospital and hospital.specialty == s %}selected{% endif %}>
+                  {{ s }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Accreditation</label>
+              <input type="text" name="accreditation" class="cc-input"
+                     placeholder="e.g. NABH, JCI"
+                     value="{{ hospital.accreditation if hospital else '' }}" />
+            </div>
+          </div>
+          <div class="col-12 mt-2">
+            <button type="submit" class="btn-cc-primary">
+              <i class="bi bi-check-lg"></i>
+              {% if hospital %}Update Hospital{% else %}Add Hospital{% endif %}
+            </button>
+            <a href="/admin/dashboard" class="btn-cc-secondary ms-2">Cancel</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

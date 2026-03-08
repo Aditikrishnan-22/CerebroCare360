@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block title %}CerebroBot — CerebroCare360{% endblock %}
+
+{% block extra_css %}
+<style>
+  .chat-wrapper {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  .chat-window {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    height: 520px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    scroll-behavior: smooth;
+  }
+  .msg {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    animation: fadeUp 0.2s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  .msg-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0; margin-top: 2px;
+  }
+  .msg-avatar.bot  { background: var(--gradient); color: white; }
+  .msg-avatar.user { background: var(--surface-2); color: var(--primary);
+                     border: 1.5px solid var(--border); }
+  .msg-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .msg.bot  .msg-bubble {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-top-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: var(--gradient);
+    color: white;
+    margin-left: auto;
+    border-top-right-radius: 4px;
+  }
+  .msg.user { flex-direction: row-reverse; }
+  .chat-input-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    margin-top: 1rem;
+  }
+  .chat-input {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    resize: none;
+    outline: none;
+    min-height: 44px;
+    max-height: 120px;
+    transition: border-color 0.18s;
+    color: var(--text-primary);
+    background: var(--surface-2);
+  }
+  .chat-input:focus { border-color: var(--primary); }
+  .typing-indicator {
+    display: flex; gap: 4px; padding: 10px 14px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    border-top-left-radius: 4px;
+    width: fit-content;
+  }
+  .typing-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30%          { transform: translateY(-6px); }
+  }
+  .suggested-questions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 1rem;
+  }
+  .suggested-q {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--primary);
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .suggested-q:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-wrapper">
+  <div class="mb-4">
+    <h1 class="cc-section-title">
+      <i class="bi bi-robot" style="background:var(--gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"></i>
+      CerebroBot
+    </h1>
+    <p class="cc-section-sub">Ask me anything about brain tumors, MRI scans, or how to use CerebroCare360</p>
+  </div>
+
+  <!-- Suggested questions -->
+  <div class="suggested-questions" id="suggestedQuestions">
+    <button class="suggested-q" onclick="askSuggested(this)">What is a glioma?</button>
+    <button class="suggested-q" onclick="askSuggested(this)">What do my results mean?</button>
+    <button class="suggested-q" onclick="askSuggested(this)">What symptoms should I watch for?</button>
+    <button class="suggested-q" onclick="askSuggested(this)">How accurate is the AI?</button>
+    <button class="suggested-q" onclick="askSuggested(this)">When should I see a doctor?</button>
+  </div>
+
+  <!-- Chat window -->
+  <div class="chat-window" id="chatWindow">
+    <!-- Welcome message -->
+    <div class="msg bot">
+      <div class="msg-avatar bot"><i class="bi bi-robot"></i></div>
+      <div class="msg-bubble">
+        👋 Hi {{ current_user.full_name.split()[0] }}! I'm CerebroBot, your brain health assistant.<br/><br/>
+        I can help you understand brain tumor types, interpret your scan results, explain symptoms,
+        and guide you on when to seek medical attention.<br/><br/>
+        <strong>How can I help you today?</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input area -->
+  <div class="chat-input-area">
+    <textarea class="chat-input" id="chatInput"
+              placeholder="Ask me about brain tumors, your results, symptoms..."
+              rows="1" onkeydown="handleKey(event)"></textarea>
+    <button class="btn-cc-primary" id="sendBtn" onclick="sendMessage()"
+            style="padding:10px 20px;flex-shrink:0;">
+      <i class="bi bi-send"></i> Send
+    </button>
+  </div>
+
+  <div class="cc-disclaimer mt-3">
+    <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
+    <span>CerebroBot provides general information only and is not a substitute for professional medical advice. Always consult a qualified neurologist for medical decisions.</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const chatWindow = document.getElementById('chatWindow');
+  const chatInput  = document.getElementById('chatInput');
+  const sendBtn    = document.getElementById('sendBtn');
+  const suggestedQ = document.getElementById('suggestedQuestions');
+
+  let conversationHistory = [];
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function askSuggested(btn) {
+    chatInput.value = btn.textContent;
+    suggestedQ.style.display = 'none';
+    sendMessage();
+  }
+
+  function appendMessage(role, text) {
+    const isBot = role === 'assistant';
+    const div = document.createElement('div');
+    div.className = `msg ${isBot ? 'bot' : 'user'}`;
+    div.innerHTML = `
+      <div class="msg-avatar ${isBot ? 'bot' : 'user'}">
+        <i class="bi bi-${isBot ? 'robot' : 'person'}"></i>
+      </div>
+      <div class="msg-bubble">${text.replace(/\n/g, '<br/>')}</div>
+    `;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    div.id = 'typingIndicator';
+    div.innerHTML = `
+      <div class="msg-avatar bot"><i class="bi bi-robot"></i></div>
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    `;
+    chatWindow.appendChild(div);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function removeTyping() {
+    const indicator = document.getElementById('typingIndicator');
+    if (indicator) indicator.remove();
+  }
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    // Hide suggested questions after first message
+    suggestedQ.style.display = 'none';
+
+    // Add user message
+    appendMessage('user', text);
+    conversationHistory.push({ role: 'user', content: text });
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      const response = await fetch('/chat/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: conversationHistory })
+      });
+
+      const data = await response.json();
+      removeTyping();
+
+      if (data.reply) {
+        appendMessage('assistant', data.reply);
+        conversationHistory.push({ role: 'assistant', content: data.reply });
+      } else {
+        appendMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+      }
+    } catch (err) {
+      removeTyping();
+      appendMessage('assistant', 'Sorry, I could not connect. Please check your connection and try again.');
+    }
+
+    sendBtn.disabled = false;
+    chatInput.focus();
+  }
+
+  // Auto-resize textarea
+  chatInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+</script>
+{% endblock %}

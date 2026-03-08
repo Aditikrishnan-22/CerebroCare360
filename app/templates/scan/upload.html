@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Upload MRI — CerebroCare360{% endblock %}
+{% block extra_css %}
+<style>
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-lg);
+    padding: 3.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--surface);
+    position: relative;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .upload-zone input[type=file] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 1.25rem;
+  }
+  .upload-title { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.4rem; }
+  .upload-sub { font-size: 13.5px; color: var(--text-muted); }
+  .upload-rules {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-top: 1.25rem;
+  }
+  .upload-rule-chip {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .preview-box {
+    display: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+  .preview-box img {
+    width: 100%; max-height: 280px;
+    object-fit: contain; background: #000;
+  }
+  .preview-info {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .info-list { list-style: none; padding: 0; margin: 0; }
+  .info-list li {
+    display: flex; align-items: flex-start;
+    gap: 10px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .info-list li:last-child { border-bottom: none; }
+  .info-list li i { color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:960px;">
+  <div class="mb-4">
+    <h1 class="cc-section-title">Upload MRI Scan</h1>
+    <p class="cc-section-sub">Upload a brain MRI image to receive an AI-powered analysis</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="cc-card">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-upload"></i></div>
+          <div>
+            <div class="cc-card-title">Select MRI Image</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">JPG or PNG, max 10MB</div>
+          </div>
+        </div>
+        <div class="cc-card-body">
+          <form method="POST" action="/scan/upload" enctype="multipart/form-data" id="uploadForm">
+            {{ form.hidden_tag() }}
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" name="mri_image" id="mriFile"
+                     accept=".jpg,.jpeg,.png" required />
+              <div class="upload-icon"><i class="bi bi-file-earmark-medical"></i></div>
+              <div class="upload-title">Drag & drop or click to browse</div>
+              <div class="upload-sub">Select your brain MRI scan file</div>
+              <div class="upload-rules">
+                <span class="upload-rule-chip"><i class="bi bi-check2"></i> JPG / PNG</span>
+                <span class="upload-rule-chip"><i class="bi bi-check2"></i> Max 10MB</span>
+                <span class="upload-rule-chip"><i class="bi bi-check2"></i> Min 64×64px</span>
+                <span class="upload-rule-chip"><i class="bi bi-check2"></i> Brain MRI only</span>
+              </div>
+            </div>
+
+            <div class="preview-box" id="previewBox">
+              <img id="previewImg" src="" alt="MRI Preview" />
+              <div class="preview-info">
+                <i class="bi bi-image"></i>
+                <span id="previewName">—</span>
+                <span id="previewSize" style="margin-left:auto;color:var(--text-muted);"></span>
+              </div>
+            </div>
+
+            <div class="cc-disclaimer mt-3 mb-4">
+              <i class="bi bi-exclamation-triangle" style="flex-shrink:0;margin-top:1px;"></i>
+              <span>Only upload brain MRI scans. Uploading non-MRI images will produce meaningless results. This tool is for educational use only.</span>
+            </div>
+
+            <button type="submit" class="btn-cc-primary w-100 justify-content-center" style="padding:12px;" id="submitBtn" disabled>
+              <i class="bi bi-cpu"></i> Analyse with AI Ensemble
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="cc-card h-100">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="cc-card-title">What to expect</div>
+        </div>
+        <div class="cc-card-body">
+          <ul class="info-list">
+            <li>
+              <i class="bi bi-clock"></i>
+              <div><strong>Analysis time:</strong> Under 5 seconds once uploaded.</div>
+            </li>
+            <li>
+              <i class="bi bi-diagram-3"></i>
+              <div><strong>3 models vote:</strong> VGG16, ResNet50, and EfficientNetB0 each analyse your scan and their predictions are weighted by accuracy.</div>
+            </li>
+            <li>
+              <i class="bi bi-bar-chart"></i>
+              <div><strong>Results include:</strong> Tumor presence, tumor type, confidence score, and probability per class.</div>
+            </li>
+            <li>
+              <i class="bi bi-file-earmark-pdf"></i>
+              <div><strong>PDF report:</strong> Download a full report from the results page.</div>
+            </li>
+            <li>
+              <i class="bi bi-save"></i>
+              <div><strong>Auto-saved:</strong> All scans are saved to your history automatically.</div>
+            </li>
+          </ul>
+          <div class="mt-3">
+            <div class="cc-stat">
+              <div class="cc-stat-value">93%+</div>
+              <div class="cc-stat-label">Ensemble accuracy on test set</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const fileInput = document.getElementById('mriFile');
+  const previewBox = document.getElementById('previewBox');
+  const previewImg = document.getElementById('previewImg');
+  const previewName = document.getElementById('previewName');
+  const previewSize = document.getElementById('previewSize');
+  const submitBtn = document.getElementById('submitBtn');
+  const uploadZone = document.getElementById('uploadZone');
+  const uploadForm = document.getElementById('uploadForm');
+
+  fileInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    previewName.textContent = file.name;
+    previewSize.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+    previewBox.style.display = 'block';
+    submitBtn.disabled = false;
+  });
+
+  uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); });
+
+  // Loading spinner on submit
+  uploadForm.addEventListener('submit', function() {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = `
+      <span class="spinner-border spinner-border-sm" role="status"
+            style="width:16px;height:16px;border-width:2px;"></span>
+      Analysing with AI Ensemble...
+    `;
+  });
+</script>
+{% endblock %}

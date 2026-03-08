@@ -1,0 +1,1142 @@
+{% extends "base.html" %}
+{% block title %}Symptom Checker — CerebroCare360{% endblock %}
+
+{% block extra_css %}
+<style>
+.checker-wrap { max-width: 720px; margin: 0 auto; padding: 0 1rem 3rem; }
+
+/* ── Emergency banner ─────────────────────── */
+.emer-banner {
+  background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 12px;
+  padding: 13px 18px; margin-bottom: 1.75rem; display: flex; gap: 11px;
+  align-items: flex-start; font-size: 13.5px; color: #7f1d1d; line-height: 1.55;
+}
+.emer-banner i { font-size: 17px; flex-shrink: 0; margin-top: 1px; color: #dc2626; }
+
+/* ── Progress stepper ─────────────────────── */
+.stepper {
+  display: flex; align-items: center; margin-bottom: 2rem;
+  padding: 1.1rem 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 14px;
+}
+.step-item {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; position: relative; z-index: 1;
+}
+.step-item:not(:last-child)::after {
+  content: ''; position: absolute; top: 14px; left: 50%; width: 100%;
+  height: 2px; background: var(--border); z-index: 0; transition: background 0.3s;
+}
+.step-item.done:not(:last-child)::after { background: var(--primary); }
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border);
+  background: var(--surface); color: var(--text-muted); font-size: 11px;
+  font-weight: 700; display: flex; align-items: center; justify-content: center;
+  z-index: 1; transition: all 0.25s;
+}
+.step-item.active .step-dot {
+  background: var(--gradient); border-color: transparent; color: white;
+  box-shadow: 0 0 0 4px rgba(59,79,216,0.12);
+}
+.step-item.done .step-dot { background: var(--primary); border-color: transparent; color: white; }
+.step-label {
+  font-size: 10.5px; font-weight: 500; color: var(--text-muted);
+  margin-top: 5px; text-align: center; white-space: nowrap;
+}
+.step-item.active .step-label { color: var(--primary); font-weight: 700; }
+.step-item.done .step-label   { color: var(--primary); }
+
+/* ── Screen system ────────────────────────── */
+.sc { display: none; }
+.sc.on { display: block; animation: scIn 0.22s ease; }
+@keyframes scIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── Question heading ─────────────────────── */
+.q-head {
+  font-family: 'Fraunces', serif; font-size: 1.45rem; font-weight: 600;
+  color: var(--text-primary); margin-bottom: 0.35rem; line-height: 1.3;
+}
+.q-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 1.4rem; line-height: 1.55; }
+.q-why {
+  background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 9px;
+  padding: 9px 14px; font-size: 12.5px; color: #3730a3; margin-bottom: 1.25rem;
+  display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;
+}
+.q-why i { flex-shrink: 0; margin-top: 1px; }
+
+/* ── Pill grid ────────────────────────────── */
+.pg { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 1.5rem; }
+.pill {
+  padding: 9px 16px; border-radius: 24px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text-secondary); font-size: 13.5px;
+  font-weight: 500; cursor: pointer; display: flex; align-items: center;
+  gap: 7px; transition: all 0.17s; user-select: none;
+}
+.pill:hover { border-color: var(--primary); color: var(--primary); background: #eef2ff; }
+.pill.sel   { background: var(--gradient); color: white; border-color: transparent; }
+.pill i { font-size: 14px; }
+
+/* ── Section label ────────────────────────── */
+.sec-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 9px; margin-top: 12px;
+}
+
+/* ── History card (Screen 1.5) ────────────── */
+.hist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.4rem; }
+.hist-card {
+  padding: 13px 14px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--surface); cursor: pointer; transition: all 0.17s;
+  display: flex; align-items: center; gap: 10px;
+}
+.hist-card:hover { border-color: var(--primary); background: #eef2ff; }
+.hist-card.sel   { border-color: var(--primary); background: #eef2ff; }
+.hist-card.sel .hist-radio { background: var(--primary); border-color: var(--primary); }
+.hist-radio {
+  width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border);
+  flex-shrink: 0; transition: all 0.17s;
+}
+.hist-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.hist-sub   { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+
+/* Age selector */
+.age-grid { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 1.4rem; }
+.age-pill {
+  padding: 10px 20px; border-radius: 24px; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text-secondary); font-size: 13.5px;
+  font-weight: 600; cursor: pointer; transition: all 0.17s; user-select: none;
+}
+.age-pill:hover { border-color: var(--primary); color: var(--primary); background: #eef2ff; }
+.age-pill.sel   { background: var(--gradient); color: white; border-color: transparent; }
+
+/* ── Yes/No pair ──────────────────────────── */
+.yn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.1rem; }
+.yn-card {
+  padding: 14px 12px; border-radius: 12px; border: 1.5px solid var(--border);
+  background: var(--surface); cursor: pointer; text-align: center; transition: all 0.17s;
+}
+.yn-card:hover { border-color: var(--primary); background: #eef2ff; }
+.yn-card.sy { background: #f0fdf4; border-color: #4ade80; }
+.yn-card.sn { background: #eef2ff; border-color: var(--primary); }
+.yn-icon { font-size: 1.4rem; display: block; margin-bottom: 5px; }
+.yn-lbl  { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.yn-qlabel { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 9px; }
+
+/* ── Onset selector ───────────────────────── */
+.onset-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 1.5rem; }
+.onset-opt {
+  display: flex; align-items: center; gap: 14px; padding: 13px 16px;
+  border-radius: 12px; border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; transition: all 0.17s;
+}
+.onset-opt:hover { border-color: var(--primary); background: #eef2ff; }
+.onset-opt.sel   { border-color: var(--primary); background: #eef2ff; }
+.onset-radio {
+  width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border);
+  flex-shrink: 0; transition: all 0.17s;
+}
+.onset-opt.sel .onset-radio { background: var(--primary); border-color: var(--primary); }
+.onset-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+.onset-desc  { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+/* ── Nav row ──────────────────────────────── */
+.nav-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--border);
+}
+
+/* ── RESULT STYLES ────────────────────────── */
+.res-card {
+  border-radius: 14px; border: 1.5px solid; padding: 1.75rem;
+  margin-bottom: 1.25rem; animation: scIn 0.3s ease;
+}
+.res-emergency { background: #fef2f2; border-color: #fca5a5; }
+.res-urgent    { background: #fffbeb; border-color: #fcd34d; }
+.res-soon      { background: #fff7ed; border-color: #fdba74; }
+.res-routine   { background: #eef2ff; border-color: #c7d2fe; }
+.res-monitor   { background: #f0fdf4; border-color: #86efac; }
+
+.res-badge {
+  display: inline-flex; align-items: center; gap: 5px; padding: 3px 12px;
+  border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;
+  text-transform: uppercase; margin-bottom: 0.85rem;
+}
+.badge-emergency { background: #dc2626; color: white; }
+.badge-urgent    { background: #d97706; color: white; }
+.badge-soon      { background: #ea580c; color: white; }
+.badge-routine   { background: var(--primary); color: white; }
+.badge-monitor   { background: #059669; color: white; }
+
+.res-title {
+  font-family: 'Fraunces', serif; font-size: 1.35rem;
+  font-weight: 600; margin-bottom: 0.6rem;
+}
+.res-emergency .res-title { color: #991b1b; }
+.res-urgent    .res-title { color: #92400e; }
+.res-soon      .res-title { color: #9a3412; }
+.res-routine   .res-title { color: #1e3a8a; }
+.res-monitor   .res-title { color: #065f46; }
+
+.res-reason { font-size: 14px; line-height: 1.7; margin-bottom: 1.1rem; }
+.res-emergency .res-reason { color: #7f1d1d; }
+.res-urgent    .res-reason { color: #78350f; }
+.res-soon      .res-reason { color: #7c2d12; }
+.res-routine   .res-reason { color: #1e3a8a; }
+.res-monitor   .res-reason { color: #14532d; }
+
+.why-box { background: rgba(255,255,255,0.65); border-radius: 10px; padding: 11px 14px; margin-bottom: 1rem; }
+.why-box-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 7px; }
+.why-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; padding: 2px 0; line-height: 1.5; }
+
+.act-box { background: rgba(255,255,255,0.65); border-radius: 10px; padding: 11px 14px; margin-bottom: 1rem; }
+.act-box-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 7px; }
+.act-item { display: flex; align-items: flex-start; gap: 9px; font-size: 13.5px; padding: 3px 0; line-height: 1.55; }
+.act-item i { flex-shrink: 0; margin-top: 2px; }
+
+.esc-strip {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: #fef2f2; border: 1px solid #fca5a5; border-radius: 9px;
+  padding: 10px 14px; font-size: 12.5px; color: #7f1d1d; line-height: 1.55; margin-top: 0.75rem;
+}
+.esc-strip i { flex-shrink: 0; color: #dc2626; margin-top: 1px; }
+
+.pattern-header { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.pattern-badge {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px;
+  border-radius: 12px; font-size: 11px; font-weight: 700; border: 1.5px solid;
+}
+.pattern-body { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+
+.mri-cta {
+  display: flex; gap: 13px; align-items: flex-start;
+  background: linear-gradient(135deg, #eef2ff, #f5f3ff);
+  border: 1px solid #c7d2fe; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+}
+.mri-cta-icon {
+  width: 38px; height: 38px; background: var(--gradient); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; color: white; font-size: 17px; flex-shrink: 0;
+}
+.mri-cta-text strong { display: block; font-size: 14px; color: var(--primary-dark); margin-bottom: 3px; }
+.mri-cta-text span   { font-size: 13px; color: var(--text-secondary); line-height: 1.55; }
+
+.upload-nudge {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap; padding: 1rem 1.25rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 1.25rem;
+}
+.upload-nudge p { font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.55; }
+
+/* ── Age/history context badge (shown in result) ── */
+.ctx-note {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
+  padding: 4px 10px; font-size: 12px; color: var(--text-muted); margin-bottom: 0.75rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checker-wrap">
+
+  <div class="mb-4">
+    <h1 class="cc-section-title">
+      <i class="bi bi-clipboard2-pulse gradient-text"></i>
+      Neurological Symptom Checker
+    </h1>
+    <p class="cc-section-sub">
+      This tool helps you understand how urgently to seek care for head, brain, and neurological symptoms.
+      <strong>It does not diagnose. Always consult a qualified medical professional.</strong>
+    </p>
+  </div>
+
+  <div class="emer-banner">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span>If you have <strong>sudden one-sided weakness, speech loss, worst-ever headache, a seizure,
+    or sudden loss of consciousness</strong> — do not use this tool.
+    <strong>Call emergency services (112 / 108 / 911) immediately.</strong></span>
+  </div>
+
+  <!-- Progress stepper — 6 steps now -->
+  <div class="stepper">
+    <div class="step-item active" id="st1"><div class="step-dot">1</div><div class="step-label">Concern</div></div>
+    <div class="step-item" id="st2"><div class="step-dot">2</div><div class="step-label">History</div></div>
+    <div class="step-item" id="st3"><div class="step-dot">3</div><div class="step-label">Safety</div></div>
+    <div class="step-item" id="st4"><div class="step-dot">4</div><div class="step-label">Symptoms</div></div>
+    <div class="step-item" id="st5"><div class="step-dot">5</div><div class="step-label">Onset</div></div>
+    <div class="step-item" id="st6"><div class="step-dot">6</div><div class="step-label">Result</div></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 1 — Main concern
+  ═══════════════════════════════════════ -->
+  <div class="cc-card sc on" id="sc1">
+    <div class="cc-card-body">
+      <div class="q-head">What is your main concern today?</div>
+      <div class="q-sub">Choose the symptom that worries you most. You can select more details in the next steps.</div>
+      <div class="pg" id="mainGrid">
+        <div class="pill" data-val="headache"   onclick="pickMain(this)"><i class="bi bi-activity"></i>        Headache</div>
+        <div class="pill" data-val="seizure"    onclick="pickMain(this)"><i class="bi bi-lightning"></i>       Seizure / Blackout</div>
+        <div class="pill" data-val="weakness"   onclick="pickMain(this)"><i class="bi bi-person"></i>          Weakness / Numbness</div>
+        <div class="pill" data-val="speech"     onclick="pickMain(this)"><i class="bi bi-chat-dots"></i>       Speech Difficulty</div>
+        <div class="pill" data-val="vision"     onclick="pickMain(this)"><i class="bi bi-eye"></i>             Vision Problem</div>
+        <div class="pill" data-val="balance"    onclick="pickMain(this)"><i class="bi bi-arrows-move"></i>     Balance / Dizziness</div>
+        <div class="pill" data-val="memory"     onclick="pickMain(this)"><i class="bi bi-brain"></i>           Memory / Behaviour</div>
+        <div class="pill" data-val="tremor"     onclick="pickMain(this)"><i class="bi bi-hand-index"></i>      Tremor / Shaking</div>
+        <div class="pill" data-val="hearing"    onclick="pickMain(this)"><i class="bi bi-ear"></i>             Hearing Problem</div>
+        <div class="pill" data-val="hormonal"   onclick="pickMain(this)"><i class="bi bi-heart-pulse"></i>     Hormonal Changes</div>
+        <div class="pill" data-val="back"       onclick="pickMain(this)"><i class="bi bi-bandaid"></i>         Back / Leg Problem</div>
+        <div class="pill" data-val="numbness"   onclick="pickMain(this)"><i class="bi bi-exclamation-circle"></i> Numbness / Tingling</div>
+      </div>
+      <div class="nav-row">
+        <div></div>
+        <button class="btn-cc-primary" onclick="go(2)" id="btn1" disabled>Next <i class="bi bi-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 2 — Quick History (NEW — Fix 2)
+  ═══════════════════════════════════════ -->
+  <div class="cc-card sc" id="sc2">
+    <div class="cc-card-body">
+      <div class="q-head">A Few Quick Questions First</div>
+      <div class="q-sub">This helps the tool give you more accurate guidance. Takes less than 30 seconds.</div>
+
+      <div class="q-why">
+        <i class="bi bi-info-circle"></i>
+        Age and medical history significantly change how symptoms should be interpreted. For example, a first seizure
+        means something different if you already have diagnosed epilepsy.
+      </div>
+
+      <!-- Age -->
+      <div class="yn-qlabel">Approximately how old are you?</div>
+      <div class="age-grid" id="ageGrid">
+        <div class="age-pill" onclick="pickAge(this,'child')">Under 18</div>
+        <div class="age-pill" onclick="pickAge(this,'adult1')">18 – 40</div>
+        <div class="age-pill" onclick="pickAge(this,'adult2')">41 – 65</div>
+        <div class="age-pill" onclick="pickAge(this,'elderly')">Over 65</div>
+      </div>
+
+      <!-- Known history -->
+      <div class="yn-qlabel" style="margin-top:0.5rem;">Do you have any of the following diagnosed conditions? <span style="font-weight:400;color:var(--text-muted);">(Select all that apply)</span></div>
+      <div class="pg" id="histGrid">
+        <div class="pill" data-k="knownCancer"    onclick="togHist(this)"><i class="bi bi-radioactive"></i>    Known cancer</div>
+        <div class="pill" data-k="knownEpilepsy"  onclick="togHist(this)"><i class="bi bi-lightning"></i>      Epilepsy / seizure disorder</div>
+        <div class="pill" data-k="knownStroke"    onclick="togHist(this)"><i class="bi bi-heart-pulse"></i>    Prior stroke / TIA</div>
+        <div class="pill" data-k="knownHyper"     onclick="togHist(this)"><i class="bi bi-graph-up"></i>       Hypertension</div>
+        <div class="pill" data-k="knownMS"        onclick="togHist(this)"><i class="bi bi-diagram-3"></i>      Multiple sclerosis</div>
+        <div class="pill" data-k="noneAbove"      onclick="togNone(this)"><i class="bi bi-x-circle"></i>       None of the above</div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-cc-secondary" onclick="go(1)"><i class="bi bi-arrow-left"></i> Back</button>
+        <button class="btn-cc-primary" onclick="go(3)" id="btn2" disabled>Next <i class="bi bi-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 3 — Safety check
+  ═══════════════════════════════════════ -->
+  <div class="cc-card sc" id="sc3">
+    <div class="cc-card-body">
+      <div class="q-head">Safety Questions First</div>
+      <div class="q-sub">Answer these honestly — they identify if you need emergency help right now.</div>
+      <div class="q-why">
+        <i class="bi bi-info-circle"></i>
+        These focus on <strong>sudden, severe changes</strong> — not long-standing symptoms.
+        Sudden onset of neurological symptoms is a medical emergency until proven otherwise.
+      </div>
+
+      <div style="margin-bottom:1.2rem;">
+        <div class="yn-qlabel">Did your main symptom come on suddenly — within minutes?</div>
+        <div class="yn-row">
+          <div class="yn-card" id="sq1y" onclick="sq('sq1','y')"><span class="yn-icon">⚡</span><div class="yn-lbl">Yes — very suddenly</div></div>
+          <div class="yn-card" id="sq1n" onclick="sq('sq1','n')"><span class="yn-icon">🕐</span><div class="yn-lbl">No — gradually</div></div>
+        </div>
+      </div>
+      <div style="margin-bottom:1.2rem;">
+        <div class="yn-qlabel">Is this the worst headache you have ever had in your life?</div>
+        <div class="yn-row">
+          <div class="yn-card" id="sq2y" onclick="sq('sq2','y')"><span class="yn-icon">🔴</span><div class="yn-lbl">Yes — worst ever</div></div>
+          <div class="yn-card" id="sq2n" onclick="sq('sq2','n')"><span class="yn-icon">✅</span><div class="yn-lbl">No</div></div>
+        </div>
+      </div>
+      <div style="margin-bottom:1.2rem;">
+        <div class="yn-qlabel">Have you had a seizure or convulsion — and is this the first time ever?</div>
+        <div class="yn-row">
+          <div class="yn-card" id="sq3y" onclick="sq('sq3','y')"><span class="yn-icon">⚠️</span><div class="yn-lbl">Yes — first time</div></div>
+          <div class="yn-card" id="sq3n" onclick="sq('sq3','n')"><span class="yn-icon">✅</span><div class="yn-lbl">No / I have epilepsy</div></div>
+        </div>
+      </div>
+      <div style="margin-bottom:0.5rem;">
+        <div class="yn-qlabel">Do you currently have sudden weakness on one side of your body OR sudden inability to speak?</div>
+        <div class="yn-row">
+          <div class="yn-card" id="sq4y" onclick="sq('sq4','y')"><span class="yn-icon">⚠️</span><div class="yn-lbl">Yes</div></div>
+          <div class="yn-card" id="sq4n" onclick="sq('sq4','n')"><span class="yn-icon">✅</span><div class="yn-lbl">No</div></div>
+        </div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-cc-secondary" onclick="go(2)"><i class="bi bi-arrow-left"></i> Back</button>
+        <button class="btn-cc-primary" onclick="evalSafety()" id="btn3" disabled>Next <i class="bi bi-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 4 — Full symptom selection
+  ═══════════════════════════════════════ -->
+  <div class="cc-card sc" id="sc4">
+    <div class="cc-card-body">
+      <div class="q-head">Select All Symptoms You Are Experiencing</div>
+      <div class="q-sub">Select everything that applies. The more thorough you are, the better the guidance.</div>
+
+      <!-- HEADACHE TYPE — Fix 3 -->
+      <div class="sec-label">Headache Type</div>
+      <div class="pg">
+        <div class="pill" data-k="headache"        onclick="tog(this)"><i class="bi bi-activity"></i>          Headache (general)</div>
+        <div class="pill" data-k="morningHA"        onclick="tog(this)"><i class="bi bi-sunrise"></i>           Worse in the morning</div>
+        <div class="pill" data-k="worseStrain"      onclick="tog(this)"><i class="bi bi-wind"></i>              Worse with cough / straining</div>
+        <div class="pill" data-k="progressiveHA"    onclick="tog(this)"><i class="bi bi-graph-up"></i>          Getting worse over weeks</div>
+        <div class="pill" data-k="bandHA"           onclick="tog(this)"><i class="bi bi-circle"></i>            Tight band around head (no nausea)</div>
+        <div class="pill" data-k="clusterHA"        onclick="tog(this)"><i class="bi bi-eye-fill"></i>          Boring pain around ONE eye + tearing</div>
+        <div class="pill" data-k="throbbingHA"      onclick="tog(this)"><i class="bi bi-pulse"></i>             Throbbing / pulsating</div>
+        <div class="pill" data-k="unilateralHA"     onclick="tog(this)"><i class="bi bi-arrow-left-right"></i>  One-sided headache</div>
+        <div class="pill" data-k="nauseaVomit"      onclick="tog(this)"><i class="bi bi-thermometer"></i>       Nausea / vomiting</div>
+        <div class="pill" data-k="lightSound"       onclick="tog(this)"><i class="bi bi-brightness-high"></i>   Light / sound sensitivity</div>
+        <div class="pill" data-k="aura"             onclick="tog(this)"><i class="bi bi-stars"></i>             Visual aura (zigzag / flashing)</div>
+        <div class="pill" data-k="raisedICP"        onclick="tog(this)"><i class="bi bi-arrow-up-circle"></i>   Waking with headache + vomiting</div>
+      </div>
+
+      <!-- NEUROLOGICAL -->
+      <div class="sec-label">Neurological</div>
+      <div class="pg">
+        <div class="pill" data-k="seizure"          onclick="tog(this)"><i class="bi bi-lightning"></i>         Seizure / convulsion</div>
+        <div class="pill" data-k="oneSideWeak"      onclick="tog(this)"><i class="bi bi-person"></i>            One-sided weakness (hemiparesis)</div>
+        <div class="pill" data-k="speechDiff"       onclick="tog(this)"><i class="bi bi-chat-dots"></i>         Speech difficulty (aphasia)</div>
+        <div class="pill" data-k="balanceDiff"      onclick="tog(this)"><i class="bi bi-arrows-move"></i>       Balance / walking difficulty</div>
+        <div class="pill" data-k="coordination"     onclick="tog(this)"><i class="bi bi-grid-3x3-gap"></i>      Loss of coordination (ataxia)</div>
+        <div class="pill" data-k="acuteConfusion"   onclick="tog(this)"><i class="bi bi-question-circle-fill"></i> Sudden / acute confusion</div>
+        <div class="pill" data-k="gradualMemory"    onclick="tog(this)"><i class="bi bi-brain"></i>             Gradual memory loss (months/years)</div>
+        <div class="pill" data-k="personalityChg"   onclick="tog(this)"><i class="bi bi-person-dash"></i>       Personality / behaviour change</div>
+        <div class="pill" data-k="apathy"           onclick="tog(this)"><i class="bi bi-emoji-neutral"></i>     Apathy / social withdrawal</div>
+        <div class="pill" data-k="dailyTasksDiff"   onclick="tog(this)"><i class="bi bi-list-task"></i>         Difficulty with daily tasks (shopping, finances)</div>
+        <div class="pill" data-k="fluctuatingAlert" onclick="tog(this)"><i class="bi bi-toggles"></i>           Fluctuating alertness / confusion</div>
+        <div class="pill" data-k="visualHallucin"   onclick="tog(this)"><i class="bi bi-eye-slash"></i>         Visual hallucinations (seeing things)</div>
+        <div class="pill" data-k="actingDreams"     onclick="tog(this)"><i class="bi bi-moon-stars"></i>        Acting out dreams while sleeping</div>
+      </div>
+
+      <!-- MOVEMENT DISORDERS — Fix 1 & 4 -->
+      <div class="sec-label">Movement & Sensation</div>
+      <div class="pg">
+        <div class="pill" data-k="restingTremor"    onclick="tog(this)"><i class="bi bi-hand-index"></i>        Resting tremor (hand shakes at rest)</div>
+        <div class="pill" data-k="actionTremor"     onclick="tog(this)"><i class="bi bi-cup-hot"></i>           Tremor during action (holding cup)</div>
+        <div class="pill" data-k="rigidity"         onclick="tog(this)"><i class="bi bi-lock"></i>              Stiffness / rigidity of limbs</div>
+        <div class="pill" data-k="slowMovement"     onclick="tog(this)"><i class="bi bi-hourglass-split"></i>   General slowness of movement</div>
+        <div class="pill" data-k="numbnessUpward"   onclick="tog(this)"><i class="bi bi-arrow-up"></i>          Numbness/tingling starting in feet, moving upward</div>
+        <div class="pill" data-k="electricShock"    onclick="tog(this)"><i class="bi bi-lightning-charge"></i>  Electric shock sensation (neck flex)</div>
+        <div class="pill" data-k="generalNumbness"  onclick="tog(this)"><i class="bi bi-hand-thumbs-down"></i>  Numbness / tingling (general)</div>
+      </div>
+
+      <!-- VISION & HEARING -->
+      <div class="sec-label">Vision & Hearing</div>
+      <div class="pg">
+        <div class="pill" data-k="blurVision"       onclick="tog(this)"><i class="bi bi-eye"></i>               Blurred vision</div>
+        <div class="pill" data-k="periVisionLoss"   onclick="tog(this)"><i class="bi bi-eye-slash"></i>         Loss of peripheral (side) vision</div>
+        <div class="pill" data-k="doubleVision"     onclick="tog(this)"><i class="bi bi-layers"></i>            Double vision</div>
+        <div class="pill" data-k="eyePainMove"      onclick="tog(this)"><i class="bi bi-eye-fill"></i>          Eye pain on movement</div>
+        <div class="pill" data-k="hearingOneSide"   onclick="tog(this)"><i class="bi bi-ear"></i>               Hearing loss — one ear</div>
+        <div class="pill" data-k="tinnitus"         onclick="tog(this)"><i class="bi bi-volume-up"></i>         Ringing in ears (tinnitus)</div>
+        <div class="pill" data-k="dizziness"        onclick="tog(this)"><i class="bi bi-arrow-clockwise"></i>   Dizziness / vertigo</div>
+      </div>
+
+      <!-- OTHER -->
+      <div class="sec-label">Other</div>
+      <div class="pg">
+        <div class="pill" data-k="hormonalChg"      onclick="tog(this)"><i class="bi bi-heart-pulse"></i>       Hormonal / menstrual changes</div>
+        <div class="pill" data-k="backPain"         onclick="tog(this)"><i class="bi bi-bandaid"></i>           Back pain</div>
+        <div class="pill" data-k="legWeak"          onclick="tog(this)"><i class="bi bi-person-walking"></i>    Leg weakness</div>
+        <div class="pill" data-k="bladderBowel"     onclick="tog(this)"><i class="bi bi-exclamation-circle"></i> Bladder / bowel problems</div>
+        <div class="pill" data-k="fatigue"          onclick="tog(this)"><i class="bi bi-battery-half"></i>      Persistent fatigue</div>
+        <div class="pill" data-k="headInjury"       onclick="tog(this)"><i class="bi bi-shield-exclamation"></i> Recent head injury</div>
+        <div class="pill" data-k="persistPostConc"  onclick="tog(this)"><i class="bi bi-clock-history"></i>     Symptoms persisting weeks after head injury</div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-cc-secondary" onclick="go(3)"><i class="bi bi-arrow-left"></i> Back</button>
+        <button class="btn-cc-primary" onclick="go(5)">Next <i class="bi bi-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 5 — Onset / Tempo
+  ═══════════════════════════════════════ -->
+  <div class="cc-card sc" id="sc5">
+    <div class="cc-card-body">
+      <div class="q-head">When did your symptoms start?</div>
+      <div class="q-sub">The speed of onset is one of the most critical clues in neurology. Be as accurate as possible.</div>
+      <div class="q-why">
+        <i class="bi bi-info-circle"></i>
+        Sudden (seconds–minutes) → vascular emergency. Progressive over days–weeks → mass lesion or inflammation.
+        Episodic → migraine or epilepsy. Chronic over months–years → neurodegeneration.
+      </div>
+      <div class="onset-list">
+        <div class="onset-opt" onclick="pickOnset(this,'sudden')">
+          <div class="onset-radio"></div>
+          <div><div class="onset-title">Suddenly — within seconds or minutes</div><div class="onset-desc">No warning; came on very abruptly</div></div>
+        </div>
+        <div class="onset-opt" onclick="pickOnset(this,'hours_days')">
+          <div class="onset-radio"></div>
+          <div><div class="onset-title">Over hours or 1–2 days</div><div class="onset-desc">Developed quickly but not instantaneously</div></div>
+        </div>
+        <div class="onset-opt" onclick="pickOnset(this,'days_weeks')">
+          <div class="onset-radio"></div>
+          <div><div class="onset-title">Over days to weeks — and getting worse</div><div class="onset-desc">Slowly progressive, building up</div></div>
+        </div>
+        <div class="onset-opt" onclick="pickOnset(this,'months_years')">
+          <div class="onset-radio"></div>
+          <div><div class="onset-title">Over months or years</div><div class="onset-desc">Very gradual, long-standing</div></div>
+        </div>
+        <div class="onset-opt" onclick="pickOnset(this,'episodic')">
+          <div class="onset-radio"></div>
+          <div><div class="onset-title">Comes and goes — recurrent episodes</div><div class="onset-desc">Attacks that start, resolve, then return</div></div>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="btn-cc-secondary" onclick="go(4)"><i class="bi bi-arrow-left"></i> Back</button>
+        <button class="btn-cc-primary" onclick="runEngine()" id="btn5" disabled>
+          <i class="bi bi-search"></i> Show My Result
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCREEN 6 — Result
+  ═══════════════════════════════════════ -->
+  <div class="sc" id="sc6">
+    <div id="resCard"></div>
+    <div id="patternBox"></div>
+    <div id="mriBox"></div>
+    <div class="cc-disclaimer mb-4">
+      <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
+      <span>
+        This tool does not diagnose brain tumors, stroke, migraine, epilepsy, dementia, or any other condition.
+        It provides urgency guidance only, based on clinically described symptom patterns (Harrison's Principles
+        of Internal Medicine). <strong>Cranial MRI with gadolinium contrast is the definitive test for suspected
+        brain masses.</strong> Consult a qualified medical professional for diagnosis and treatment.
+      </span>
+    </div>
+    <div class="d-flex gap-3 flex-wrap">
+      <button class="btn-cc-secondary" onclick="reset()"><i class="bi bi-arrow-clockwise"></i> Start Over</button>
+      <a href="/scan/upload" class="btn-cc-primary"><i class="bi bi-upload"></i> Upload MRI Scan</a>
+      <a href="/hospital/find" class="btn-cc-secondary"><i class="bi bi-hospital"></i> Find a Specialist</a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+const D = {
+  main: null,
+  age: null,           // child / adult1 / adult2 / elderly
+  hist: {},            // known conditions
+  onset: null,
+  sq: { sq1:null, sq2:null, sq3:null, sq4:null },
+  sym: {}
+};
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION — now 6 screens
+// ═══════════════════════════════════════════════════
+function go(n) {
+  document.querySelectorAll('.sc').forEach(s => s.classList.remove('on'));
+  document.getElementById('sc' + n).classList.add('on');
+  for (let i = 1; i <= 6; i++) {
+    const s = document.getElementById('st' + i);
+    s.classList.remove('active','done');
+    if (i < n)  s.classList.add('done');
+    if (i === n) s.classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════
+//  SCREEN 1 — main concern
+// ═══════════════════════════════════════════════════
+function pickMain(el) {
+  document.querySelectorAll('#mainGrid .pill').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+  D.main = el.dataset.val;
+  document.getElementById('btn1').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════
+//  SCREEN 2 — history (Fix 2)
+// ═══════════════════════════════════════════════════
+function pickAge(el, val) {
+  document.querySelectorAll('#ageGrid .age-pill').forEach(p => p.classList.remove('sel'));
+  el.classList.add('sel');
+  D.age = val;
+  checkBtn2();
+}
+
+function togHist(el) {
+  // If "none of above" was selected, deselect it
+  const none = document.querySelector('[data-k="noneAbove"]');
+  none.classList.remove('sel');
+  D.hist['noneAbove'] = false;
+  el.classList.toggle('sel');
+  D.hist[el.dataset.k] = el.classList.contains('sel');
+  checkBtn2();
+}
+
+function togNone(el) {
+  // Deselect all other history pills
+  document.querySelectorAll('#histGrid .pill').forEach(p => {
+    if (p !== el) { p.classList.remove('sel'); D.hist[p.dataset.k] = false; }
+  });
+  el.classList.toggle('sel');
+  D.hist['noneAbove'] = el.classList.contains('sel');
+  checkBtn2();
+}
+
+function checkBtn2() {
+  // Enable if age selected AND at least one history option selected
+  const histSelected = Object.values(D.hist).some(v => v === true);
+  document.getElementById('btn2').disabled = !(D.age && histSelected);
+}
+
+// ═══════════════════════════════════════════════════
+//  SCREEN 3 — safety
+// ═══════════════════════════════════════════════════
+function sq(id, val) {
+  ['y','n'].forEach(v => document.getElementById(id+v).classList.remove('sy','sn'));
+  document.getElementById(id+val).classList.add(val==='y' ? 'sy' : 'sn');
+  D.sq[id] = val;
+  const done = Object.values(D.sq).every(v => v !== null);
+  document.getElementById('btn3').disabled = !done;
+}
+
+function evalSafety() {
+  const s = D.sq;
+
+  // Stroke / FAST — but if known stroke history, still emergency
+  if (s.sq1 === 'y' && s.sq4 === 'y') {
+    fireEmergency('Possible Stroke — FAST Alert',
+      'You have reported sudden onset of weakness or speech difficulty. This matches the FAST pattern for a stroke or intracerebral hemorrhage.' +
+      (D.hist.knownStroke ? ' You have a prior stroke history, which increases this risk further.' : ''),
+      ['Call emergency services (112 / 108 / 911) immediately',
+       'Do not drive yourself to hospital',
+       'Note the exact time symptoms started — this is critical for treatment']);
+    return;
+  }
+  // Thunderclap
+  if (s.sq1 === 'y' && s.sq2 === 'y') {
+    fireEmergency('Possible Subarachnoid Hemorrhage',
+      'A sudden explosive "worst headache of my life" can indicate a ruptured cerebral aneurysm.',
+      ['Go to the emergency department immediately',
+       'This requires urgent CT brain imaging',
+       'Do not wait to see if it improves']);
+    return;
+  }
+  // First seizure — ONLY urgent if they DON'T have known epilepsy
+  if (s.sq3 === 'y' && !D.hist.knownEpilepsy) {
+    fireEmergency('First-Time Seizure — Urgent Assessment Required',
+      'Any first-time seizure in an adult is a high-priority neurological event. Up to 90% of low-grade gliomas present with seizures as their first symptom. Brain imaging is mandatory.',
+      ['Go to a hospital or neurology department urgently',
+       'MRI brain with contrast will likely be needed',
+       'Bring someone with you if possible']);
+    return;
+  }
+  go(4);
+}
+
+function fireEmergency(title, reason, actions) {
+  document.querySelectorAll('.sc').forEach(s => s.classList.remove('on'));
+  document.getElementById('sc6').classList.add('on');
+  for (let i = 1; i <= 6; i++) {
+    const s = document.getElementById('st' + i);
+    s.classList.remove('active','done');
+    if (i < 6) s.classList.add('done');
+    if (i === 6) s.classList.add('active');
+  }
+  const actHTML = actions.map(a =>
+    `<div class="act-item"><i class="bi bi-arrow-right-circle" style="color:#dc2626;"></i><span>${a}</span></div>`
+  ).join('');
+  document.getElementById('resCard').innerHTML = `
+    <div class="res-card res-emergency">
+      <div class="res-badge badge-emergency"><i class="bi bi-exclamation-octagon"></i> Emergency</div>
+      <div class="res-title">🚨 ${title}</div>
+      <div class="res-reason">${reason}</div>
+      <div class="act-box">
+        <div class="act-box-title">What to do right now</div>
+        ${actHTML}
+        <div class="act-item"><i class="bi bi-x-circle" style="color:#dc2626;"></i><span>Do not continue using this tool. Get emergency care now.</span></div>
+      </div>
+    </div>`;
+  document.getElementById('patternBox').innerHTML = '';
+  document.getElementById('mriBox').innerHTML = '';  // ← Fixed: no MRI box for emergencies
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════════════
+//  SCREEN 4 — symptom toggles
+// ═══════════════════════════════════════════════════
+function tog(el) {
+  el.classList.toggle('sel');
+  D.sym[el.dataset.k] = el.classList.contains('sel');
+}
+
+// ═══════════════════════════════════════════════════
+//  SCREEN 5 — onset
+// ═══════════════════════════════════════════════════
+function pickOnset(el, val) {
+  document.querySelectorAll('.onset-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  D.onset = val;
+  document.getElementById('btn5').disabled = false;
+}
+
+// ═══════════════════════════════════════════════════
+//  DECISION ENGINE (v2 — all 9 fixes applied)
+// ═══════════════════════════════════════════════════
+function runEngine() {
+  const sy = D.sym;
+  const on = D.onset;
+  const age = D.age;
+  const hist = D.hist;
+
+  // ── Secondary emergency rules ──
+  if (sy.backPain && sy.legWeak && sy.bladderBowel) {
+    fireEmergency('Possible Spinal Cord Compression',
+      'Back pain + leg weakness + bladder/bowel dysfunction is a spinal emergency.' +
+      (hist.knownCancer ? ' A known cancer diagnosis makes this pattern especially urgent.' : '') +
+      ' Motor deficits established >12–48 hours may become permanent.',
+      ['Go to the emergency department immediately',
+       'Urgent spinal MRI is required',
+       'Do not delay — this is highly time-sensitive']);
+    return;
+  }
+  if (on === 'sudden' && sy.doubleVision && sy.dizziness && sy.coordination && sy.nauseaVomit) {
+    fireEmergency('Possible Brainstem / Cerebellar Emergency',
+      'Sudden double vision, dizziness, loss of coordination, and vomiting can indicate cerebellar or brainstem stroke.',
+      ['Call emergency services immediately',
+       'Urgent CT / MRI brain is required',
+       'Do not attempt to drive or walk alone']);
+    return;
+  }
+  // Acute confusion in elderly → possible emergency
+  if (sy.acuteConfusion && on === 'sudden' && age === 'elderly') {
+    fireEmergency('Sudden Confusion in Older Adult',
+      'Sudden onset confusion in an older adult can indicate stroke, intracranial hemorrhage, or acute metabolic crisis. This requires urgent medical evaluation.',
+      ['Seek emergency medical help immediately',
+       'Do not leave the person alone',
+       'Note any medications they may have taken']);
+    return;
+  }
+
+  // ── Scoring ──
+  let tumorScore    = 0;
+  let migraineScore = 0;
+  let clusterScore  = 0;
+  let tensionScore  = 0;
+  let dementiaScore = 0;
+  let parkinsonScore= 0;
+  let msScore       = 0;
+  let postConcScore = 0;
+  const triggered   = [];
+
+  // --- HEADACHE PATTERNS ---
+  if (sy.morningHA)     { tumorScore += 2; triggered.push('Headache worse in the morning — classic intracranial pressure pattern'); }
+  if (sy.worseStrain)   { tumorScore += 2; triggered.push('Headache worse with coughing / straining'); }
+  if (sy.progressiveHA) { tumorScore += 3; triggered.push('Headache progressively worsening over weeks'); }
+  if (sy.raisedICP)     { tumorScore += 3; triggered.push('Waking with headache and vomiting — raised intracranial pressure sign'); }
+  if (sy.nauseaVomit && sy.headache) { tumorScore += 2; triggered.push('Headache combined with nausea / vomiting'); }
+
+  // Tension headache (Fix 6)
+  if (sy.bandHA && !sy.nauseaVomit && !sy.lightSound) {
+    tensionScore += 4; triggered.push('Tight band-like headache without nausea — tension-type pattern');
+  }
+
+  // Cluster headache (Fix 5)
+  if (sy.clusterHA) { clusterScore += 5; triggered.push('Boring pain around one eye with tearing — cluster headache pattern'); }
+
+  // --- SEIZURE ---
+  if (sy.seizure) {
+    tumorScore += 4;
+    triggered.push(hist.knownEpilepsy
+      ? 'Seizure — known epilepsy (monitor for change in pattern)'
+      : 'Seizure — major indicator, presenting symptom in up to 90% of low-grade gliomas');
+  }
+
+  // --- FOCAL DEFICITS ---
+  if (sy.oneSideWeak)  { tumorScore += 4; triggered.push('One-sided weakness (hemiparesis)'); }
+  if (sy.speechDiff)   { tumorScore += 4; triggered.push('Speech difficulty (aphasia)'); }
+  if (sy.periVisionLoss){ tumorScore += 4; triggered.push('Peripheral vision loss'); }
+  if (sy.balanceDiff)  { tumorScore += 3; triggered.push('Balance / gait difficulty'); }
+  if (sy.coordination) { tumorScore += 3; triggered.push('Loss of coordination (ataxia)'); }
+
+  // --- COGNITIVE / PERSONALITY ---
+  if (sy.personalityChg) { tumorScore += 2; triggered.push('Personality / behaviour change'); }
+  if (sy.apathy)          { tumorScore += 2; triggered.push('Apathy / social withdrawal — can indicate frontal mass'); }
+  // Acute confusion = urgent
+  if (sy.acuteConfusion) { tumorScore += 3; triggered.push('Sudden / acute confusion'); }
+
+  // --- DEMENTIA BRANCH (Fix 3) ---
+  if (sy.gradualMemory)    { dementiaScore += 3; triggered.push('Gradual memory loss over months/years'); }
+  if (sy.dailyTasksDiff)   { dementiaScore += 3; triggered.push('Difficulty with daily tasks (finances, shopping)'); }
+  if (sy.fluctuatingAlert) { dementiaScore += 3; triggered.push('Fluctuating alertness — possible Lewy body pattern'); }
+  if (sy.visualHallucin)   { dementiaScore += 2; triggered.push('Visual hallucinations'); }
+  if (sy.actingDreams)     { dementiaScore += 2; triggered.push('Acting out dreams — possible REM sleep behaviour disorder'); }
+  // Vascular dementia boosted by history
+  if (dementiaScore > 0 && (hist.knownHyper || hist.knownStroke)) {
+    dementiaScore += 2; triggered.push('Hypertension / prior stroke history — raises vascular dementia risk');
+  }
+  // Age weighting for dementia
+  if (dementiaScore > 0 && (age === 'adult2' || age === 'elderly')) { dementiaScore += 1; }
+
+  // --- MOVEMENT DISORDERS (Fix 1 & 4) ---
+  if (sy.restingTremor) { parkinsonScore += 4; triggered.push('Resting tremor — characteristic of Parkinsonism'); }
+  if (sy.rigidity)      { parkinsonScore += 3; triggered.push('Stiffness / rigidity'); }
+  if (sy.slowMovement)  { parkinsonScore += 3; triggered.push('Slowness of movement (bradykinesia)'); }
+  if (sy.actionTremor && !sy.restingTremor) {
+    triggered.push('Action tremor (appears during movement) — possible essential tremor, distinct from Parkinson\'s');
+    parkinsonScore += 1; // low, just flag it
+  }
+
+  // --- MS / SPINAL PATTERN (Fix 9) ---
+  if (sy.eyePainMove && sy.blurVision)  { msScore += 4; triggered.push('Eye pain on movement + vision loss — optic neuritis pattern'); }
+  if (sy.electricShock)                 { msScore += 3; triggered.push('Electric shock sensation on neck flex (Lhermitte\'s sign)'); }
+  if (sy.numbnessUpward)                { msScore += 3; triggered.push('Numbness starting in feet and moving upward — spinal cord / MS pattern'); }
+  if (sy.generalNumbness && hist.knownMS){ msScore += 2; triggered.push('Numbness in known MS patient'); }
+
+  // --- TUMOR-SPECIFIC COMBOS ---
+  if ((sy.blurVision || sy.periVisionLoss) && sy.hormonalChg) {
+    tumorScore += 5; triggered.push('Vision change + hormonal changes — pituitary region pattern');
+  }
+  if (sy.hearingOneSide && sy.dizziness) {
+    tumorScore += 3; triggered.push('One-sided hearing loss + dizziness — vestibular schwannoma pattern');
+  }
+  if (sy.hearingOneSide && sy.tinnitus)  { tumorScore += 2; triggered.push('One-sided hearing loss + tinnitus'); }
+
+  // Age-specific boost: child + balance + headache = medulloblastoma risk
+  if (age === 'child' && sy.balanceDiff && sy.headache && sy.nauseaVomit) {
+    tumorScore += 4; triggered.push('Child with headache + balance + nausea — cerebellar tumor risk (e.g. medulloblastoma)');
+  }
+  // Elderly + known cancer + any neurological = high concern
+  if (hist.knownCancer && (sy.oneSideWeak || sy.seizure || sy.headache)) {
+    tumorScore += 4; triggered.push('Known cancer + neurological symptoms — brain metastasis must be excluded');
+  }
+
+  // Onset weighting
+  if (on === 'days_weeks') { tumorScore += 2; triggered.push('Subacute onset over days–weeks — characteristic of mass lesions'); }
+
+  // --- MIGRAINE SCORING (Fix 8 — lowered threshold) ---
+  if (on === 'episodic')   migraineScore += 2;
+  if (sy.unilateralHA)     migraineScore += 2;
+  if (sy.throbbingHA)      migraineScore += 2;
+  if (sy.lightSound)       migraineScore += 2;
+  if (sy.nauseaVomit)      migraineScore += 1;
+  if (sy.aura)             migraineScore += 2;
+
+  // --- POST-CONCUSSION (Fix 7) ---
+  if (sy.persistPostConc)  { postConcScore += 4; triggered.push('Symptoms persisting weeks after head injury — post-concussion syndrome'); }
+  else if (sy.headInjury)  { postConcScore += 1; }
+
+  // ── Classify ──
+  const hasFocal = sy.oneSideWeak || sy.speechDiff || sy.periVisionLoss || sy.coordination;
+  const needsMRI = tumorScore >= 5 || sy.seizure || hasFocal || msScore >= 4 ||
+                   (sy.eyePainMove && sy.blurVision) || (hist.knownCancer && sy.headache);
+
+  let result;
+
+  // Priority 1: Tumor / structural
+  if (tumorScore >= 8 || (tumorScore >= 6 && hasFocal)) {
+    result = {
+      lv: 'urgent', title: 'Urgent Neurological Review Recommended',
+      reason: 'Your answers include progressive neurological warning features that can occur with structural brain conditions — including brain tumors, vascular lesions, and inflammatory disease.' +
+              (hist.knownCancer ? ' Your known cancer history makes it especially important to exclude brain metastases.' : ''),
+      actions: [
+        'Visit a neurologist or neurology emergency unit soon',
+        'Request a brain MRI with gadolinium contrast — the definitive test for brain masses',
+        'Do not delay if symptoms are worsening or new deficits develop'
+      ]
+    };
+  } else if (tumorScore >= 5 || msScore >= 4) {
+    result = {
+      lv: 'soon', title: 'Medical Review Recommended Soon',
+      reason: msScore >= 4
+        ? 'Your symptoms include features associated with inflammatory neurological conditions such as multiple sclerosis. A neurological assessment and MRI of brain and spine are recommended.'
+        : 'Some of your answers include symptoms that can be associated with neurological conditions requiring assessment.',
+      actions: [
+        'Book a doctor or neurologist appointment',
+        'Describe all your symptoms and when they started',
+        'Ask your doctor whether brain or spinal imaging is appropriate'
+      ]
+    };
+
+  // Priority 2: Movement disorders
+  } else if (parkinsonScore >= 6) {
+    result = {
+      lv: 'routine', title: 'Movement Disorder Evaluation Recommended',
+      reason: 'Your symptoms include features associated with Parkinsonism — resting tremor, rigidity, and slowness of movement. If an action tremor (appearing only during movement) is predominant, Essential Tremor is also possible. Both require a neurologist assessment.',
+      actions: [
+        'Book an appointment with a neurologist',
+        'Describe when tremor or stiffness started and whether it began on one side',
+        'Avoid self-medicating with any neurological drugs before diagnosis'
+      ]
+    };
+
+  // Priority 3: Dementia branch
+  } else if (dementiaScore >= 5) {
+    const dementiaType = sy.fluctuatingAlert && sy.visualHallucin
+      ? 'Lewy body dementia pattern (fluctuating alertness + visual hallucinations)'
+      : (hist.knownHyper || hist.knownStroke)
+        ? 'vascular cognitive impairment pattern'
+        : 'Alzheimer\'s-type pattern (gradual episodic memory loss)';
+    result = {
+      lv: 'routine', title: 'Cognitive Evaluation Recommended',
+      reason: `Your answers suggest a ${dementiaType}. Gradual memory loss or cognitive decline interfering with daily tasks warrants a specialist evaluation. This is not an emergency, but should not be indefinitely postponed.`,
+      actions: [
+        'Book an appointment with a neurologist or geriatrician',
+        'Ask for a formal cognitive assessment (e.g. MMSE)',
+        'A brain MRI is often performed to rule out other reversible causes'
+      ]
+    };
+
+  // Priority 4: Post-concussion
+  } else if (postConcScore >= 4) {
+    result = {
+      lv: 'routine', title: 'Post-Concussion Evaluation Recommended',
+      reason: 'Symptoms persisting for weeks or months after a head injury suggest post-concussion syndrome. Lingering headache, fatigue, dizziness, and concentration difficulties are common features. Medical follow-up is recommended.',
+      actions: [
+        'Consult a doctor if you have not already done so after the injury',
+        'Avoid contact sports or high-risk activities until cleared',
+        'Imaging may be recommended if symptoms are worsening'
+      ]
+    };
+
+  // Priority 5: Cluster headache
+  } else if (clusterScore >= 5) {
+    result = {
+      lv: 'routine', title: 'Pattern May Suggest Cluster Headache',
+      reason: 'Excruciating boring pain around one eye, recurring at the same time each day, with tearing or nasal congestion is a classic cluster headache presentation. This is not a brain tumor sign, but it does require specialist management as cluster headaches are severe and have specific treatments.',
+      actions: [
+        'See a doctor or neurologist — cluster headaches have specific treatments',
+        'Keep a headache diary (time, duration, side, triggers)',
+        'Seek urgent care if headache pattern changes or neurological symptoms develop'
+      ]
+    };
+
+  // Priority 6: Tension headache
+  } else if (tensionScore >= 4 && migraineScore < 4 && tumorScore < 3) {
+    result = {
+      lv: 'monitor', title: 'Pattern May Suggest Tension-Type Headache',
+      reason: 'A bilateral, band-like headache without nausea or light sensitivity is the most common headache type and usually indicates tension-type headache. This is a low-urgency pattern.',
+      actions: [
+        'Try over-the-counter analgesics and stress management',
+        'See a doctor if headaches are frequent, severe, or changing in character',
+        'Seek urgent care if you develop weakness, vision changes, or speech trouble'
+      ]
+    };
+
+  // Priority 7: Migraine (Fix 8 — lowered threshold to 5)
+  } else if (migraineScore >= 5 && tumorScore < 4) {
+    result = {
+      lv: 'routine', title: 'Pattern May Suggest a Recurring Headache Disorder',
+      reason: 'Your symptom pattern has features commonly seen in migraine — episodic onset, one-sided throbbing pain, light/sound sensitivity. Note: brain tumors can occasionally mimic migraine exactly. If this is a new or worsening pattern, consult a doctor.',
+      actions: [
+        'Consult a doctor — especially if this is new or changing',
+        'Keep a headache diary (frequency, duration, triggers)',
+        'Seek urgent care if you develop weakness, speech trouble, or confusion'
+      ]
+    };
+
+  // Chronic / long-standing
+  } else if (on === 'months_years' && (sy.gradualMemory || sy.fatigue || sy.generalNumbness)) {
+    result = {
+      lv: 'routine', title: 'Routine Medical Review Recommended',
+      reason: 'Your long-standing symptoms should be assessed by a doctor. Chronic neurological symptoms do not usually represent an emergency, but they deserve proper evaluation to identify any treatable causes.',
+      actions: [
+        'Book a routine doctor or specialist appointment',
+        'Describe when symptoms started and how they have progressed',
+        'Seek urgent care if any sudden or severe new symptoms develop'
+      ]
+    };
+
+  // Default: monitor
+  } else {
+    result = {
+      lv: 'monitor', title: 'Monitor Your Symptoms',
+      reason: 'Your answers do not strongly match an urgent neurological pattern at this time. This does not rule out any condition — it means your current symptom combination does not fall into a clearly high-urgency category.',
+      actions: [
+        'Monitor your symptoms and keep notes of any changes',
+        'See a doctor if symptoms persist for more than 2–3 weeks',
+        'Seek immediate help if sudden weakness, speech loss, severe headache, or first seizure develops'
+      ]
+    };
+  }
+
+  renderResult(result, triggered, needsMRI, tumorScore, parkinsonScore, dementiaScore, msScore);
+  go(6);
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDER RESULT
+// ═══════════════════════════════════════════════════
+function renderResult(r, triggered, needsMRI, tScore, pScore, dScore, mScore) {
+  const sy = D.sym;
+  const lm = {
+    urgent:  { cl:'res-urgent',  bc:'badge-urgent',  lbl:'Urgent',          ic:'#d97706' },
+    soon:    { cl:'res-soon',    bc:'badge-soon',    lbl:'See Doctor Soon', ic:'#ea580c' },
+    routine: { cl:'res-routine', bc:'badge-routine', lbl:'Routine',         ic:'#3b4fd8' },
+    monitor: { cl:'res-monitor', bc:'badge-monitor', lbl:'Monitor',         ic:'#059669' }
+  }[r.lv];
+
+  // Age/history context badge
+  const ageLabel = { child:'Under 18', adult1:'18–40', adult2:'41–65', elderly:'Over 65' }[D.age] || '';
+  const ctxNote = ageLabel ? `<div class="ctx-note"><i class="bi bi-person-circle"></i> Age group: <strong>${ageLabel}</strong></div>` : '';
+
+  const whyHTML = triggered.length > 0 ? `
+    <div class="why-box">
+      <div class="why-box-title">Why this result appeared</div>
+      ${triggered.map(t => `
+        <div class="why-item">
+          <i class="bi bi-dot" style="color:${lm.ic};font-size:18px;margin-top:-2px;flex-shrink:0;"></i>
+          <span>${t}</span>
+        </div>`).join('')}
+    </div>` : '';
+
+  const actHTML = r.actions.map(a =>
+    `<div class="act-item"><i class="bi bi-arrow-right-circle" style="color:${lm.ic};"></i><span>${a}</span></div>`
+  ).join('');
+
+  document.getElementById('resCard').innerHTML = `
+    <div class="res-card ${lm.cl}">
+      ${ctxNote}
+      <div class="res-badge ${lm.bc}">${lm.lbl}</div>
+      <div class="res-title">${r.title}</div>
+      <div class="res-reason">${r.reason}</div>
+      ${whyHTML}
+      <div class="act-box">
+        <div class="act-box-title">Recommended next step</div>
+        ${actHTML}
+      </div>
+      <div class="esc-strip">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>Seek emergency care immediately if you develop: sudden one-sided weakness,
+        speech loss, worst-ever headache, first-time seizure, sudden confusion,
+        or repeated vomiting with drowsiness.</span>
+      </div>
+    </div>`;
+
+  // ── Pattern cards ──
+  let patterns = [];
+  if (tScore >= 4) {
+    if (sy.seizure || (sy.oneSideWeak && D.onset === 'days_weeks')) {
+      patterns.push({ label:'Glioma Pattern', color:'#dc2626', bg:'#fef2f2', bdr:'#fca5a5',
+        text:'Seizures are the presenting symptom in up to 90% of low-grade gliomas and ~25% of high-grade gliomas. Progressive focal weakness is more characteristic of high-grade disease. Only MRI can confirm or exclude this.' });
+    }
+    if ((sy.headache || sy.gradualMemory || sy.personalityChg || sy.apathy) && !sy.seizure) {
+      patterns.push({ label:'Meningioma Pattern', color:'#d97706', bg:'#fffbeb', bdr:'#fcd34d',
+        text:'Meningiomas often present with headache (37%), cognitive or personality changes, or seizures. They are frequently found incidentally on MRI. Small asymptomatic meningiomas may only require serial MRI monitoring.' });
+    }
+    if ((sy.blurVision || sy.periVisionLoss) && sy.hormonalChg) {
+      patterns.push({ label:'Pituitary / Suprasellar Pattern', color:'#7c3aed', bg:'#f5f3ff', bdr:'#c4b5fd',
+        text:'Pituitary tumors can compress the optic chiasm, causing bitemporal peripheral vision loss. Combined with hormonal symptoms (menstrual irregularity, unexpected lactation, growth changes), this suggests a pituitary mass. Endocrinology and neurology review is recommended.' });
+    }
+    if (sy.hearingOneSide && (sy.dizziness || sy.tinnitus)) {
+      patterns.push({ label:'Vestibular Schwannoma Pattern', color:'#0891b2', bg:'#ecfeff', bdr:'#a5f3fc',
+        text:'Progressive one-sided hearing loss with dizziness or tinnitus is the hallmark of vestibular schwannoma (acoustic neuroma). This is a benign tumor. Small lesions are often managed with serial MRI monitoring.' });
+    }
+  }
+  if (mScore >= 3 || (sy.eyePainMove && sy.blurVision)) {
+    patterns.push({ label:'Optic Neuritis / MS Pattern', color:'#059669', bg:'#f0fdf4', bdr:'#86efac',
+      text:'Eye pain on movement + monocular vision loss is optic neuritis — a common first presentation of MS. Lhermitte\'s sign and ascending numbness are further MS indicators. MRI of brain and spine is required.' });
+  }
+  if (pScore >= 6) {
+    patterns.push({ label:'Parkinsonism Pattern', color:'#7c3aed', bg:'#faf5ff', bdr:'#e9d5ff',
+      text:'Resting tremor (often starting in one hand), combined with rigidity and slowness of movement, is the classic triad of Parkinsonism. Essential Tremor is distinguished by tremor appearing only during action (holding a cup). Both require a neurologist assessment for proper diagnosis and treatment.' });
+  }
+  if (dScore >= 5) {
+    const dtype = (sy.fluctuatingAlert && sy.visualHallucin)
+      ? 'Dementia with Lewy Bodies is suggested by fluctuating alertness and well-formed visual hallucinations. Acting out dreams (RBD) is another feature.'
+      : (D.hist.knownHyper || D.hist.knownStroke)
+        ? 'Vascular Cognitive Impairment is suggested by stepwise cognitive decline in someone with hypertension or prior stroke history.'
+        : 'Alzheimer\'s-type dementia is suggested by insidious loss of episodic memory (forgetting recent events) that is gradually interfering with daily tasks.';
+    patterns.push({ label:'Cognitive Decline Pattern', color:'#0891b2', bg:'#f0f9ff', bdr:'#bae6fd',
+      text: dtype + ' A formal cognitive assessment and brain MRI are typically the next steps.' });
+  }
+
+  if (patterns.length > 0) {
+    document.getElementById('patternBox').innerHTML = `
+      <div class="cc-card mb-4">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-diagram-3"></i></div>
+          <div class="cc-card-title">Symptom Patterns — Informational Only</div>
+        </div>
+        <div class="cc-card-body">
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:1rem;">
+            Your symptoms share features with these patterns. <strong>This is not a diagnosis.</strong>
+            Only clinical examination and imaging can confirm or exclude any condition.
+          </p>
+          ${patterns.map(p => `
+            <div style="border-radius:10px;background:${p.bg};border:1px solid ${p.bdr};
+                        border-left:3px solid ${p.color};padding:12px 15px;margin-bottom:10px;">
+              <div class="pattern-header" style="color:${p.color};">
+                <i class="bi bi-info-circle"></i><span>${p.label}</span>
+                <span class="pattern-badge" style="color:${p.color};border-color:${p.bdr};">For Reference Only</span>
+              </div>
+              <div class="pattern-body">${p.text}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('patternBox').innerHTML = '';
+  }
+
+  // MRI box — never shown for emergencies (handled in fireEmergency)
+  document.getElementById('mriBox').innerHTML = needsMRI ? `
+    <div class="mri-cta mb-3">
+      <div class="mri-cta-icon"><i class="bi bi-badge-hd"></i></div>
+      <div class="mri-cta-text">
+        <strong>Brain MRI with contrast may be recommended</strong>
+        <span>Cranial MRI with gadolinium contrast is the preferred and definitive diagnostic test for
+        detecting brain tumors, masses, MS plaques, and other structural conditions.
+        Ask your doctor about this test.</span>
+      </div>
+    </div>
+    <div class="upload-nudge mb-4">
+      <p>Have an MRI scan already? Upload it to CerebroCare360 for automated AI analysis of
+      glioma, meningioma, and pituitary tumors.</p>
+      <a href="/scan/upload" class="btn-cc-primary" style="white-space:nowrap;flex-shrink:0;">
+        <i class="bi bi-cloud-upload"></i> Upload MRI
+      </a>
+    </div>` : '';
+}
+
+// ═══════════════════════════════════════════════════
+//  RESET
+// ═══════════════════════════════════════════════════
+function reset() {
+  D.main=null; D.age=null; D.hist={}; D.onset=null;
+  D.sq={sq1:null,sq2:null,sq3:null,sq4:null}; D.sym={};
+  document.querySelectorAll('.pill,.age-pill').forEach(p => p.classList.remove('sel'));
+  document.querySelectorAll('.yn-card').forEach(c => c.classList.remove('sy','sn'));
+  document.querySelectorAll('.onset-opt').forEach(o => o.classList.remove('sel'));
+  ['btn1','btn2','btn3','btn5'].forEach(id => document.getElementById(id).disabled = true);
+  document.getElementById('resCard').innerHTML='';
+  document.getElementById('patternBox').innerHTML='';
+  document.getElementById('mriBox').innerHTML='';
+  go(1);
+}
+</script>
+{% endblock %}

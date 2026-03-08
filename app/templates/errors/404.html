@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found — CerebroCare360{% endblock %}
+
+{% block content %}
+<div style="min-height:60vh;display:flex;align-items:center;justify-content:center;">
+  <div style="text-align:center;padding:2rem;">
+    <div style="font-family:'Fraunces',serif;font-size:8rem;font-weight:600;
+                background:linear-gradient(135deg,#3b4fd8,#7c3aed);
+                -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+                line-height:1;">404</div>
+    <h2 style="font-family:'Fraunces',serif;font-size:1.6rem;margin-bottom:0.75rem;">
+      Page Not Found
+    </h2>
+    <p style="color:var(--text-muted);font-size:15px;max-width:400px;margin:0 auto 2rem;">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="/" class="btn-cc-primary">
+        <i class="bi bi-house"></i> Go Home
+      </a>
+      <a href="/scan/upload" class="btn-cc-secondary">
+        <i class="bi bi-upload"></i> Upload MRI
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

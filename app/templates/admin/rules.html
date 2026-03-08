@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}{% if rule %}Edit Rule{% else %}Add Rule{% endif %} — CerebroCare360{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:640px;">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/admin/dashboard" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
+      <i class="bi bi-arrow-left"></i> Back
+    </a>
+    <h1 class="cc-section-title mb-0">
+      {% if rule %}Edit Rule{% else %}Add Symptom Rule{% endif %}
+    </h1>
+  </div>
+
+  <div class="cc-card">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+      <div class="cc-card-title">Rule Details</div>
+    </div>
+    <div class="cc-card-body">
+      <form method="POST">
+        <div class="cc-form-group">
+          <label class="cc-label">Symptoms (select all that apply to this rule)</label>
+          {% set all_symptoms = [
+            'headache','vomiting','seizures','vision_problems','memory_loss',
+            'weakness','speech_problems','balance_issues','personality_change',
+            'fatigue','nausea','numbness'
+          ] %}
+          {% if rule %}
+            {% set selected_keys = rule.symptom_keys | tojson | tojson %}
+          {% endif %}
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            {% for sym in all_symptoms %}
+            <label style="display:flex;align-items:center;gap:6px;
+                          padding:6px 12px;border:1.5px solid var(--border);
+                          border-radius:8px;cursor:pointer;font-size:13px;
+                          font-weight:500;background:var(--surface);">
+              <input type="checkbox" name="symptom_keys" value="{{ sym }}"
+                {% if rule %}
+                  {% set rkeys = rule.symptom_keys %}
+                  {% if sym in rkeys %}checked{% endif %}
+                {% endif %}
+              />
+              {{ sym | replace('_', ' ') | title }}
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="cc-form-group">
+          <label class="cc-label">Condition Name *</label>
+          <input type="text" name="condition" class="cc-input"
+                 placeholder="e.g. Possible Brain Tumor"
+                 value="{{ rule.condition if rule else '' }}" required />
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Department *</label>
+              <select name="department" class="cc-input" required>
+                <option value="">Select department</option>
+                {% for d in ['Neurology', 'Oncology', 'Neurosurgery', 'General Medicine'] %}
+                <option value="{{ d }}"
+                  {% if rule and rule.department == d %}selected{% endif %}>
+                  {{ d }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="cc-form-group mb-0">
+              <label class="cc-label">Urgency *</label>
+              <select name="urgency" class="cc-input" required>
+                <option value="">Select urgency</option>
+                {% for u in ['high', 'medium', 'low'] %}
+                <option value="{{ u }}"
+                  {% if rule and rule.urgency == u %}selected{% endif %}>
+                  {{ u | title }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc-form-group mt-3">
+          <label class="cc-label">Advice / Description *</label>
+          <textarea name="advice" class="cc-input" rows="3"
+                    placeholder="Describe what the patient should do..."
+                    required>{{ rule.advice if rule else '' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn-cc-primary">
+          <i class="bi bi-check-lg"></i>
+          {% if rule %}Update Rule{% else %}Add Rule{% endif %}
+        </button>
+        <a href="/admin/dashboard" class="btn-cc-secondary ms-2">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

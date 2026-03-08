@@ -1,0 +1,364 @@
+{% extends "base.html" %}
+{% block title %}Result — CerebroCare360{% endblock %}
+{% block extra_css %}
+<style>
+  .result-verdict {
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .verdict-tumor {
+    background: linear-gradient(135deg, #fef2f2, #fff1f2);
+    border: 1.5px solid #fecaca;
+  }
+  .verdict-no-tumor {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    border: 1.5px solid #a7f3d0;
+  }
+  .verdict-pending {
+    background: linear-gradient(135deg, #eef0fd, #f5f3ff);
+    border: 1.5px solid #c7d2fe;
+  }
+  .verdict-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 1rem;
+  }
+  .icon-tumor   { background: #fee2e2; color: #dc2626; }
+  .icon-clear   { background: #d1fae5; color: #059669; }
+  .icon-pending { background: var(--primary-light); color: var(--primary); }
+  .verdict-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; margin-bottom: 0.4rem;
+  }
+  .verdict-tumor .verdict-label   { color: #dc2626; }
+  .verdict-no-tumor .verdict-label{ color: #059669; }
+  .verdict-pending .verdict-label { color: var(--primary); }
+  .verdict-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem; font-weight: 600;
+  }
+  .verdict-tumor .verdict-title   { color: #991b1b; }
+  .verdict-no-tumor .verdict-title{ color: #065f46; }
+  .verdict-pending .verdict-title { color: var(--primary-dark); }
+  .verdict-conf {
+    font-size: 13.5px; margin-top: 0.5rem;
+  }
+  .verdict-tumor .verdict-conf    { color: #b91c1c; }
+  .verdict-no-tumor .verdict-conf { color: #047857; }
+  .verdict-pending .verdict-conf  { color: var(--text-secondary); }
+
+  /* Pending pulse animation */
+  .pending-pulse {
+    display: flex; justify-content: center; gap: 6px; margin: 1rem 0 0.5rem;
+  }
+  .pending-pulse span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--primary);
+    animation: pulse-dot 1.4s infinite ease-in-out;
+  }
+  .pending-pulse span:nth-child(2) { animation-delay: 0.2s; }
+  .pending-pulse span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes pulse-dot {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40%           { transform: scale(1);   opacity: 1; }
+  }
+
+  /* Pending steps */
+  .pending-steps {
+    display: flex; flex-direction: column; gap: 12px;
+    margin-top: 1.25rem;
+  }
+  .pending-step {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13.5px;
+  }
+  .pending-step-icon {
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .step-waiting { background: var(--primary-light); color: var(--primary); }
+  .step-done    { background: #d1fae5; color: #059669; }
+  .pending-step-text { flex: 1; }
+  .pending-step-text strong { display: block; font-weight: 600; color: var(--text-primary); }
+  .pending-step-text span   { font-size: 12px; color: var(--text-muted); }
+
+  /* Prob bars */
+  .prob-bar-label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .prob-bar-track {
+    height: 10px; background: var(--surface-2);
+    border-radius: 20px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .prob-bar-fill {
+    height: 100%; border-radius: 20px;
+    background: var(--gradient);
+    transition: width 1s ease;
+  }
+  .prob-bar-fill.muted { background: var(--border); }
+  .prob-item { margin-bottom: 14px; }
+  .prob-row  { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .prob-pct  { font-size: 12px; font-weight: 600; color: var(--primary); }
+
+  .mri-preview { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+  .mri-preview img { width: 100%; object-fit: contain; background: #000; max-height: 280px; }
+
+  .type-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 600;
+    background: var(--primary-light); color: var(--primary);
+    margin-top: 0.75rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:960px;">
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/scan/upload" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
+      <i class="bi bi-arrow-left"></i> New Scan
+    </a>
+    <div>
+      <h1 class="cc-section-title mb-0">Analysis Result</h1>
+      <p style="font-size:13px;color:var(--text-muted);margin:0;">
+        Scan ID #{{ scan.id }} &nbsp;·&nbsp; {{ scan.upload_date.strftime('%d %b %Y, %H:%M') }}
+      </p>
+    </div>
+    {% if prediction.model_version != 'pending' %}
+    <a href="/report/generate/{{ prediction.id }}" class="btn-cc-primary ms-auto">
+      <i class="bi bi-file-earmark-pdf"></i> Download Report
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+
+      {% if prediction.model_version == 'pending' %}
+      <!-- ── PENDING STATE ─────────────────────────────── -->
+      <div class="result-verdict verdict-pending">
+        <div class="verdict-icon icon-pending">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="verdict-label">Analysis Pending</div>
+        <div class="verdict-title">AI Models Not Ready Yet</div>
+        <div class="verdict-conf">
+          Your scan was uploaded successfully. Results will appear once the AI ensemble is loaded.
+        </div>
+        <div class="pending-pulse">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- What's happening -->
+      <div class="cc-card">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-cpu"></i></div>
+          <div class="cc-card-title">What's Happening?</div>
+        </div>
+        <div class="cc-card-body">
+          <p style="font-size:14px;color:var(--text-secondary);margin-bottom:1.25rem;">
+            CerebroCare360 uses an ensemble of 3 deep learning models to analyse your MRI.
+            The models are currently being trained and will be available soon.
+          </p>
+          <div class="pending-steps">
+            <div class="pending-step">
+              <div class="pending-step-icon step-done">
+                <i class="bi bi-check-lg"></i>
+              </div>
+              <div class="pending-step-text">
+                <strong>Scan Uploaded</strong>
+                <span>Your MRI image was validated and saved successfully</span>
+              </div>
+            </div>
+            <div class="pending-step">
+              <div class="pending-step-icon step-done">
+                <i class="bi bi-check-lg"></i>
+              </div>
+              <div class="pending-step-text">
+                <strong>VGG16 Model — 93.69% accuracy</strong>
+                <span>Trained and ready</span>
+              </div>
+            </div>
+            <div class="pending-step">
+              <div class="pending-step-icon step-waiting">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+              <div class="pending-step-text">
+                <strong>EfficientNetB0 Model</strong>
+                <span>Training in progress — needed for ensemble</span>
+              </div>
+            </div>
+            <div class="pending-step">
+              <div class="pending-step-icon step-waiting">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+              <div class="pending-step-text">
+                <strong>Ensemble Prediction</strong>
+                <span>Will run once all models are loaded</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% else %}
+      <!-- ── REAL RESULT STATE ──────────────────────────── -->
+      <div class="result-verdict {% if prediction.has_tumor %}verdict-tumor{% else %}verdict-no-tumor{% endif %}">
+        <div class="verdict-icon {% if prediction.has_tumor %}icon-tumor{% else %}icon-clear{% endif %}">
+          <i class="bi {% if prediction.has_tumor %}bi-exclamation-triangle{% else %}bi-check-circle{% endif %}"></i>
+        </div>
+        <div class="verdict-label">
+          {% if prediction.has_tumor %}Tumor Detected{% else %}No Tumor Detected{% endif %}
+        </div>
+        <div class="verdict-title">
+          {% if prediction.has_tumor %}
+            {{ prediction.tumor_type | capitalize }} Tumor
+          {% else %}
+            No Tumor Found
+          {% endif %}
+        </div>
+        <div class="verdict-conf">
+          Confidence: <strong>{{ "%.1f"|format(prediction.confidence * 100) }}%</strong>
+        </div>
+
+        {% if prediction.low_confidence %}
+        <div style="
+            background: #fffbeb;
+            border: 1.5px solid #fcd34d;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 0.85rem;
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.55;
+        ">
+            <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;color:#d97706;"></i>
+            <span>
+                <strong>Low confidence prediction.</strong>
+                The model is uncertain between multiple classes.
+                This result should be interpreted with caution and
+                reviewed by a qualified radiologist.
+            </span>
+        </div>
+        {% endif %}
+
+        {% if prediction.has_tumor %}
+        <div class="type-badge mt-3">
+          <i class="bi bi-tag"></i> {{ prediction.tumor_type | capitalize }}
+        </div>
+        {% endif %}
+        {% if prediction.has_tumor %}
+        <div class="type-badge mt-3">
+          <i class="bi bi-tag"></i> {{ prediction.tumor_type | capitalize }}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Probability breakdown -->
+      <div class="cc-card">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-bar-chart"></i></div>
+          <div class="cc-card-title">Probability Breakdown</div>
+        </div>
+        <div class="cc-card-body">
+          {% set probs = [
+            ('Glioma',     prediction.prob_glioma),
+            ('Meningioma', prediction.prob_meningioma),
+            ('No Tumor',   prediction.prob_notumor),
+            ('Pituitary',  prediction.prob_pituitary)
+          ] %}
+          {% for label, prob in probs %}
+          <div class="prob-item">
+            <div class="prob-row">
+              <span class="prob-bar-label">{{ label }}</span>
+              <span class="prob-pct">{{ "%.1f"|format(prob * 100) }}%</span>
+            </div>
+            <div class="prob-bar-track">
+              <div class="prob-bar-fill" style="width:{{ "%.1f"|format(prob * 100) }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <div class="col-lg-5">
+      <!-- MRI preview -->
+      <div class="cc-card mb-4">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-image"></i></div>
+          <div class="cc-card-title">Uploaded Scan</div>
+        </div>
+        <div class="cc-card-body p-0">
+          <div class="mri-preview">
+            <img src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}"
+                 alt="MRI Scan" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="cc-card mb-4">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="cc-card-title">Analysis Details</div>
+        </div>
+        <div class="cc-card-body">
+          <table style="width:100%;font-size:13.5px;border-collapse:collapse;">
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text-muted);">Status</td>
+              <td style="padding:8px 0;font-weight:500;text-align:right;">
+                {% if prediction.model_version == 'pending' %}
+                  <span style="color:var(--primary);">⏳ Pending</span>
+                {% else %}
+                  <span style="color:#059669;">✅ Complete</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text-muted);">Model</td>
+              <td style="padding:8px 0;font-weight:500;text-align:right;">{{ prediction.model_version }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text-muted);">Uploaded</td>
+              <td style="padding:8px 0;font-weight:500;text-align:right;">{{ scan.upload_date.strftime('%H:%M:%S') }}</td>
+            </tr>
+            <tr>
+              <td style="padding:8px 0;color:var(--text-muted);">Patient</td>
+              <td style="padding:8px 0;font-weight:500;text-align:right;">{{ current_user.full_name }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="cc-disclaimer">
+        <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
+        <span>This result is AI-generated and for educational purposes only. It is not a medical diagnosis. Please consult a qualified neurologist.</span>
+      </div>
+
+      <div class="d-flex gap-2 mt-3">
+        <a href="/hospital/find" class="btn-cc-secondary flex-fill justify-content-center" style="padding:10px;">
+          <i class="bi bi-hospital"></i> Find Specialist
+        </a>
+        <a href="/symptom/checker" class="btn-cc-secondary flex-fill justify-content-center" style="padding:10px;">
+          <i class="bi bi-clipboard2-pulse"></i> Symptom Check
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

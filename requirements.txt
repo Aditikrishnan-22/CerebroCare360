@@ -1,0 +1,15 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-migrate
+flask-bcrypt
+flask-wtf
+python-dotenv
+email-validator
+Pillow
+reportlab
+tensorflow
+numpy
+groq
+anthropic
+psycopg2-binary
