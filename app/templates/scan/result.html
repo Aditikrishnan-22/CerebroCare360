@@ -8,52 +8,42 @@
     text-align: center;
     margin-bottom: 1.5rem;
   }
-  .verdict-tumor {
-    background: linear-gradient(135deg, #fef2f2, #fff1f2);
-    border: 1.5px solid #fecaca;
-  }
-  .verdict-no-tumor {
-    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
-    border: 1.5px solid #a7f3d0;
-  }
-  .verdict-pending {
-    background: linear-gradient(135deg, #eef0fd, #f5f3ff);
-    border: 1.5px solid #c7d2fe;
-  }
+  .verdict-tumor    { background: linear-gradient(135deg, #fef2f2, #fff1f2); border: 1.5px solid #fecaca; }
+  .verdict-no-tumor { background: linear-gradient(135deg, #ecfdf5, #f0fdf4); border: 1.5px solid #a7f3d0; }
+  .verdict-pending  { background: linear-gradient(135deg, #eef0fd, #f5f3ff); border: 1.5px solid #c7d2fe; }
+
   .verdict-icon {
-    width: 64px; height: 64px;
-    border-radius: 50%;
+    width: 64px; height: 64px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-size: 28px; margin: 0 auto 1rem;
   }
   .icon-tumor   { background: #fee2e2; color: #dc2626; }
   .icon-clear   { background: #d1fae5; color: #059669; }
   .icon-pending { background: var(--primary-light); color: var(--primary); }
+
   .verdict-label {
     font-size: 11px; font-weight: 700; letter-spacing: 1px;
     text-transform: uppercase; margin-bottom: 0.4rem;
   }
-  .verdict-tumor .verdict-label   { color: #dc2626; }
-  .verdict-no-tumor .verdict-label{ color: #059669; }
-  .verdict-pending .verdict-label { color: var(--primary); }
+  .verdict-tumor .verdict-label    { color: #dc2626; }
+  .verdict-no-tumor .verdict-label { color: #059669; }
+  .verdict-pending .verdict-label  { color: var(--primary); }
+
   .verdict-title {
     font-family: 'Fraunces', serif;
     font-size: 1.6rem; font-weight: 600;
   }
-  .verdict-tumor .verdict-title   { color: #991b1b; }
-  .verdict-no-tumor .verdict-title{ color: #065f46; }
-  .verdict-pending .verdict-title { color: var(--primary-dark); }
-  .verdict-conf {
-    font-size: 13.5px; margin-top: 0.5rem;
-  }
+  .verdict-tumor .verdict-title    { color: #991b1b; }
+  .verdict-no-tumor .verdict-title { color: #065f46; }
+  .verdict-pending .verdict-title  { color: var(--primary-dark); }
+
+  .verdict-conf { font-size: 13.5px; margin-top: 0.5rem; }
   .verdict-tumor .verdict-conf    { color: #b91c1c; }
   .verdict-no-tumor .verdict-conf { color: #047857; }
   .verdict-pending .verdict-conf  { color: var(--text-secondary); }
 
-  /* Pending pulse animation */
-  .pending-pulse {
-    display: flex; justify-content: center; gap: 6px; margin: 1rem 0 0.5rem;
-  }
+  /* Pending pulse */
+  .pending-pulse { display: flex; justify-content: center; gap: 6px; margin: 1rem 0 0.5rem; }
   .pending-pulse span {
     width: 10px; height: 10px; border-radius: 50%;
     background: var(--primary);
@@ -67,16 +57,11 @@
   }
 
   /* Pending steps */
-  .pending-steps {
-    display: flex; flex-direction: column; gap: 12px;
-    margin-top: 1.25rem;
-  }
+  .pending-steps { display: flex; flex-direction: column; gap: 12px; margin-top: 1.25rem; }
   .pending-step {
     display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    padding: 12px 16px; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: var(--radius);
     font-size: 13.5px;
   }
   .pending-step-icon {
@@ -94,21 +79,58 @@
   .prob-bar-label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
   .prob-bar-track {
     height: 10px; background: var(--surface-2);
-    border-radius: 20px; overflow: hidden;
-    border: 1px solid var(--border);
+    border-radius: 20px; overflow: hidden; border: 1px solid var(--border);
   }
   .prob-bar-fill {
     height: 100%; border-radius: 20px;
-    background: var(--gradient);
-    transition: width 1s ease;
+    background: var(--gradient); transition: width 1s ease;
   }
-  .prob-bar-fill.muted { background: var(--border); }
   .prob-item { margin-bottom: 14px; }
   .prob-row  { display: flex; justify-content: space-between; margin-bottom: 5px; }
   .prob-pct  { font-size: 12px; font-weight: 600; color: var(--primary); }
 
-  .mri-preview { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-  .mri-preview img { width: 100%; object-fit: contain; background: #000; max-height: 280px; }
+  /* ── MRI Viewer with GradCAM toggle ──────────────────────────────── */
+  .mri-viewer { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: #000; }
+  .mri-viewer img {
+    width: 100%; object-fit: contain;
+    max-height: 300px; display: block;
+    transition: opacity 0.35s ease;
+  }
+  .mri-viewer img.hidden { opacity: 0; position: absolute; top: 0; left: 0; }
+  .mri-viewer img.visible { opacity: 1; position: relative; }
+
+  /* Toggle pill */
+  .scan-toggle {
+    display: flex; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 30px;
+    padding: 3px; gap: 2px; margin-bottom: 10px;
+  }
+  .scan-toggle-btn {
+    flex: 1; padding: 7px 10px; border-radius: 26px;
+    font-size: 12px; font-weight: 600; border: none;
+    cursor: pointer; transition: all 0.2s ease;
+    background: transparent; color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .scan-toggle-btn.active {
+    background: var(--primary); color: #fff;
+    box-shadow: 0 2px 8px rgba(59,79,216,0.25);
+  }
+  .scan-toggle-btn:hover:not(.active) { background: var(--surface-3); color: var(--text-primary); }
+
+  /* GradCAM legend */
+  .gradcam-legend {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px; background: rgba(0,0,0,0.75);
+    border-radius: 8px; margin-top: 8px;
+    font-size: 11px; color: #fff;
+  }
+  .legend-bar {
+    height: 10px; width: 120px; border-radius: 5px;
+    background: linear-gradient(to right, #00008b, #0000ff, #00ffff, #ffff00, #ff8c00, #ff0000);
+    flex-shrink: 0;
+  }
+  .legend-labels { display: flex; justify-content: space-between; width: 120px; font-size: 10px; color: #ccc; }
 
   .type-badge {
     display: inline-flex; align-items: center; gap: 6px;
@@ -116,6 +138,14 @@
     font-size: 13px; font-weight: 600;
     background: var(--primary-light); color: var(--primary);
     margin-top: 0.75rem;
+  }
+
+  /* Low confidence warning */
+  .low-conf-warning {
+    background: #fffbeb; border: 1.5px solid #fcd34d;
+    border-radius: 10px; padding: 10px 14px; margin-top: 0.85rem;
+    display: flex; gap: 9px; align-items: flex-start;
+    font-size: 13px; color: #92400e; line-height: 1.55;
   }
 </style>
 {% endblock %}
@@ -145,20 +175,13 @@
       {% if prediction.model_version == 'pending' %}
       <!-- ── PENDING STATE ─────────────────────────────── -->
       <div class="result-verdict verdict-pending">
-        <div class="verdict-icon icon-pending">
-          <i class="bi bi-hourglass-split"></i>
-        </div>
+        <div class="verdict-icon icon-pending"><i class="bi bi-hourglass-split"></i></div>
         <div class="verdict-label">Analysis Pending</div>
         <div class="verdict-title">AI Models Not Ready Yet</div>
-        <div class="verdict-conf">
-          Your scan was uploaded successfully. Results will appear once the AI ensemble is loaded.
-        </div>
-        <div class="pending-pulse">
-          <span></span><span></span><span></span>
-        </div>
+        <div class="verdict-conf">Your scan was uploaded successfully. Results will appear once the AI ensemble is loaded.</div>
+        <div class="pending-pulse"><span></span><span></span><span></span></div>
       </div>
 
-      <!-- What's happening -->
       <div class="cc-card">
         <div class="cc-card-header">
           <div class="cc-card-icon"><i class="bi bi-cpu"></i></div>
@@ -171,36 +194,28 @@
           </p>
           <div class="pending-steps">
             <div class="pending-step">
-              <div class="pending-step-icon step-done">
-                <i class="bi bi-check-lg"></i>
-              </div>
+              <div class="pending-step-icon step-done"><i class="bi bi-check-lg"></i></div>
               <div class="pending-step-text">
                 <strong>Scan Uploaded</strong>
                 <span>Your MRI image was validated and saved successfully</span>
               </div>
             </div>
             <div class="pending-step">
-              <div class="pending-step-icon step-done">
-                <i class="bi bi-check-lg"></i>
-              </div>
+              <div class="pending-step-icon step-done"><i class="bi bi-check-lg"></i></div>
               <div class="pending-step-text">
                 <strong>VGG16 Model — 93.69% accuracy</strong>
                 <span>Trained and ready</span>
               </div>
             </div>
             <div class="pending-step">
-              <div class="pending-step-icon step-waiting">
-                <i class="bi bi-hourglass-split"></i>
-              </div>
+              <div class="pending-step-icon step-waiting"><i class="bi bi-hourglass-split"></i></div>
               <div class="pending-step-text">
                 <strong>EfficientNetB0 Model</strong>
                 <span>Training in progress — needed for ensemble</span>
               </div>
             </div>
             <div class="pending-step">
-              <div class="pending-step-icon step-waiting">
-                <i class="bi bi-hourglass-split"></i>
-              </div>
+              <div class="pending-step-icon step-waiting"><i class="bi bi-hourglass-split"></i></div>
               <div class="pending-step-text">
                 <strong>Ensemble Prediction</strong>
                 <span>Will run once all models are loaded</span>
@@ -220,45 +235,19 @@
           {% if prediction.has_tumor %}Tumor Detected{% else %}No Tumor Detected{% endif %}
         </div>
         <div class="verdict-title">
-          {% if prediction.has_tumor %}
-            {{ prediction.tumor_type | capitalize }} Tumor
-          {% else %}
-            No Tumor Found
-          {% endif %}
+          {% if prediction.has_tumor %}{{ prediction.tumor_type | capitalize }} Tumor{% else %}No Tumor Found{% endif %}
         </div>
         <div class="verdict-conf">
           Confidence: <strong>{{ "%.1f"|format(prediction.confidence * 100) }}%</strong>
         </div>
 
         {% if prediction.low_confidence %}
-        <div style="
-            background: #fffbeb;
-            border: 1.5px solid #fcd34d;
-            border-radius: 10px;
-            padding: 10px 14px;
-            margin-top: 0.85rem;
-            display: flex;
-            gap: 9px;
-            align-items: flex-start;
-            font-size: 13px;
-            color: #92400e;
-            line-height: 1.55;
-        ">
-            <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;color:#d97706;"></i>
-            <span>
-                <strong>Low confidence prediction.</strong>
-                The model is uncertain between multiple classes.
-                This result should be interpreted with caution and
-                reviewed by a qualified radiologist.
-            </span>
+        <div class="low-conf-warning mt-3" style="text-align:left;">
+          <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;color:#d97706;"></i>
+          <span><strong>Low confidence prediction.</strong> The model is uncertain between multiple classes. This result should be interpreted with caution and reviewed by a qualified radiologist.</span>
         </div>
         {% endif %}
 
-        {% if prediction.has_tumor %}
-        <div class="type-badge mt-3">
-          <i class="bi bi-tag"></i> {{ prediction.tumor_type | capitalize }}
-        </div>
-        {% endif %}
         {% if prediction.has_tumor %}
         <div class="type-badge mt-3">
           <i class="bi bi-tag"></i> {{ prediction.tumor_type | capitalize }}
@@ -292,22 +281,72 @@
           {% endfor %}
         </div>
       </div>
+
+      <!-- GradCAM explainability note -->
+      {% if prediction.heatmap_filename %}
+      <div class="cc-card">
+        <div class="cc-card-header">
+          <div class="cc-card-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="cc-card-title">AI Explainability (Grad-CAM)</div>
+        </div>
+        <div class="cc-card-body">
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:0.75rem;">
+            The heatmap shows <strong>which regions of the MRI the AI focused on</strong> to reach its decision.
+            Red/yellow areas = high attention. Blue areas = low attention.
+            Use the toggle above the scan image to switch between views.
+          </p>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <span style="font-size:12px;color:var(--text-muted);">Attention scale:</span>
+            <div>
+              <div class="legend-bar" style="height:10px;width:160px;border-radius:5px;background:linear-gradient(to right,#00008b,#0000ff,#00ffff,#ffff00,#ff8c00,#ff0000);"></div>
+              <div style="display:flex;justify-content:space-between;width:160px;font-size:10px;color:var(--text-muted);margin-top:2px;">
+                <span>Low</span><span>High</span>
+              </div>
+            </div>
+            <span style="font-size:12px;color:var(--text-muted);">Model: VGG16 (93.69% accuracy)</span>
+          </div>
+        </div>
+      </div>
       {% endif %}
 
+      {% endif %}
     </div>
 
     <div class="col-lg-5">
-      <!-- MRI preview -->
+
+      <!-- ── MRI Scan Viewer with GradCAM toggle ─────────── -->
       <div class="cc-card mb-4">
         <div class="cc-card-header">
           <div class="cc-card-icon"><i class="bi bi-image"></i></div>
           <div class="cc-card-title">Uploaded Scan</div>
         </div>
-        <div class="cc-card-body p-0">
-          <div class="mri-preview">
-            <img src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}"
-                 alt="MRI Scan" />
+        <div class="cc-card-body">
+
+          {% if prediction.model_version != 'pending' and prediction.heatmap_filename %}
+          <!-- Toggle pill — only shown when GradCAM is available -->
+          <div class="scan-toggle mb-2">
+            <button class="scan-toggle-btn active" id="btn-original" onclick="showOriginal()">
+              <i class="bi bi-image"></i> Original MRI
+            </button>
+            <button class="scan-toggle-btn" id="btn-gradcam" onclick="showGradcam()">
+              <i class="bi bi-fire"></i> Grad-CAM
+            </button>
           </div>
+          {% endif %}
+
+          <div class="mri-viewer">
+            <img id="img-original"
+                 src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}"
+                 alt="Original MRI"
+                 class="visible" />
+            {% if prediction.model_version != 'pending' and prediction.heatmap_filename %}
+            <img id="img-gradcam"
+                 src="{{ url_for('static', filename='heatmaps/' + prediction.heatmap_filename) }}"
+                 alt="Grad-CAM Heatmap"
+                 class="hidden" />
+            {% endif %}
+          </div>
+
         </div>
       </div>
 
@@ -334,6 +373,16 @@
               <td style="padding:8px 0;font-weight:500;text-align:right;">{{ prediction.model_version }}</td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:8px 0;color:var(--text-muted);">Grad-CAM</td>
+              <td style="padding:8px 0;font-weight:500;text-align:right;">
+                {% if prediction.heatmap_filename %}
+                  <span style="color:#059669;">✅ Generated</span>
+                {% else %}
+                  <span style="color:var(--text-muted);">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:8px 0;color:var(--text-muted);">Uploaded</td>
               <td style="padding:8px 0;font-weight:500;text-align:right;">{{ scan.upload_date.strftime('%H:%M:%S') }}</td>
             </tr>
@@ -358,7 +407,26 @@
           <i class="bi bi-clipboard2-pulse"></i> Symptom Check
         </a>
       </div>
+
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showOriginal() {
+  document.getElementById('img-original').className = 'visible';
+  document.getElementById('img-gradcam').className  = 'hidden';
+  document.getElementById('btn-original').classList.add('active');
+  document.getElementById('btn-gradcam').classList.remove('active');
+}
+
+function showGradcam() {
+  document.getElementById('img-original').className = 'hidden';
+  document.getElementById('img-gradcam').className  = 'visible';
+  document.getElementById('btn-gradcam').classList.add('active');
+  document.getElementById('btn-original').classList.remove('active');
+}
+</script>
 {% endblock %}

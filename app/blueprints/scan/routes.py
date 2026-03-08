@@ -60,7 +60,8 @@ def upload():
                 prob_meningioma = 0.0,
                 prob_notumor    = 1.0,
                 prob_pituitary  = 0.0,
-                model_version   = 'pending'
+                model_version   = 'pending',
+                heatmap_filename = result.get('heatmap_filename')
             )
 
         db.session.add(prediction)
