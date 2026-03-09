@@ -1,73 +1,214 @@
 {% extends "base.html" %}
-{% block title %}Admin — CerebroCare360{% endblock %}
+{% block title %}Admin Panel — CerebroCare360{% endblock %}
 {% block extra_css %}
 <style>
+  /* ── Stats ─────────────────────────────────────────────────── */
   .admin-stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    display: flex; align-items: center; gap: 1.25rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.4rem;
+    display: flex; align-items: center; gap: 1.1rem;
+    transition: all 0.2s;
   }
+  .admin-stat:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
   .admin-stat-icon {
-    width: 52px; height: 52px; border-radius: 14px;
+    width: 50px; height: 50px; border-radius: 14px;
     background: var(--primary-light); color: var(--primary);
     display: flex; align-items: center; justify-content: center;
-    font-size: 24px; flex-shrink: 0;
+    font-size: 22px; flex-shrink: 0;
   }
+  .admin-stat-icon.green  { background: #d1fae5; color: #059669; }
+  .admin-stat-icon.orange { background: #fff7ed; color: #ea580c; }
+  .admin-stat-icon.purple { background: #faf5ff; color: #7c3aed; }
   .admin-stat-value {
-    font-family: 'Fraunces', serif;
-    font-size: 1.9rem; font-weight: 600;
+    font-family: 'Fraunces', serif; font-size: 1.8rem;
+    font-weight: 600; line-height: 1;
     background: var(--gradient);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    line-height: 1;
   }
-  .admin-stat-label { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
-  .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .admin-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; font-weight: 500; }
+
+  /* ── Tabs ───────────────────────────────────────────────────── */
+  .admin-tabs {
+    display: flex; gap: 4px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 4px; margin-bottom: 1.5rem;
+  }
+  .admin-tab-btn {
+    flex: 1; padding: 9px 16px; border-radius: 9px;
+    font-size: 13px; font-weight: 600; border: none; cursor: pointer;
+    background: transparent; color: var(--text-secondary); transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .admin-tab-btn.active {
+    background: var(--surface); color: var(--primary);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Table ──────────────────────────────────────────────────── */
+  .admin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   .admin-table th {
     text-align: left; padding: 10px 14px;
-    font-size: 11.5px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.5px; color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-    background: var(--surface-2);
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--text-muted);
+    border-bottom: 1px solid var(--border); background: var(--surface-2);
+    white-space: nowrap;
   }
-  .admin-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
+  .admin-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   .admin-table tr:last-child td { border-bottom: none; }
   .admin-table tr:hover td { background: var(--surface-2); }
+
+  /* ── Badges ─────────────────────────────────────────────────── */
+  .status-badge {
+    padding: 3px 10px; border-radius: 20px; font-size: 11.5px;
+    font-weight: 600; display: inline-block;
+  }
+  .badge-active   { background: #d1fae5; color: #059669; }
+  .badge-inactive { background: #fee2e2; color: #dc2626; }
+  .badge-mri      { background: #ecfdf5; color: #059669; }
+  .badge-public   { background: #fffbeb; color: #92400e; }
+  .badge-private  { background: #eff6ff; color: #2563eb; }
+  .badge-clinic   { background: #fdf4ff; color: #a21caf; }
+  .badge-accred   { background: var(--primary-light); color: var(--primary); }
+  .badge-admin-role { background: #fef3c7; color: #92400e; }
+  .badge-user-role  { background: var(--primary-light); color: var(--primary); }
+  .urgency-high   { background: #fee2e2; color: #dc2626; }
+  .urgency-medium { background: #fffbeb; color: #d97706; }
+  .urgency-low    { background: #d1fae5; color: #059669; }
+
+  /* ── Action buttons ─────────────────────────────────────────── */
   .action-btn {
-    padding: 5px 12px; border-radius: 7px; font-size: 12.5px;
-    font-weight: 500; cursor: pointer; border: 1.5px solid;
-    transition: all 0.15s; text-decoration: none;
-    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 11px; border-radius: 7px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 1.5px solid; transition: all 0.15s;
+    text-decoration: none; display: inline-flex; align-items: center;
+    gap: 4px; white-space: nowrap;
   }
-  .btn-edit {
-    border-color: var(--primary); color: var(--primary); background: var(--primary-light);
-  }
+  .btn-edit    { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
   .btn-edit:hover { background: var(--primary); color: white; }
-  .btn-delete {
-    border-color: var(--danger); color: var(--danger); background: #fef2f2;
+  .btn-toggle  { border-color: #d97706; color: #d97706; background: #fffbeb; }
+  .btn-toggle:hover { background: #d97706; color: white; }
+  .btn-promote { border-color: #7c3aed; color: #7c3aed; background: #faf5ff; }
+  .btn-promote:hover { background: #7c3aed; color: white; }
+  .btn-view    { border-color: #059669; color: #059669; background: #ecfdf5; }
+  .btn-view:hover { background: #059669; color: white; }
+  .btn-delete  { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+  .btn-delete:hover { background: #dc2626; color: white; }
+
+  /* ── Hospital card in table ─────────────────────────────────── */
+  .hosp-avatar {
+    width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+    background: var(--primary-light); color: var(--primary);
   }
-  .btn-delete:hover { background: var(--danger); color: white; }
+  .hosp-avatar.public  { background: #fffbeb; color: #d97706; }
+  .hosp-avatar.clinic  { background: #fdf4ff; color: #a21caf; }
+
+  /* ── User avatar ────────────────────────────────────────────── */
+  .user-avatar-sm {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--gradient); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .user-avatar-sm.inactive { background: #e5e7eb; color: #9ca3af; }
+
+  /* ── Scan mini row ──────────────────────────────────────────── */
+  .scan-mini {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12.5px; color: var(--text-muted);
+  }
+
+  /* ── Modal ──────────────────────────────────────────────────── */
+  .admin-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 1000;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .admin-modal-overlay.open { display: flex; }
+  .admin-modal {
+    background: var(--surface); border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+  }
+  .admin-modal-header {
+    padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--surface); z-index: 1;
+  }
+  .admin-modal-title { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
+  .admin-modal-body  { padding: 1.5rem; }
+  .admin-modal-footer {
+    padding: 1rem 1.5rem; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+    position: sticky; bottom: 0; background: var(--surface);
+  }
+  .btn-close-modal {
+    background: none; border: none; font-size: 1.3rem;
+    cursor: pointer; color: var(--text-muted); padding: 4px 8px; border-radius: 6px;
+  }
+  .btn-close-modal:hover { background: var(--surface-2); }
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .form-grid-2 { grid-template-columns: 1fr; } }
+
+  /* ── Symptom checkbox grid ──────────────────────────────────── */
+  .symptom-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .symptom-check-label {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1.5px solid var(--border);
+    border-radius: 8px; cursor: pointer; font-size: 13px;
+    font-weight: 500; background: var(--surface); transition: all 0.15s;
+    user-select: none;
+  }
+  .symptom-check-label:has(input:checked) {
+    border-color: var(--primary); background: var(--primary-light); color: var(--primary);
+  }
+  .symptom-check-label input { display: none; }
+
+  /* ── Rule card ──────────────────────────────────────────────── */
+  .rule-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    margin-bottom: 10px; transition: all 0.2s;
+  }
+  .rule-card:hover { border-color: rgba(59,79,216,0.3); box-shadow: var(--shadow-sm); }
+  .rule-card-header {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px; margin-bottom: 8px;
+  }
+  .rule-condition { font-weight: 700; font-size: 14px; color: var(--text-primary); }
+  .rule-dept { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .rule-advice {
+    font-size: 12.5px; color: var(--text-secondary);
+    background: var(--surface-2); border-radius: 7px;
+    padding: 8px 10px; margin-top: 8px; line-height: 1.55;
+  }
+  .symptom-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+  .symptom-tag {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 2px 8px; font-size: 11.5px;
+    color: var(--text-secondary);
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
+
+  <!-- Header -->
   <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
       <h1 class="cc-section-title">Admin Panel</h1>
-      <p class="cc-section-sub mb-0">Manage hospitals, symptom rules, and monitor platform data</p>
+      <p class="cc-section-sub mb-0">Manage hospitals, users, and symptom rules</p>
     </div>
     <span class="cc-badge-role badge-admin">ADMIN</span>
   </div>
 
   <!-- Stats -->
-  <div class="row g-4 mb-4">
-    <div class="col-sm-6 col-lg-3">
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
       <div class="admin-stat">
         <div class="admin-stat-icon"><i class="bi bi-people"></i></div>
         <div>
@@ -76,27 +217,27 @@
         </div>
       </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
       <div class="admin-stat">
-        <div class="admin-stat-icon"><i class="bi bi-file-earmark-medical"></i></div>
+        <div class="admin-stat-icon green"><i class="bi bi-file-earmark-medical"></i></div>
         <div>
           <div class="admin-stat-value">{{ stats.total_scans }}</div>
           <div class="admin-stat-label">Total Scans</div>
         </div>
       </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
       <div class="admin-stat">
-        <div class="admin-stat-icon"><i class="bi bi-hospital"></i></div>
+        <div class="admin-stat-icon orange"><i class="bi bi-hospital"></i></div>
         <div>
           <div class="admin-stat-value">{{ stats.total_hospitals }}</div>
           <div class="admin-stat-label">Hospitals</div>
         </div>
       </div>
     </div>
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
       <div class="admin-stat">
-        <div class="admin-stat-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+        <div class="admin-stat-icon purple"><i class="bi bi-file-earmark-pdf"></i></div>
         <div>
           <div class="admin-stat-value">{{ stats.total_reports }}</div>
           <div class="admin-stat-label">Reports Generated</div>
@@ -105,120 +246,625 @@
     </div>
   </div>
 
-  <!-- Hospital Management -->
-  <div class="cc-card mb-4">
-    <div class="cc-card-header">
-      <div class="cc-card-icon"><i class="bi bi-hospital"></i></div>
-      <div class="cc-card-title">Hospital Records</div>
-      <a href="/admin/hospitals/add" class="btn-cc-primary ms-auto" style="padding:8px 18px;font-size:13px;">
-        <i class="bi bi-plus-lg"></i> Add Hospital
-      </a>
-    </div>
-    <div style="overflow-x:auto;">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Hospital Name</th>
-            <th>City</th>
-            <th>Specialty</th>
-            <th>Accreditation</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for h in hospitals %}
-          <tr>
-            <td><strong>{{ h.name }}</strong></td>
-            <td>{{ h.city }}</td>
-            <td>{{ h.specialty }}</td>
-            <td>
-              {% if h.accreditation %}
-                <span style="background:var(--primary-light);color:var(--primary);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">
-                  {{ h.accreditation }}
-                </span>
-              {% else %}—{% endif %}
-            </td>
-            <td>
-              {% if h.is_active %}
-                <span style="background:#d1fae5;color:#059669;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">Active</span>
-              {% else %}
-                <span style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">Inactive</span>
-              {% endif %}
-            </td>
-            <td>
-              <div style="display:flex;gap:6px;">
-                <a href="/admin/hospitals/edit/{{ h.id }}" class="action-btn btn-edit">
-                  <i class="bi bi-pencil"></i> Edit
-                </a>
-                <a href="/admin/hospitals/delete/{{ h.id }}" class="action-btn btn-delete"
-                   onclick="return confirm('Delete {{ h.name }}?')">
-                  <i class="bi bi-trash"></i>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <!-- Tab switcher -->
+  <div class="admin-tabs">
+    <button class="admin-tab-btn active" onclick="switchTab('hospitals', this)">
+      <i class="bi bi-hospital"></i> Hospitals
+    </button>
+    <button class="admin-tab-btn" onclick="switchTab('users', this)">
+      <i class="bi bi-people"></i> Users
+      <span style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:1px 7px;font-size:11px;">{{ users|length }}</span>
+    </button>
+    <button class="admin-tab-btn" onclick="switchTab('rules', this)">
+      <i class="bi bi-clipboard2-pulse"></i> Symptom Rules
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- TAB: HOSPITALS                                             -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="tab-hospitals" class="tab-panel active">
+    <div class="cc-card">
+      <div class="cc-card-header">
+        <div class="cc-card-icon"><i class="bi bi-hospital"></i></div>
+        <div class="cc-card-title">Hospital Records
+          <span style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px;">{{ hospitals|length }} total</span>
+        </div>
+        <div class="ms-auto d-flex gap-2 align-items-center">
+          <input type="text" id="hosp-search" class="cc-input"
+            style="width:190px;padding:7px 12px;font-size:13px;"
+            placeholder="Search..." oninput="filterTable('hosp-search','hosp-row')">
+          <button class="btn-cc-primary" style="padding:8px 16px;font-size:13px;" onclick="openModal('add-hosp-modal')">
+            <i class="bi bi-plus-lg"></i> Add Hospital
+          </button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Hospital</th>
+              <th>Location</th>
+              <th>Specialty</th>
+              <th>Type</th>
+              <th>Rating</th>
+              <th>MRI</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for h in hospitals %}
+            <tr class="hosp-row" data-search="{{ h.name|lower }} {{ h.city|lower }}">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="hosp-avatar {% if h.hospital_type=='Public' %}public{% elif h.hospital_type=='Clinic' %}clinic{% endif %}">
+                    <i class="bi {% if h.hospital_type=='Public' %}bi-bank{% elif h.hospital_type=='Clinic' %}bi-clipboard2-pulse{% else %}bi-hospital{% endif %}"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:13.5px;">{{ h.name }}</div>
+                    {% if h.accreditation %}
+                    <span class="status-badge badge-accred" style="font-size:10px;">{{ h.accreditation }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div style="font-size:13px;">{{ h.city }}</div>
+                <div style="font-size:11.5px;color:var(--text-muted);">{{ h.state }}</div>
+              </td>
+              <td style="font-size:13px;">{{ h.specialty or '—' }}</td>
+              <td>
+                {% if h.hospital_type == 'Public' %}<span class="status-badge badge-public">Govt</span>
+                {% elif h.hospital_type == 'Private' %}<span class="status-badge badge-private">Private</span>
+                {% elif h.hospital_type == 'Clinic' %}<span class="status-badge badge-clinic">Clinic</span>
+                {% else %}{{ h.hospital_type or '—' }}{% endif %}
+              </td>
+              <td>
+                {% if h.rating %}<span style="font-weight:600;color:#d97706;font-size:13px;"><i class="bi bi-star-fill" style="font-size:10px;"></i> {{ h.rating }}</span>
+                {% else %}—{% endif %}
+              </td>
+              <td>
+                {% if h.is_mri_center %}<span class="status-badge badge-mri"><i class="bi bi-broadcast" style="font-size:10px;"></i> Yes</span>
+                {% else %}<span style="color:var(--text-muted);">—</span>{% endif %}
+              </td>
+              <td>
+                {% if h.is_active %}<span class="status-badge badge-active">Active</span>
+                {% else %}<span class="status-badge badge-inactive">Inactive</span>{% endif %}
+              </td>
+              <td>
+                <div style="display:flex;gap:5px;">
+                  <button class="action-btn btn-edit" onclick="openEditHosp({{ h.id }})" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <a href="/admin/hospitals/toggle/{{ h.id }}" class="action-btn btn-toggle"
+                     title="{{ 'Deactivate' if h.is_active else 'Activate' }}">
+                    <i class="bi {{ 'bi-eye-slash' if h.is_active else 'bi-eye' }}"></i>
+                  </a>
+                  <a href="/admin/hospitals/delete/{{ h.id }}" class="action-btn btn-delete"
+                     onclick="return confirm('Delete {{ h.name }}?')" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- Symptom Rules -->
-  <div class="cc-card">
-    <div class="cc-card-header">
-      <div class="cc-card-icon"><i class="bi bi-clipboard2-pulse"></i></div>
-      <div class="cc-card-title">Symptom Rules</div>
-      <a href="/admin/rules/add" class="btn-cc-primary ms-auto" style="padding:8px 18px;font-size:13px;">
-        <i class="bi bi-plus-lg"></i> Add Rule
-      </a>
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- TAB: USERS                                                 -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="tab-users" class="tab-panel">
+    <div class="cc-card">
+      <div class="cc-card-header">
+        <div class="cc-card-icon"><i class="bi bi-people"></i></div>
+        <div class="cc-card-title">User Management</div>
+        <div class="ms-auto">
+          <input type="text" class="cc-input"
+            style="width:190px;padding:7px 12px;font-size:13px;"
+            placeholder="Search users..." oninput="filterTable(this,'user-row')">
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Scans</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr class="user-row" data-search="{{ u.full_name|lower }} {{ u.email|lower }}">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="user-avatar-sm {% if not u.is_active %}inactive{% endif %}">
+                    {{ u.full_name[0]|upper }}
+                  </div>
+                  <div>
+                    <div style="font-weight:600;font-size:13.5px;">
+                      {{ u.full_name }}
+                      {% if u.id == current_user.id %}
+                      <span style="font-size:10.5px;color:var(--text-muted);font-weight:400;">(you)</span>
+                      {% endif %}
+                    </div>
+                    <div style="font-size:11.5px;color:var(--text-muted);">ID #{{ u.id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size:13px;color:var(--text-secondary);">{{ u.email }}</td>
+              <td>
+                {% if u.role == 'admin' %}
+                  <span class="status-badge badge-admin-role"><i class="bi bi-shield-check" style="font-size:10px;"></i> ADMIN</span>
+                {% else %}
+                  <span class="status-badge badge-user-role"><i class="bi bi-person" style="font-size:10px;"></i> USER</span>
+                {% endif %}
+              </td>
+              <td>
+                <span style="font-weight:600;">{{ u.scans|length }}</span>
+                {% if u.scans|length > 0 %}
+                <span style="font-size:11.5px;color:var(--text-muted);margin-left:4px;">scans</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.is_active %}
+                  <span class="status-badge badge-active">Active</span>
+                {% else %}
+                  <span class="status-badge badge-inactive">Inactive</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.id != current_user.id %}
+                <div style="display:flex;gap:5px;flex-wrap:wrap;">
+                  <!-- View scans -->
+                  <a href="/admin/users/{{ u.id }}/scans" class="action-btn btn-view" title="View Scans">
+                    <i class="bi bi-eye"></i> Scans
+                  </a>
+                  <!-- Promote / Demote -->
+                  <a href="/admin/users/toggle-role/{{ u.id }}"
+                     class="action-btn btn-promote"
+                     title="{{ 'Demote to User' if u.role == 'admin' else 'Promote to Admin' }}"
+                     onclick="return confirm('{{ 'Demote ' + u.full_name + ' to User?' if u.role == 'admin' else 'Promote ' + u.full_name + ' to Admin?' }}')">
+                    <i class="bi {{ 'bi-arrow-down-circle' if u.role == 'admin' else 'bi-arrow-up-circle' }}"></i>
+                    {{ 'Demote' if u.role == 'admin' else 'Promote' }}
+                  </a>
+                  <!-- Activate / Deactivate -->
+                  <a href="/admin/users/toggle-active/{{ u.id }}"
+                     class="action-btn btn-toggle"
+                     title="{{ 'Activate' if not u.is_active else 'Deactivate' }}"
+                     onclick="return confirm('{{ ('Activate ' if not u.is_active else 'Deactivate ') + u.full_name + '?' }}')">
+                    <i class="bi {{ 'bi-person-check' if not u.is_active else 'bi-person-slash' }}"></i>
+                    {{ 'Activate' if not u.is_active else 'Deactivate' }}
+                  </a>
+                  <!-- Delete -->
+                  <a href="/admin/users/delete/{{ u.id }}"
+                     class="action-btn btn-delete"
+                     onclick="return confirm('Permanently delete {{ u.full_name }} and ALL their data?')"
+                     title="Delete User">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+                {% else %}
+                <span style="font-size:12px;color:var(--text-muted);">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
-    <div style="overflow-x:auto;">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Symptoms</th>
-            <th>Condition</th>
-            <th>Department</th>
-            <th>Urgency</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for rule in rules %}
-          <tr>
-            <td>
-              {% for sym in rule.symptom_keys | from_json %}
-                <span style="background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:12px;margin-right:4px;">
-                  {{ sym }}
-                </span>
-              {% endfor %}
-            </td>
-            <td>{{ rule.condition }}</td>
-            <td>{{ rule.department }}</td>
-            <td>
-              {% set uc = {'high':'#dc2626','medium':'#d97706','low':'#059669'} %}
-              {% set ub = {'high':'#fee2e2','medium':'#fffbeb','low':'#d1fae5'} %}
-              <span style="background:{{ ub[rule.urgency] }};color:{{ uc[rule.urgency] }};border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;text-transform:uppercase;">
-                {{ rule.urgency }}
-              </span>
-            </td>
-            <td>
-              <div style="display:flex;gap:6px;">
-                <a href="/admin/rules/edit/{{ rule.id }}" class="action-btn btn-edit">
-                  <i class="bi bi-pencil"></i> Edit
-                </a>
-                <a href="/admin/rules/delete/{{ rule.id }}" class="action-btn btn-delete"
-                   onclick="return confirm('Delete this rule?')">
-                  <i class="bi bi-trash"></i>
-                </a>
-              </div>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+
+    <!-- User management info box -->
+    <div class="cc-disclaimer mt-3">
+      <i class="bi bi-info-circle" style="flex-shrink:0;margin-top:1px;"></i>
+      <span>
+        <strong>Promote</strong> gives a user admin access to this panel.
+        <strong>Deactivate</strong> blocks login without deleting data.
+        <strong>Delete</strong> permanently removes the user and all their scans, predictions and reports.
+        You cannot modify your own account from this panel.
+      </span>
     </div>
   </div>
+
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <!-- TAB: SYMPTOM RULES                                         -->
+  <!-- ══════════════════════════════════════════════════════════ -->
+  <div id="tab-rules" class="tab-panel">
+    <div class="row g-4">
+
+      <!-- Left: existing rules -->
+      <div class="col-lg-7">
+        <div class="cc-card">
+          <div class="cc-card-header">
+            <div class="cc-card-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+            <div class="cc-card-title">Existing Rules
+              <span style="font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px;">{{ rules|length }}</span>
+            </div>
+          </div>
+          <div class="cc-card-body" style="padding-top:1rem;">
+            {% if rules %}
+            {% for rule in rules %}
+            <div class="rule-card">
+              <div class="rule-card-header">
+                <div>
+                  <div class="rule-condition">{{ rule.condition }}</div>
+                  <div class="rule-dept"><i class="bi bi-hospital" style="font-size:11px;"></i> {{ rule.department }}</div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <span class="status-badge urgency-{{ rule.urgency }}">{{ rule.urgency|upper }}</span>
+                  <a href="/admin/rules/edit/{{ rule.id }}" class="action-btn btn-edit" style="padding:4px 9px;">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <a href="/admin/rules/delete/{{ rule.id }}" class="action-btn btn-delete" style="padding:4px 9px;"
+                     onclick="return confirm('Delete this rule?')">
+                    <i class="bi bi-trash"></i>
+                  </a>
+                </div>
+              </div>
+              <!-- symptom tags -->
+              <div class="symptom-tags">
+                {% for sym in rule.symptom_keys | from_json %}
+                <span class="symptom-tag">{{ sym | replace('_',' ') | title }}</span>
+                {% endfor %}
+              </div>
+              {% if rule.advice %}
+              <div class="rule-advice">{{ rule.advice }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);">
+              <i class="bi bi-clipboard2-pulse" style="font-size:2rem;opacity:0.3;display:block;margin-bottom:0.5rem;"></i>
+              No rules yet. Add one using the form.
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: add rule form -->
+      <div class="col-lg-5">
+        <div class="cc-card" style="position:sticky;top:80px;">
+          <div class="cc-card-header">
+            <div class="cc-card-icon"><i class="bi bi-plus-circle"></i></div>
+            <div class="cc-card-title">Add New Rule</div>
+          </div>
+          <div class="cc-card-body">
+            <form method="POST" action="/admin/rules/add">
+              <div class="cc-form-group">
+                <label class="cc-label">Symptoms <span style="color:var(--text-muted);font-weight:400;">(check all that apply)</span></label>
+                {% set all_symptoms = [
+                  'headache','vomiting','seizures','vision_problems','memory_loss',
+                  'weakness','speech_problems','balance_issues','personality_change',
+                  'fatigue','nausea','numbness','tremor','confusion'
+                ] %}
+                <div class="symptom-grid">
+                  {% for sym in all_symptoms %}
+                  <label class="symptom-check-label">
+                    <input type="checkbox" name="symptom_keys" value="{{ sym }}">
+                    {{ sym | replace('_',' ') | title }}
+                  </label>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div class="cc-form-group">
+                <label class="cc-label">Condition Name *</label>
+                <input type="text" name="condition" class="cc-input" required
+                  placeholder="e.g. Possible Brain Tumor">
+              </div>
+
+              <div class="form-grid-2">
+                <div class="cc-form-group mb-0">
+                  <label class="cc-label">Department *</label>
+                  <select name="department" class="cc-input" required>
+                    <option value="">Select</option>
+                    <option>Neurology</option>
+                    <option>Oncology</option>
+                    <option>Neurosurgery</option>
+                    <option>General Medicine</option>
+                  </select>
+                </div>
+                <div class="cc-form-group mb-0">
+                  <label class="cc-label">Urgency *</label>
+                  <select name="urgency" class="cc-input" required>
+                    <option value="">Select</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="cc-form-group mt-3">
+                <label class="cc-label">Advice / Description</label>
+                <textarea name="advice" class="cc-input" rows="3"
+                  placeholder="What should the patient do?..."></textarea>
+              </div>
+
+              <button type="submit" class="btn-cc-primary w-100">
+                <i class="bi bi-plus-lg"></i> Add Rule
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- ADD HOSPITAL MODAL                                             -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="admin-modal-overlay" id="add-hosp-modal">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <div class="admin-modal-title"><i class="bi bi-plus-circle" style="color:var(--primary);margin-right:6px;"></i>Add New Hospital</div>
+      <button class="btn-close-modal" onclick="closeModal('add-hosp-modal')">×</button>
+    </div>
+    <form method="POST" action="/admin/hospitals/add">
+      <div class="admin-modal-body">
+        <div class="form-grid-2">
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Hospital Name *</label>
+            <input type="text" name="name" class="cc-input" required placeholder="Full hospital name">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">City *</label>
+            <input type="text" name="city" class="cc-input" required placeholder="e.g. Kochi">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">State</label>
+            <input type="text" name="state" class="cc-input" placeholder="e.g. Kerala">
+          </div>
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Address</label>
+            <input type="text" name="address" class="cc-input" placeholder="Full address">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Phone</label>
+            <input type="text" name="phone" class="cc-input" placeholder="+91 XXXXX XXXXX">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Email</label>
+            <input type="email" name="email" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Website</label>
+            <input type="text" name="website" class="cc-input" placeholder="https://...">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Specialty</label>
+            <select name="specialty" class="cc-input">
+              <option value="">Select</option>
+              <option>Neurology</option><option>Neurosurgery</option>
+              <option>Neuro Oncology</option><option>Radiology</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Hospital Type</label>
+            <select name="hospital_type" class="cc-input">
+              <option value="">Select</option>
+              <option>Public</option><option>Private</option><option>Clinic</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Accreditation</label>
+            <input type="text" name="accreditation" class="cc-input" placeholder="e.g. NABH, JCI">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Rating (0–5)</label>
+            <input type="number" step="0.1" min="0" max="5" name="rating" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Latitude</label>
+            <input type="number" step="any" name="latitude" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Longitude</label>
+            <input type="number" step="any" name="longitude" class="cc-input">
+          </div>
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Facilities <span style="color:var(--text-muted);font-weight:400;">(comma-separated)</span></label>
+            <input type="text" name="facilities" class="cc-input" placeholder="MRI,Brain Tumor Surgery,Radiation Therapy">
+          </div>
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Doctors <span style="color:var(--text-muted);font-weight:400;">(Name – Role, comma-separated)</span></label>
+            <input type="text" name="doctors" class="cc-input" placeholder="Dr. A Kumar – Neurosurgeon, Dr. B Nair – Neurologist">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">MRI Centre?</label>
+            <select name="is_mri_center" class="cc-input">
+              <option value="0">No</option><option value="1">Yes</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">MRI Types</label>
+            <input type="text" name="mri_types" class="cc-input" placeholder="3T MRI, Open MRI">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Cost Range</label>
+            <input type="text" name="cost_range" class="cc-input" placeholder="₹3000 – ₹8000">
+          </div>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-cc-secondary" onclick="closeModal('add-hosp-modal')">Cancel</button>
+        <button type="submit" class="btn-cc-primary"><i class="bi bi-check-lg"></i> Save Hospital</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- EDIT HOSPITAL MODAL                                            -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div class="admin-modal-overlay" id="edit-hosp-modal">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <div class="admin-modal-title"><i class="bi bi-pencil" style="color:var(--primary);margin-right:6px;"></i>Edit Hospital</div>
+      <button class="btn-close-modal" onclick="closeModal('edit-hosp-modal')">×</button>
+    </div>
+    <form method="POST" id="edit-hosp-form">
+      <div class="admin-modal-body">
+        <div class="form-grid-2">
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Hospital Name *</label>
+            <input type="text" name="name" id="eh-name" class="cc-input" required>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">City *</label>
+            <input type="text" name="city" id="eh-city" class="cc-input" required>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">State</label>
+            <input type="text" name="state" id="eh-state" class="cc-input">
+          </div>
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Address</label>
+            <input type="text" name="address" id="eh-address" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Phone</label>
+            <input type="text" name="phone" id="eh-phone" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Email</label>
+            <input type="email" name="email" id="eh-email" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Website</label>
+            <input type="text" name="website" id="eh-website" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Specialty</label>
+            <select name="specialty" id="eh-specialty" class="cc-input">
+              <option value="">Select</option>
+              <option>Neurology</option><option>Neurosurgery</option>
+              <option>Neuro Oncology</option><option>Radiology</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Hospital Type</label>
+            <select name="hospital_type" id="eh-hospital_type" class="cc-input">
+              <option value="">Select</option>
+              <option>Public</option><option>Private</option><option>Clinic</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Accreditation</label>
+            <input type="text" name="accreditation" id="eh-accreditation" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Rating</label>
+            <input type="number" step="0.1" min="0" max="5" name="rating" id="eh-rating" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Latitude</label>
+            <input type="number" step="any" name="latitude" id="eh-latitude" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Longitude</label>
+            <input type="number" step="any" name="longitude" id="eh-longitude" class="cc-input">
+          </div>
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Facilities</label>
+            <input type="text" name="facilities" id="eh-facilities" class="cc-input">
+          </div>
+          <div class="cc-form-group" style="grid-column:1/-1;">
+            <label class="cc-label">Doctors</label>
+            <input type="text" name="doctors" id="eh-doctors" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">MRI Centre?</label>
+            <select name="is_mri_center" id="eh-is_mri_center" class="cc-input">
+              <option value="0">No</option><option value="1">Yes</option>
+            </select>
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">MRI Types</label>
+            <input type="text" name="mri_types" id="eh-mri_types" class="cc-input">
+          </div>
+          <div class="cc-form-group">
+            <label class="cc-label">Cost Range</label>
+            <input type="text" name="cost_range" id="eh-cost_range" class="cc-input">
+          </div>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-cc-secondary" onclick="closeModal('edit-hosp-modal')">Cancel</button>
+        <button type="submit" class="btn-cc-primary"><i class="bi bi-check-lg"></i> Update Hospital</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Hospital data for JS -->
+<script>
+const HOSPITALS = {
+  {% for h in hospitals %}
+  {{ h.id }}: {
+    name: {{ h.name|tojson }}, city: {{ h.city|tojson }},
+    state: {{ (h.state or '')|tojson }}, address: {{ (h.address or '')|tojson }},
+    phone: {{ (h.phone or '')|tojson }}, email: {{ (h.email or '')|tojson }},
+    website: {{ (h.website or '')|tojson }}, specialty: {{ (h.specialty or '')|tojson }},
+    hospital_type: {{ (h.hospital_type or '')|tojson }},
+    accreditation: {{ (h.accreditation or '')|tojson }},
+    rating: '{{ h.rating or "" }}', latitude: '{{ h.latitude or "" }}',
+    longitude: '{{ h.longitude or "" }}', facilities: {{ (h.facilities or '')|tojson }},
+    doctors: {{ (h.doctors or '')|tojson }},
+    is_mri_center: '{{ "1" if h.is_mri_center else "0" }}',
+    mri_types: {{ (h.mri_types or '')|tojson }},
+    cost_range: {{ (h.cost_range or '')|tojson }},
+  },
+  {% endfor %}
+};
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.admin-modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+function openEditHosp(id) {
+  const h = HOSPITALS[id];
+  if (!h) return;
+  document.getElementById('edit-hosp-form').action = '/admin/hospitals/edit/' + id;
+  const fields = ['name','city','state','address','phone','email','website','specialty',
+                  'hospital_type','accreditation','rating','latitude','longitude',
+                  'facilities','doctors','is_mri_center','mri_types','cost_range'];
+  fields.forEach(f => {
+    const el = document.getElementById('eh-' + f);
+    if (el) el.value = h[f] ?? '';
+  });
+  openModal('edit-hosp-modal');
+}
+
+function filterTable(inputEl, rowClass) {
+  const q = (typeof inputEl === 'string'
+    ? document.getElementById(inputEl)
+    : inputEl).value.toLowerCase();
+  document.querySelectorAll('.' + rowClass).forEach(row => {
+    row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+  });
+}
+</script>
 {% endblock %}

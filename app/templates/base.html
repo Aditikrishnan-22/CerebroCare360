@@ -455,30 +455,27 @@
 
       {% if current_user.is_authenticated %}
       <div class="cc-nav-links">
-        <a href="/scan/upload" class="cc-nav-link {% if request.endpoint == 'scan.upload' %}active{% endif %}">
-          <i class="bi bi-upload"></i> Upload MRI
-        </a>
-        <a href="/scan/history" class="cc-nav-link {% if request.endpoint == 'scan.history' %}active{% endif %}">
-          <i class="bi bi-clock-history"></i> History
-        </a>
-        <a href="/hospital/find" class="cc-nav-link {% if request.endpoint == 'hospital.find' %}active{% endif %}">
-          <i class="bi bi-hospital"></i> Find Care
-        </a>
-        <a href="/symptom/checker" class="cc-nav-link {% if request.endpoint == 'symptom.checker' %}active{% endif %}">
-          <i class="bi bi-clipboard2-pulse"></i> Symptom Check
-        </a>
-        <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
-          <i class="bi bi-robot"></i> CerebroBot
-        </a>
-        {% if current_user.role == 'admin' %}
-        <a href="/admin/dashboard" class="cc-nav-link {% if 'admin' in request.endpoint %}active{% endif %}">
-          <i class="bi bi-shield-check"></i> Admin
-        </a>
-        <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
-          <i class="bi bi-robot"></i> CerebroBot
-        </a>
-        {% endif %}
-      </div>
+  {% if current_user.role == 'admin' %}
+  <a href="/admin/dashboard" class="cc-nav-link {% if 'admin' in request.endpoint %}active{% endif %}">
+    <i class="bi bi-shield-check"></i> Admin
+  </a>
+  {% endif %}
+  <a href="/scan/upload" class="cc-nav-link {% if request.endpoint == 'scan.upload' %}active{% endif %}">
+    <i class="bi bi-upload"></i> Upload MRI
+  </a>
+  <a href="/scan/history" class="cc-nav-link {% if request.endpoint == 'scan.history' %}active{% endif %}">
+    <i class="bi bi-clock-history"></i> History
+  </a>
+  <a href="/hospital/find" class="cc-nav-link {% if request.endpoint == 'hospital.find' %}active{% endif %}">
+    <i class="bi bi-hospital"></i> Find Care
+  </a>
+  <a href="/symptom/checker" class="cc-nav-link {% if request.endpoint == 'symptom.checker' %}active{% endif %}">
+    <i class="bi bi-clipboard2-pulse"></i> Symptom Check
+  </a>
+  <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
+    <i class="bi bi-robot"></i> CerebroBot
+  </a>
+</div>
       {% endif %}
 
       <div class="cc-nav-right">

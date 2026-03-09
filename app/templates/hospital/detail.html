@@ -1,0 +1,412 @@
+{% extends "base.html" %}
+{% block title %}{{ hospital.name }} — CerebroCare360{% endblock %}
+{% block extra_css %}
+<style>
+  .detail-hero {
+    background: linear-gradient(135deg, #eef0fd 0%, #f5f3ff 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 0 1.75rem;
+  }
+
+  .type-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+    margin-bottom: 0.75rem;
+  }
+  .chip-public  { background: #fffbeb; color: #92400e; }
+  .chip-private { background: #ecfdf5; color: #065f46; }
+  .chip-clinic  { background: #fdf2f8; color: #9333ea; }
+
+  .detail-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.9rem; font-weight: 600;
+    color: var(--text-primary); line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-location {
+    font-size: 14px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .rating-big {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-radius: 10px; padding: 8px 16px;
+    font-weight: 700; font-size: 1.1rem; color: #d97706;
+  }
+
+  /* ── Section cards ─────────────────────────────────────────── */
+  .detail-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+  .detail-section-header {
+    padding: 1rem 1.4rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface-2);
+  }
+  .detail-section-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .detail-section-title {
+    font-weight: 700; font-size: 0.92rem;
+    color: var(--text-primary);
+  }
+  .detail-section-body {
+    padding: 1.25rem 1.4rem;
+  }
+
+  /* ── Facility grid ─────────────────────────────────────────── */
+  .facility-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 8px;
+  }
+  .facility-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    border: 1px solid;
+  }
+  .fac-mri-item      { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+  .fac-surgery-item  { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .fac-radiation-item{ background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+  .fac-chemo-item    { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
+  .fac-biopsy-item   { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+  .fac-gamma-item    { background: #fdf4ff; color: #a21caf; border-color: #f0abfc; }
+  .fac-other-item    { background: var(--surface-2); color: var(--text-secondary); border-color: var(--border); }
+
+  /* ── Doctors list ──────────────────────────────────────────── */
+  .doctor-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .doctor-item:last-child { border-bottom: none; }
+  .doctor-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .doctor-name { font-weight: 600; font-size: 13.5px; color: var(--text-primary); }
+  .doctor-role { font-size: 12px; color: var(--text-muted); }
+
+  /* ── Contact table ─────────────────────────────────────────── */
+  .contact-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .contact-row:last-child { border-bottom: none; }
+  .contact-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--primary-light); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .contact-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .contact-value { font-weight: 600; color: var(--text-primary); }
+
+  /* ── MRI section ───────────────────────────────────────────── */
+  .mri-highlight {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    border: 1.5px solid #a7f3d0;
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .mri-highlight-icon {
+    width: 46px; height: 46px; border-radius: 12px;
+    background: #d1fae5; color: #059669;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+
+  /* ── Map ───────────────────────────────────────────────────── */
+  .map-container {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    height: 280px;
+    background: var(--surface-2);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 10px;
+    color: var(--text-muted); font-size: 13px;
+  }
+  .map-container iframe {
+    width: 100%; height: 100%; border: none;
+  }
+
+  /* ── Action buttons ────────────────────────────────────────── */
+  .btn-gmaps {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #4285F4; color: #fff;
+    border: none; border-radius: 10px;
+    padding: 11px 20px; font-size: 13.5px; font-weight: 600;
+    text-decoration: none; transition: all 0.2s;
+    cursor: pointer;
+  }
+  .btn-gmaps:hover { background: #3367d6; color: #fff; transform: translateY(-1px); }
+
+  .btn-call {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #ecfdf5; color: #059669;
+    border: 1.5px solid #a7f3d0; border-radius: 10px;
+    padding: 11px 20px; font-size: 13.5px; font-weight: 600;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .btn-call:hover { background: #d1fae5; color: #059669; }
+</style>
+{% endblock %}
+
+{% block content %}
+{% set facs = hospital.facilities.split(',') if hospital.facilities else [] %}
+{% set docs = hospital.doctors.split(',') if hospital.doctors else [] %}
+{% set maps_url = 'https://www.google.com/maps/search/?api=1&query=' + (hospital.name + ' ' + hospital.city + ' ' + (hospital.state or ''))|urlencode %}
+
+<!-- Back + Hero -->
+<div class="detail-hero">
+  <div class="container">
+    <a href="/hospital/find" class="btn-cc-secondary mb-3" style="font-size:13px;padding:7px 14px;">
+      <i class="bi bi-arrow-left"></i> Back to Find Care
+    </a>
+
+    <div class="row align-items-start g-4">
+      <div class="col-lg-8">
+        <div class="type-chip
+          {% if hospital.hospital_type == 'Public' %}chip-public
+          {% elif hospital.hospital_type == 'Clinic' %}chip-clinic
+          {% else %}chip-private{% endif %}">
+          <i class="bi {% if hospital.hospital_type == 'Public' %}bi-bank{% elif hospital.hospital_type == 'Clinic' %}bi-clipboard2-pulse{% else %}bi-building{% endif %}"></i>
+          {{ hospital.hospital_type }}
+          {% if hospital.is_mri_center %}&nbsp;·&nbsp;<i class="bi bi-broadcast"></i> MRI Centre{% endif %}
+        </div>
+        <div class="detail-name">{{ hospital.name }}</div>
+        <div class="detail-location">
+          <i class="bi bi-geo-alt-fill" style="color:var(--primary);font-size:12px;"></i>
+          {{ hospital.address }}{% if hospital.address %}, {% endif %}{{ hospital.city }}{% if hospital.state %}, {{ hospital.state }}{% endif %}
+        </div>
+        {% if hospital.accreditation %}
+        <div class="mt-2">
+          <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;">
+            <i class="bi bi-patch-check"></i> {{ hospital.accreditation }}
+          </span>
+        </div>
+        {% endif %}
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        {% if hospital.rating %}
+        <div class="rating-big mb-3">
+          <i class="bi bi-star-fill"></i> {{ hospital.rating }} / 5.0
+        </div>
+        <br>
+        {% endif %}
+        <div class="d-flex gap-2 flex-wrap justify-content-lg-end">
+          <a href="{{ maps_url }}" target="_blank" class="btn-gmaps">
+            <i class="bi bi-map-fill"></i> Open in Google Maps
+          </a>
+          {% if hospital.phone %}
+          <a href="tel:{{ hospital.phone }}" class="btn-call">
+            <i class="bi bi-telephone-fill"></i> Call
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+  <div class="row g-4">
+
+    <!-- LEFT COLUMN -->
+    <div class="col-lg-7">
+
+      <!-- Facilities -->
+      {% if facs %}
+      <div class="detail-section">
+        <div class="detail-section-header">
+          <div class="detail-section-icon"><i class="bi bi-check2-circle"></i></div>
+          <div class="detail-section-title">Facilities & Treatments</div>
+        </div>
+        <div class="detail-section-body">
+          <div class="facility-grid">
+            {% for fac in facs %}
+            {% set f = fac.strip() %}
+            {% if 'MRI' in f %}
+              <div class="facility-item fac-mri-item"><i class="bi bi-broadcast"></i> {{ f }}</div>
+            {% elif 'Surgery' in f %}
+              <div class="facility-item fac-surgery-item"><i class="bi bi-scissors"></i> {{ f }}</div>
+            {% elif 'Radiation' in f %}
+              <div class="facility-item fac-radiation-item"><i class="bi bi-radioactive"></i> {{ f }}</div>
+            {% elif 'Chemo' in f %}
+              <div class="facility-item fac-chemo-item"><i class="bi bi-capsule"></i> {{ f }}</div>
+            {% elif 'Biopsy' in f %}
+              <div class="facility-item fac-biopsy-item"><i class="bi bi-eyedropper"></i> {{ f }}</div>
+            {% elif 'Gamma' in f %}
+              <div class="facility-item fac-gamma-item"><i class="bi bi-lightning"></i> {{ f }}</div>
+            {% else %}
+              <div class="facility-item fac-other-item"><i class="bi bi-check-circle"></i> {{ f }}</div>
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- MRI Info -->
+      {% if hospital.is_mri_center %}
+      <div class="detail-section">
+        <div class="detail-section-header">
+          <div class="detail-section-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-broadcast"></i></div>
+          <div class="detail-section-title">MRI Scan Centre</div>
+        </div>
+        <div class="detail-section-body">
+          <div class="mri-highlight">
+            <div class="mri-highlight-icon"><i class="bi bi-broadcast"></i></div>
+            <div>
+              {% if hospital.mri_types %}
+              <div style="font-weight:700;font-size:14px;color:#059669;margin-bottom:4px;">
+                {{ hospital.mri_types }}
+              </div>
+              {% endif %}
+              {% if hospital.cost_range %}
+              <div style="font-size:13px;color:var(--text-secondary);">
+                Estimated scan cost: <strong style="color:var(--primary);">{{ hospital.cost_range }}</strong>
+              </div>
+              {% endif %}
+              <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+                <i class="bi bi-info-circle"></i> Contact the centre directly to confirm availability and pricing.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Doctors -->
+      {% if docs %}
+      <div class="detail-section">
+        <div class="detail-section-header">
+          <div class="detail-section-icon"><i class="bi bi-person-badge"></i></div>
+          <div class="detail-section-title">Specialist Doctors</div>
+        </div>
+        <div class="detail-section-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+          {% for doc in docs %}
+          {% set parts = doc.strip().split('–') %}
+          <div class="doctor-item">
+            <div class="doctor-avatar"><i class="bi bi-person-fill"></i></div>
+            <div>
+              <div class="doctor-name">{{ parts[0].strip() }}</div>
+              {% if parts|length > 1 %}
+              <div class="doctor-role">{{ parts[1].strip() }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="col-lg-5">
+
+      <!-- Map -->
+      <div class="detail-section mb-3">
+        <div class="detail-section-header">
+          <div class="detail-section-icon"><i class="bi bi-map"></i></div>
+          <div class="detail-section-title">Location</div>
+        </div>
+        <div class="detail-section-body" style="padding:0;">
+          {% if hospital.latitude and hospital.longitude %}
+          <div class="map-container" style="height:260px;">
+            <iframe
+              src="https://maps.google.com/maps?q={{ hospital.latitude }},{{ hospital.longitude }}&z=15&output=embed"
+              allowfullscreen loading="lazy">
+            </iframe>
+          </div>
+          {% else %}
+          <div class="map-container" style="height:200px;">
+            <i class="bi bi-map" style="font-size:2rem;opacity:0.3;"></i>
+            <span>Map not available</span>
+          </div>
+          {% endif %}
+          <div style="padding:0.85rem 1.4rem;">
+            <a href="{{ maps_url }}" target="_blank" class="btn-gmaps w-100 justify-content-center">
+              <i class="bi bi-map-fill"></i> Open in Google Maps
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="detail-section">
+        <div class="detail-section-header">
+          <div class="detail-section-icon"><i class="bi bi-person-lines-fill"></i></div>
+          <div class="detail-section-title">Contact Information</div>
+        </div>
+        <div class="detail-section-body" style="padding-top:0.5rem;padding-bottom:0.5rem;">
+          {% if hospital.phone %}
+          <div class="contact-row">
+            <div class="contact-icon"><i class="bi bi-telephone-fill"></i></div>
+            <div>
+              <div class="contact-label">Phone</div>
+              <a href="tel:{{ hospital.phone }}" class="contact-value" style="color:inherit;text-decoration:none;">{{ hospital.phone }}</a>
+            </div>
+          </div>
+          {% endif %}
+          {% if hospital.email %}
+          <div class="contact-row">
+            <div class="contact-icon"><i class="bi bi-envelope-fill"></i></div>
+            <div>
+              <div class="contact-label">Email</div>
+              <a href="mailto:{{ hospital.email }}" class="contact-value" style="color:inherit;text-decoration:none;">{{ hospital.email }}</a>
+            </div>
+          </div>
+          {% endif %}
+          {% if hospital.website %}
+          <div class="contact-row">
+            <div class="contact-icon"><i class="bi bi-globe"></i></div>
+            <div>
+              <div class="contact-label">Website</div>
+              <a href="{{ hospital.website }}" target="_blank" class="contact-value" style="color:var(--primary);text-decoration:none;">
+                {{ hospital.website | replace('https://','') | replace('http://','') }}
+              </a>
+            </div>
+          </div>
+          {% endif %}
+          <div class="contact-row">
+            <div class="contact-icon"><i class="bi bi-geo-alt-fill"></i></div>
+            <div>
+              <div class="contact-label">Address</div>
+              <div class="contact-value" style="font-size:13px;">
+                {{ hospital.address }}{% if hospital.address %},{% endif %}
+                {{ hospital.city }}{% if hospital.state %}, {{ hospital.state }}{% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="cc-disclaimer mt-3">
+        <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
+        <span>Hospital information is for reference only. Always confirm details directly with the hospital before visiting.</span>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

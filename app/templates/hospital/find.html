@@ -2,6 +2,47 @@
 {% block title %}Find Care — CerebroCare360{% endblock %}
 {% block extra_css %}
 <style>
+  /* ── Page header ───────────────────────────────────────────── */
+  .find-hero {
+    background: linear-gradient(135deg, #eef0fd 0%, #f5f3ff 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 0 2rem;
+  }
+
+  /* ── Tab switcher ──────────────────────────────────────────── */
+  .tab-pill {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 4px;
+    gap: 2px;
+    box-shadow: var(--shadow-sm);
+  }
+  .tab-pill-btn {
+    padding: 9px 22px;
+    border-radius: 26px;
+    font-size: 13.5px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 7px;
+    text-decoration: none;
+  }
+  .tab-pill-btn.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(59,79,216,0.3);
+  }
+  .tab-pill-btn:hover:not(.active) {
+    background: var(--surface-2);
+    color: var(--text-primary);
+  }
+
+  /* ── Search bar ────────────────────────────────────────────── */
   .search-bar {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -14,214 +55,432 @@
     box-shadow: var(--shadow-sm);
     margin-bottom: 1.75rem;
   }
-
   .search-bar .cc-form-group {
     margin-bottom: 0;
     flex: 1;
-    min-width: 160px;
+    min-width: 140px;
   }
 
+  /* ── Results meta ──────────────────────────────────────────── */
+  .results-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .results-count {
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  /* ── Hospital card ─────────────────────────────────────────── */
   .hospital-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    transition: all 0.2s;
+    overflow: hidden;
+    transition: all 0.22s ease;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .hospital-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+    border-color: rgba(59,79,216,0.3);
   }
 
-  .hospital-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-    border-color: var(--primary);
+  .hospital-card-top {
+    padding: 1.4rem 1.4rem 1rem;
+    border-bottom: 1px solid var(--border);
+    flex: 1;
+  }
+
+  .hospital-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 0.9rem;
   }
 
   .hospital-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 46px; height: 46px;
+    border-radius: 12px;
     background: var(--primary-light);
     color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 20px;
-    margin-bottom: 1rem;
+    flex-shrink: 0;
   }
+  .hospital-icon.mri { background: #ecfdf5; color: #059669; }
+  .hospital-icon.public { background: #fffbeb; color: #d97706; }
+  .hospital-icon.clinic { background: #fdf2f8; color: #9333ea; }
 
   .hospital-name {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
+    font-weight: 700;
+    font-size: 0.97rem;
+    color: var(--text-primary);
+    line-height: 1.35;
+    margin-bottom: 3px;
   }
 
+  .hospital-location {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* rating */
+  .star-rating {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600;
+    color: #d97706;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 20px;
+    padding: 2px 8px;
+  }
+
+  /* detail rows */
   .hospital-detail {
     font-size: 13px;
     color: var(--text-secondary);
-    display: flex;
-    align-items: flex-start;
-    gap: 7px;
-    margin-top: 6px;
+    display: flex; align-items: flex-start;
+    gap: 7px; margin-top: 7px;
   }
+  .hospital-detail i { flex-shrink: 0; margin-top: 2px; color: var(--text-muted); }
 
-  .hospital-detail i {
-    flex-shrink: 0;
-    margin-top: 2px;
-    color: var(--text-muted);
-  }
-
-  .accred-badge {
-    display: inline-block;
-    background: var(--primary-light);
-    color: var(--primary);
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 11.5px;
-    font-weight: 600;
+  /* facility badges */
+  .facility-badges {
+    display: flex; flex-wrap: wrap; gap: 5px;
     margin-top: 10px;
   }
+  .fac-badge {
+    font-size: 11px; font-weight: 600;
+    padding: 3px 9px; border-radius: 20px;
+    border: 1px solid;
+  }
+  .fac-mri      { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
+  .fac-surgery  { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+  .fac-radiation{ background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+  .fac-chemo    { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
+  .fac-biopsy   { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+  .fac-gamma    { background: #fdf4ff; color: #a21caf; border-color: #f0abfc; }
+  .fac-other    { background: var(--surface-2); color: var(--text-secondary); border-color: var(--border); }
 
-  .no-results {
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-muted);
+  /* accred + type badges */
+  .info-badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+  .info-badge {
+    font-size: 11px; font-weight: 600; padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .badge-accred { background: var(--primary-light); color: var(--primary); }
+  .badge-public  { background: #fffbeb; color: #92400e; }
+  .badge-private { background: #ecfdf5; color: #065f46; }
+  .badge-clinic  { background: #fdf2f8; color: #9333ea; }
+  .badge-mricenter { background: #ecfdf5; color: #059669; }
+
+  /* MRI cost */
+  .mri-cost-row {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 8px; font-size: 13px;
+  }
+  .mri-cost-val {
+    font-weight: 700; color: var(--primary);
+    font-size: 13.5px;
   }
 
-  .no-results i {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    display: block;
+  /* card footer actions */
+  .hospital-card-footer {
+    padding: 0.85rem 1.4rem;
+    display: flex; gap: 8px;
+    background: var(--surface-2);
+  }
+  .btn-detail {
+    flex: 1; padding: 8px 12px;
+    background: var(--primary); color: #fff;
+    border: none; border-radius: 8px;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-detail:hover { background: var(--primary-dark); color: #fff; }
+  .btn-maps {
+    padding: 8px 12px;
+    background: var(--surface); color: var(--text-secondary);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12.5px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .btn-maps:hover {
+    background: #ecfdf5; color: #059669;
+    border-color: #a7f3d0;
+  }
+
+  /* ── Empty state ───────────────────────────────────────────── */
+  .no-results {
+    text-align: center; padding: 4rem 2rem;
+    color: var(--text-muted);
+  }
+  .no-results i { font-size: 2.8rem; margin-bottom: 1rem; display: block; opacity: 0.4; }
+
+  /* ── MRI Centers special badge ─────────────────────────────── */
+  .mri-type-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #ecfdf5; color: #059669;
+    border: 1px solid #a7f3d0;
+    border-radius: 20px; padding: 3px 10px;
+    font-size: 11.5px; font-weight: 600;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="mb-4">
-    <h1 class="cc-section-title">Find Specialist Care</h1>
-    <p class="cc-section-sub">Search verified hospitals with neurology and oncology departments</p>
-  </div>
+<!-- Page Header -->
+<div class="find-hero">
+  <div class="container">
+    <h1 class="cc-section-title mb-1">Find Specialist Care</h1>
+    <p class="cc-section-sub mb-3">Search hospitals, neurology centres, and MRI scan centres across India</p>
 
+    <!-- Tab switcher -->
+    <div class="tab-pill">
+      <a href="/hospital/find?tab=hospitals{{ '&city=' + request.args.get('city','') if request.args.get('city') }}"
+         class="tab-pill-btn {% if tab != 'mri' %}active{% endif %}">
+        <i class="bi bi-hospital"></i> Hospitals & Specialists
+      </a>
+      <a href="/hospital/find?tab=mri{{ '&city=' + request.args.get('city','') if request.args.get('city') }}"
+         class="tab-pill-btn {% if tab == 'mri' %}active{% endif %}">
+        <i class="bi bi-broadcast"></i> MRI Scan Centres
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+
+  <!-- Search / Filter bar -->
   <form method="GET" action="/hospital/find">
+    <input type="hidden" name="tab" value="{{ tab }}">
     <div class="search-bar">
       <div class="cc-form-group">
-        <label class="cc-label">State</label>
-        <div style="position:relative;">
-          <input type="text" name="state" class="cc-input" placeholder="e.g. Maharashtra"
-            value="{{ request.args.get('state', '') }}" />
-        </div>
+        <label class="cc-label"><i class="bi bi-map" style="font-size:11px;"></i> State</label>
+        <input type="text" name="state" class="cc-input" placeholder="e.g. Kerala"
+          value="{{ request.args.get('state', '') }}" />
       </div>
       <div class="cc-form-group">
-        <label class="cc-label">City</label>
-        <div style="position:relative;">
-          <i class="bi bi-geo-alt"
-            style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
-          <input type="text" name="city" class="cc-input" style="padding-left:36px;" placeholder="e.g. Mumbai"
-            value="{{ request.args.get('city', '') }}" />
-        </div>
+        <label class="cc-label"><i class="bi bi-geo-alt" style="font-size:11px;"></i> City</label>
+        <input type="text" name="city" class="cc-input" placeholder="e.g. Kochi"
+          value="{{ request.args.get('city', '') }}" />
       </div>
+
+      {% if tab != 'mri' %}
       <div class="cc-form-group">
-        <label class="cc-label">Specialty</label>
+        <label class="cc-label"><i class="bi bi-heart-pulse" style="font-size:11px;"></i> Specialty</label>
         <select name="specialty" class="cc-input">
           <option value="">All Specialties</option>
-          <option value="Neurology" {% if request.args.get('specialty')=='Neurology' %}selected{% endif %}>Neurology
-          </option>
-          <option value="Oncology" {% if request.args.get('specialty')=='Oncology' %}selected{% endif %}>Oncology
-          </option>
-          <option value="Neurosurgery" {% if request.args.get('specialty')=='Neurosurgery' %}selected{% endif %}>
-            Neurosurgery</option>
+          <option value="Neurology"    {% if request.args.get('specialty')=='Neurology' %}selected{% endif %}>Neurology</option>
+          <option value="Neurosurgery" {% if request.args.get('specialty')=='Neurosurgery' %}selected{% endif %}>Neurosurgery</option>
+          <option value="Neuro Oncology" {% if request.args.get('specialty')=='Neuro Oncology' %}selected{% endif %}>Neuro Oncology</option>
+          <option value="Radiology"    {% if request.args.get('specialty')=='Radiology' %}selected{% endif %}>Radiology</option>
         </select>
       </div>
       <div class="cc-form-group">
-        <label class="cc-label">Type</label>
+        <label class="cc-label"><i class="bi bi-building" style="font-size:11px;"></i> Type</label>
         <select name="hospital_type" class="cc-input">
           <option value="">All Types</option>
-          <option value="Public" {% if request.args.get('hospital_type')=='Public' %}selected{% endif %}>Public</option>
-          <option value="Private" {% if request.args.get('hospital_type')=='Private' %}selected{% endif %}>Private
-          </option>
-          <option value="Clinic" {% if request.args.get('hospital_type')=='Clinic' %}selected{% endif %}>Clinic</option>
+          <option value="Public"  {% if request.args.get('hospital_type')=='Public' %}selected{% endif %}>Public / Govt</option>
+          <option value="Private" {% if request.args.get('hospital_type')=='Private' %}selected{% endif %}>Private</option>
+          <option value="Clinic"  {% if request.args.get('hospital_type')=='Clinic' %}selected{% endif %}>Clinic / Centre</option>
         </select>
       </div>
+      {% endif %}
+
       <div class="cc-form-group">
-        <label class="cc-label">Min Rating</label>
-        <div style="position:relative;">
-          <i class="bi bi-star"
-            style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);"></i>
-          <input type="number" step="0.1" min="0" max="5" name="rating" class="cc-input" style="padding-left:36px;"
-            placeholder="e.g. 4.0" value="{{ request.args.get('rating', '') }}" />
-        </div>
+        <label class="cc-label"><i class="bi bi-star" style="font-size:11px;"></i> Min Rating</label>
+        <input type="number" step="0.1" min="0" max="5" name="rating" class="cc-input"
+          placeholder="e.g. 4.0" value="{{ request.args.get('rating', '') }}" />
       </div>
-      <button type="submit" class="btn-cc-primary" style="padding:11px 24px;">
+
+      <button type="submit" class="btn-cc-primary" style="padding:11px 24px;white-space:nowrap;">
         <i class="bi bi-search"></i> Search
       </button>
+      {% if request.args %}
+      <a href="/hospital/find?tab={{ tab }}" class="btn-cc-secondary" style="padding:11px 16px;">
+        <i class="bi bi-x"></i> Clear
+      </a>
+      {% endif %}
     </div>
   </form>
 
+  <!-- Results -->
   {% if hospitals %}
-  <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:1.25rem;">
-    Found <strong>{{ hospitals | length }}</strong> hospital{{ 's' if hospitals | length != 1 }}
-  </p>
+  <div class="results-meta">
+    <span class="results-count">
+      Found <strong>{{ hospitals|length }}</strong>
+      {{ 'MRI centre' if tab == 'mri' else 'hospital' }}{{ 's' if hospitals|length != 1 }}
+    </span>
+  </div>
+
   <div class="row g-4">
     {% for h in hospitals %}
+    {% set facs = h.facilities.split(',') if h.facilities else [] %}
+    {% set maps_url = 'https://www.google.com/maps/search/?api=1&query=' + (h.name + ' ' + h.city + ' ' + (h.state or ''))|urlencode %}
+
     <div class="col-md-6 col-lg-4">
       <div class="hospital-card">
-        <div class="hospital-icon"><i class="bi bi-hospital"></i></div>
-        <div class="hospital-name">{{ h.name }}</div>
-        <div class="hospital-detail">
-          <i class="bi bi-geo-alt"></i>
-          <span>{{ h.address }}, {{ h.city }}{% if h.state %}, {{ h.state }}{% endif %}</span>
+        <div class="hospital-card-top">
+
+          <!-- Header -->
+          <div class="hospital-card-header">
+            <div class="hospital-icon {% if tab == 'mri' %}mri{% elif h.hospital_type == 'Public' %}public{% elif h.hospital_type == 'Clinic' %}clinic{% endif %}">
+              <i class="bi {% if tab == 'mri' %}bi-broadcast{% elif h.hospital_type == 'Public' %}bi-bank{% else %}bi-hospital{% endif %}"></i>
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div class="hospital-name">{{ h.name }}</div>
+              <div class="hospital-location">
+                <i class="bi bi-geo-alt-fill" style="font-size:10px;"></i>
+                {{ h.city }}{% if h.state %}, {{ h.state }}{% endif %}
+              </div>
+            </div>
+            {% if h.rating %}
+            <div class="star-rating" style="flex-shrink:0;">
+              <i class="bi bi-star-fill" style="font-size:10px;"></i>
+              {{ h.rating }}
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Address -->
+          {% if h.address %}
+          <div class="hospital-detail">
+            <i class="bi bi-pin-map"></i>
+            <span>{{ h.address }}</span>
+          </div>
+          {% endif %}
+
+          <!-- Phone -->
+          {% if h.phone %}
+          <div class="hospital-detail">
+            <i class="bi bi-telephone"></i>
+            <a href="tel:{{ h.phone }}" style="color:inherit;text-decoration:none;">{{ h.phone }}</a>
+          </div>
+          {% endif %}
+
+          <!-- Specialty -->
+          {% if h.specialty and tab != 'mri' %}
+          <div class="hospital-detail">
+            <i class="bi bi-heart-pulse"></i>
+            <span>{{ h.specialty }}</span>
+          </div>
+          {% endif %}
+
+          <!-- MRI types (for MRI tab) -->
+          {% if h.mri_types %}
+          <div class="hospital-detail">
+            <i class="bi bi-broadcast"></i>
+            <span>{{ h.mri_types }}</span>
+          </div>
+          {% endif %}
+
+          <!-- MRI cost -->
+          {% if h.cost_range and tab == 'mri' %}
+          <div class="mri-cost-row">
+            <i class="bi bi-currency-rupee" style="color:var(--text-muted);font-size:13px;"></i>
+            <span style="color:var(--text-muted);font-size:12px;">Est. cost:</span>
+            <span class="mri-cost-val">{{ h.cost_range }}</span>
+          </div>
+          {% endif %}
+
+          <!-- Facility badges -->
+          {% if facs %}
+          <div class="facility-badges">
+            {% for fac in facs %}
+            {% set f = fac.strip() %}
+            {% if 'MRI' in f %}
+              <span class="fac-badge fac-mri"><i class="bi bi-broadcast" style="font-size:9px;"></i> {{ f }}</span>
+            {% elif 'Surgery' in f %}
+              <span class="fac-badge fac-surgery"><i class="bi bi-scissors" style="font-size:9px;"></i> {{ f }}</span>
+            {% elif 'Radiation' in f %}
+              <span class="fac-badge fac-radiation"><i class="bi bi-radioactive" style="font-size:9px;"></i> {{ f }}</span>
+            {% elif 'Chemo' in f %}
+              <span class="fac-badge fac-chemo"><i class="bi bi-capsule" style="font-size:9px;"></i> {{ f }}</span>
+            {% elif 'Biopsy' in f %}
+              <span class="fac-badge fac-biopsy"><i class="bi bi-eyedropper" style="font-size:9px;"></i> {{ f }}</span>
+            {% elif 'Gamma' in f %}
+              <span class="fac-badge fac-gamma"><i class="bi bi-lightning" style="font-size:9px;"></i> {{ f }}</span>
+            {% else %}
+              <span class="fac-badge fac-other">{{ f }}</span>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Info badges -->
+          <div class="info-badges">
+            {% if h.accreditation %}
+            <span class="info-badge badge-accred"><i class="bi bi-patch-check" style="font-size:10px;"></i> {{ h.accreditation }}</span>
+            {% endif %}
+            {% if h.hospital_type == 'Public' %}
+              <span class="info-badge badge-public"><i class="bi bi-bank" style="font-size:10px;"></i> Government</span>
+            {% elif h.hospital_type == 'Private' %}
+              <span class="info-badge badge-private"><i class="bi bi-building" style="font-size:10px;"></i> Private</span>
+            {% elif h.hospital_type == 'Clinic' %}
+              <span class="info-badge badge-clinic"><i class="bi bi-clipboard2-pulse" style="font-size:10px;"></i> Clinic</span>
+            {% endif %}
+            {% if h.is_mri_center %}
+            <span class="info-badge badge-mricenter"><i class="bi bi-broadcast" style="font-size:10px;"></i> MRI Centre</span>
+            {% endif %}
+          </div>
+
         </div>
-        {% if h.phone %}
-        <div class="hospital-detail">
-          <i class="bi bi-telephone"></i>
-          <span>{{ h.phone }}</span>
+
+        <!-- Footer actions -->
+        <div class="hospital-card-footer">
+          <a href="/hospital/{{ h.id }}" class="btn-detail">
+            <i class="bi bi-eye"></i> View Details
+          </a>
+          <a href="{{ maps_url }}" target="_blank" rel="noopener" class="btn-maps">
+            <i class="bi bi-map"></i> Directions
+          </a>
         </div>
-        {% endif %}
-        {% if h.email %}
-        <div class="hospital-detail">
-          <i class="bi bi-envelope"></i>
-          <span>{{ h.email }}</span>
-        </div>
-        {% endif %}
-        <div class="hospital-detail">
-          <i class="bi bi-heart-pulse"></i>
-          <span>{{ h.specialty }}</span>
-        </div>
-        {% if h.accreditation %}
-        <div class="accred-badge">
-          <i class="bi bi-patch-check"></i> {{ h.accreditation }}
-        </div>
-        {% endif %}
-        {% if h.rating %}
-        <div class="accred-badge" style="background:#fffbeb; color:#92400e;">
-          <i class="bi bi-star-fill"></i> {{ h.rating }}/5.0
-        </div>
-        {% endif %}
-        {% if h.hospital_type %}
-        <div class="accred-badge" style="background:#ecfdf5; color:#059669;">
-          <i class="bi bi-building"></i> {{ h.hospital_type }}
-        </div>
-        {% endif %}
       </div>
     </div>
     {% endfor %}
   </div>
+
   {% elif request.args %}
   <div class="cc-card">
     <div class="no-results">
       <i class="bi bi-hospital"></i>
-      <h5 style="font-weight:600;">No hospitals found</h5>
-      <p style="font-size:14px;">Try a different city or specialty filter.</p>
+      <h5 style="font-weight:600;color:var(--text-primary);">No results found</h5>
+      <p style="font-size:14px;">Try a different city, state, or remove some filters.</p>
+      <a href="/hospital/find?tab={{ tab }}" class="btn-cc-secondary mt-2">Clear filters</a>
     </div>
   </div>
+
   {% else %}
   <div class="cc-card">
     <div class="no-results">
       <i class="bi bi-search"></i>
-      <h5 style="font-weight:600;">Search for hospitals</h5>
-      <p style="font-size:14px;">Enter a city name or specialty above to find hospitals near you.</p>
+      <h5 style="font-weight:600;color:var(--text-primary);">
+        {% if tab == 'mri' %}Search for MRI centres{% else %}Search for hospitals{% endif %}
+      </h5>
+      <p style="font-size:14px;">
+        {% if tab == 'mri' %}
+          Enter a city to find MRI scan centres near you.
+        {% else %}
+          Enter a city, state, or specialty to find specialist hospitals.
+        {% endif %}
+      </p>
     </div>
   </div>
   {% endif %}
+
 </div>
 {% endblock %}

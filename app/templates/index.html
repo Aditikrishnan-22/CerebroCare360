@@ -343,9 +343,15 @@
           Get instant results, downloadable reports, and specialist guidance.
         </p>
         <div class="hero-actions">
-          <a href="/auth/register" class="btn-cc-primary btn-lg">
-            <i class="bi bi-upload"></i> Analyse My MRI
-          </a>
+          {% if current_user.is_authenticated %}
+             <a href="/scan/upload" class="btn-cc-primary btn-lg">
+             <i class="bi bi-upload"></i> Analyse My MRI
+             </a>
+             {% else %}
+              <a href="/auth/register" class="btn-cc-primary btn-lg">
+              <i class="bi bi-upload"></i> Analyse My MRI
+              </a>
+          {% endif %}
           <a href="#how-it-works" class="btn-cc-secondary btn-lg">
             How it works
           </a>

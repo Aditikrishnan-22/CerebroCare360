@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ user.full_name }}'s Scans — Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width:900px;">
+
+  <!-- Header -->
+  <div class="d-flex align-items-center gap-3 mb-4">
+    <a href="/admin/dashboard" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
+      <i class="bi bi-arrow-left"></i> Back to Admin
+    </a>
+    <div>
+      <h1 class="cc-section-title mb-0">{{ user.full_name }}'s Scans</h1>
+      <p class="cc-section-sub mb-0" style="margin-top:2px;">{{ user.email }} · {{ scans|length }} scan{{ 's' if scans|length != 1 }}</p>
+    </div>
+    <div class="ms-auto d-flex align-items-center gap-2">
+      {% if user.role == 'admin' %}
+        <span class="status-badge badge-admin-role"><i class="bi bi-shield-check" style="font-size:10px;"></i> ADMIN</span>
+      {% else %}
+        <span class="status-badge badge-user-role"><i class="bi bi-person" style="font-size:10px;"></i> USER</span>
+      {% endif %}
+      {% if user.is_active %}
+        <span class="status-badge badge-active">Active</span>
+      {% else %}
+        <span class="status-badge badge-inactive">Inactive</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if scans %}
+  <div class="cc-card">
+    <div class="cc-card-header">
+      <div class="cc-card-icon"><i class="bi bi-file-earmark-medical"></i></div>
+      <div class="cc-card-title">Scan History</div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+        <thead>
+          <tr>
+            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Scan</th>
+            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Date</th>
+            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Result</th>
+            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Confidence</th>
+            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scan in scans %}
+          <tr style="{% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+            <td style="padding:12px 16px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:40px;height:40px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;flex-shrink:0;">
+                  <img src="/static/uploads/{{ scan.image_filename }}"
+                       style="width:100%;height:100%;object-fit:cover;"
+                       onerror="this.style.display='none'">
+                </div>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">{{ scan.original_name or scan.image_filename }}</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);">
+                    {{ (scan.file_size / 1024)|round(1) }} KB
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td style="padding:12px 16px;color:var(--text-secondary);font-size:13px;">
+              {{ scan.upload_date.strftime('%d %b %Y') if scan.upload_date else '—' }}<br>
+              <span style="font-size:11.5px;color:var(--text-muted);">
+                {{ scan.upload_date.strftime('%I:%M %p') if scan.upload_date else '' }}
+              </span>
+            </td>
+            <td style="padding:12px 16px;">
+              {% if scan.predictions %}
+                {% set pred = scan.predictions[0] %}
+                {% if pred.has_tumor %}
+                  <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#fee2e2;color:#dc2626;">
+                    <i class="bi bi-exclamation-circle" style="font-size:10px;"></i>
+                    {{ pred.tumor_type | replace('_',' ') | title }}
+                  </span>
+                {% else %}
+                  <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#d1fae5;color:#059669;">
+                    <i class="bi bi-check-circle" style="font-size:10px;"></i>
+                    No Tumor
+                  </span>
+                {% endif %}
+              {% else %}
+                <span style="color:var(--text-muted);font-size:13px;">No prediction</span>
+              {% endif %}
+            </td>
+            <td style="padding:12px 16px;">
+              {% if scan.predictions %}
+                {% set pred = scan.predictions[0] %}
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:70px;height:6px;background:var(--border);border-radius:4px;overflow:hidden;">
+                    <div style="width:{{ (pred.confidence * 100)|round }}%;height:100%;border-radius:4px;
+                      background:{% if pred.confidence >= 0.75 %}var(--success){% elif pred.confidence >= 0.5 %}#d97706{% else %}#dc2626{% endif %};"></div>
+                  </div>
+                  <span style="font-size:12.5px;font-weight:600;color:var(--text-secondary);">
+                    {{ (pred.confidence * 100)|round(1) }}%
+                  </span>
+                </div>
+              {% else %}—{% endif %}
+            </td>
+            <td style="padding:12px 16px;">
+              {% if scan.predictions %}
+              <a href="/scan/result/{{ scan.predictions[0].id }}"
+                 style="padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;
+                        border:1.5px solid var(--primary);color:var(--primary);
+                        background:var(--primary-light);text-decoration:none;
+                        display:inline-flex;align-items:center;gap:4px;">
+                <i class="bi bi-eye"></i> View
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <div class="cc-card">
+    <div class="cc-card-body" style="text-align:center;padding:3rem;">
+      <i class="bi bi-file-earmark-medical" style="font-size:3rem;color:var(--text-muted);opacity:0.3;display:block;margin-bottom:1rem;"></i>
+      <div style="font-weight:600;color:var(--text-primary);margin-bottom:6px;">No scans yet</div>
+      <div style="font-size:13.5px;color:var(--text-muted);">{{ user.full_name }} hasn't uploaded any MRI scans.</div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<style>
+  .status-badge { padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;display:inline-block; }
+  .badge-active   { background:#d1fae5;color:#059669; }
+  .badge-inactive { background:#fee2e2;color:#dc2626; }
+  .badge-admin-role { background:#fef3c7;color:#92400e; }
+  .badge-user-role  { background:var(--primary-light);color:var(--primary); }
+</style>
+{% endblock %}

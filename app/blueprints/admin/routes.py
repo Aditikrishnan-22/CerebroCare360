@@ -8,8 +8,8 @@ from app.models.symptom_rule import SymptomRule
 from app.models.user import User
 from app.models.mri_scan import MRIScan
 from app.models.report import Report
-from app.utils.decorators import admin_required
 import json
+
 
 def admin_required(f):
     @wraps(f)
@@ -20,6 +20,7 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated
 
+
 @admin_bp.route('/dashboard')
 @login_required
 @admin_required
@@ -28,84 +29,165 @@ def dashboard():
         'total_users':     User.query.count(),
         'total_scans':     MRIScan.query.count(),
         'total_hospitals': Hospital.query.count(),
-        'total_reports':   Report.query.count()
+        'total_reports':   Report.query.count(),
     }
     hospitals = Hospital.query.order_by(Hospital.name).all()
     rules     = SymptomRule.query.all()
+    users     = User.query.order_by(User.id.desc()).all()
     return render_template('admin/dashboard.html',
-                           stats=stats,
-                           hospitals=hospitals,
-                           rules=rules)
+                           stats=stats, hospitals=hospitals,
+                           rules=rules, users=users)
 
-@admin_bp.route('/hospitals/add', methods=['GET', 'POST'])
+
+# ── HOSPITAL HELPERS ────────────────────────────────────────────
+def _hospital_from_form(h):
+    h.name          = request.form.get('name', '').strip()
+    h.address       = request.form.get('address', '').strip()
+    h.city          = request.form.get('city', '').strip()
+    h.state         = request.form.get('state', '').strip()
+    h.phone         = request.form.get('phone', '').strip()
+    h.email         = request.form.get('email', '').strip()
+    h.website       = request.form.get('website', '').strip()
+    h.specialty     = request.form.get('specialty', '').strip()
+    h.hospital_type = request.form.get('hospital_type', '').strip()
+    h.accreditation = request.form.get('accreditation', '').strip()
+    h.facilities    = request.form.get('facilities', '').strip()
+    h.doctors       = request.form.get('doctors', '').strip()
+    h.mri_types     = request.form.get('mri_types', '').strip()
+    h.cost_range    = request.form.get('cost_range', '').strip()
+    h.is_mri_center = request.form.get('is_mri_center') == '1'
+    try:
+        h.rating    = float(request.form.get('rating')) if request.form.get('rating') else None
+    except ValueError:
+        h.rating    = None
+    try:
+        h.latitude  = float(request.form.get('latitude')) if request.form.get('latitude') else None
+    except ValueError:
+        h.latitude  = None
+    try:
+        h.longitude = float(request.form.get('longitude')) if request.form.get('longitude') else None
+    except ValueError:
+        h.longitude = None
+    return h
+
+
+@admin_bp.route('/hospitals/add', methods=['POST'])
 @login_required
 @admin_required
 def add_hospital():
-    if request.method == 'POST':
-        h = Hospital(
-            name          = request.form.get('name'),
-            address       = request.form.get('address'),
-            city          = request.form.get('city'),
-            state         = request.form.get('state'),
-            phone         = request.form.get('phone'),
-            email         = request.form.get('email'),
-            specialty     = request.form.get('specialty'),
-            accreditation = request.form.get('accreditation'),
-            is_active     = True
-        )
-        db.session.add(h)
-        db.session.commit()
-        flash('Hospital added successfully.', 'success')
-        return redirect(url_for('admin.dashboard'))
-    return render_template('admin/hospitals.html', hospital=None)
+    h = Hospital(is_active=True)
+    h = _hospital_from_form(h)
+    db.session.add(h)
+    db.session.commit()
+    flash(f'Hospital "{h.name}" added.', 'success')
+    return redirect(url_for('admin.dashboard'))
 
-@admin_bp.route('/hospitals/edit/<int:hospital_id>', methods=['GET', 'POST'])
+
+@admin_bp.route('/hospitals/edit/<int:hospital_id>', methods=['POST'])
 @login_required
 @admin_required
 def edit_hospital(hospital_id):
     h = Hospital.query.get_or_404(hospital_id)
-    if request.method == 'POST':
-        h.name          = request.form.get('name')
-        h.address       = request.form.get('address')
-        h.city          = request.form.get('city')
-        h.state         = request.form.get('state')
-        h.phone         = request.form.get('phone')
-        h.email         = request.form.get('email')
-        h.specialty     = request.form.get('specialty')
-        h.accreditation = request.form.get('accreditation')
-        db.session.commit()
-        flash('Hospital updated.', 'success')
-        return redirect(url_for('admin.dashboard'))
-    return render_template('admin/hospitals.html', hospital=h)
+    h = _hospital_from_form(h)
+    db.session.commit()
+    flash(f'Hospital "{h.name}" updated.', 'success')
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/hospitals/toggle/<int:hospital_id>')
+@login_required
+@admin_required
+def toggle_hospital(hospital_id):
+    h = Hospital.query.get_or_404(hospital_id)
+    h.is_active = not h.is_active
+    db.session.commit()
+    flash(f'Hospital "{h.name}" {"activated" if h.is_active else "deactivated"}.', 'success')
+    return redirect(url_for('admin.dashboard'))
+
 
 @admin_bp.route('/hospitals/delete/<int:hospital_id>')
 @login_required
 @admin_required
 def delete_hospital(hospital_id):
     h = Hospital.query.get_or_404(hospital_id)
+    name = h.name
     db.session.delete(h)
     db.session.commit()
-    flash('Hospital deleted.', 'success')
+    flash(f'Hospital "{name}" deleted.', 'success')
     return redirect(url_for('admin.dashboard'))
 
-@admin_bp.route('/rules/add', methods=['GET', 'POST'])
+
+# ── USER MANAGEMENT ─────────────────────────────────────────────
+@admin_bp.route('/users/toggle-role/<int:user_id>')
+@login_required
+@admin_required
+def toggle_user_role(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot change your own role.', 'warning')
+        return redirect(url_for('admin.dashboard'))
+    user.role = 'admin' if user.role == 'user' else 'user'
+    db.session.commit()
+    flash(f'{user.full_name} promoted to {user.role.upper()}.', 'success')
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/users/toggle-active/<int:user_id>')
+@login_required
+@admin_required
+def toggle_user_active(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot deactivate your own account.', 'warning')
+        return redirect(url_for('admin.dashboard'))
+    user.is_active = not user.is_active
+    db.session.commit()
+    flash(f'{user.full_name} {"activated" if user.is_active else "deactivated"}.', 'success')
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/users/delete/<int:user_id>')
+@login_required
+@admin_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.id == current_user.id:
+        flash('You cannot delete your own account.', 'warning')
+        return redirect(url_for('admin.dashboard'))
+    name = user.full_name
+    db.session.delete(user)
+    db.session.commit()
+    flash(f'User "{name}" deleted.', 'success')
+    return redirect(url_for('admin.dashboard'))
+
+
+@admin_bp.route('/users/<int:user_id>/scans')
+@login_required
+@admin_required
+def user_scans(user_id):
+    user  = User.query.get_or_404(user_id)
+    scans = MRIScan.query.filter_by(user_id=user_id).order_by(MRIScan.upload_date.desc()).all()
+    return render_template('admin/user_scans.html', user=user, scans=scans)
+
+
+# ── SYMPTOM RULES ────────────────────────────────────────────────
+@admin_bp.route('/rules/add', methods=['POST'])
 @login_required
 @admin_required
 def add_rule():
-    if request.method == 'POST':
-        keys = request.form.getlist('symptom_keys')
-        rule = SymptomRule(
-            symptom_keys = json.dumps(keys),
-            condition    = request.form.get('condition'),
-            department   = request.form.get('department'),
-            urgency      = request.form.get('urgency'),
-            advice       = request.form.get('advice')
-        )
-        db.session.add(rule)
-        db.session.commit()
-        flash('Rule added.', 'success')
-        return redirect(url_for('admin.dashboard'))
-    return render_template('admin/rules.html', rule=None)
+    keys = request.form.getlist('symptom_keys')
+    rule = SymptomRule(
+        symptom_keys=json.dumps(keys),
+        condition=request.form.get('condition'),
+        department=request.form.get('department'),
+        urgency=request.form.get('urgency'),
+        advice=request.form.get('advice'),
+    )
+    db.session.add(rule)
+    db.session.commit()
+    flash('Symptom rule added.', 'success')
+    return redirect(url_for('admin.dashboard'))
+
 
 @admin_bp.route('/rules/edit/<int:rule_id>', methods=['GET', 'POST'])
 @login_required
@@ -120,9 +202,10 @@ def edit_rule(rule_id):
         rule.urgency      = request.form.get('urgency')
         rule.advice       = request.form.get('advice')
         db.session.commit()
-        flash('Rule updated.', 'success')
+        flash('Symptom rule updated.', 'success')
         return redirect(url_for('admin.dashboard'))
     return render_template('admin/rules.html', rule=rule)
+
 
 @admin_bp.route('/rules/delete/<int:rule_id>')
 @login_required
@@ -131,5 +214,5 @@ def delete_rule(rule_id):
     rule = SymptomRule.query.get_or_404(rule_id)
     db.session.delete(rule)
     db.session.commit()
-    flash('Rule deleted.', 'success')
+    flash('Symptom rule deleted.', 'success')
     return redirect(url_for('admin.dashboard'))
