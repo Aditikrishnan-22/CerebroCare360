@@ -24,11 +24,22 @@ def generate_gradcam(image_path, model, class_idx, layer_name='block5_conv3'):
     img_tensor = tf.constant(np.expand_dims(img_array, axis=0))
 
     with tf.GradientTape() as tape:
-    tape.watch(img_tensor)
-    outputs      = grad_model(img_tensor)
-    conv_outputs = tf.convert_to_tensor(outputs[0])
-    predictions  = tf.convert_to_tensor(outputs[1])
-    loss         = tf.reduce_mean(predictions[:, class_idx])
+        tape.watch(img_tensor)
+        outputs      = grad_model(img_tensor)
+        conv_outputs = tf.convert_to_tensor(outputs[0])
+        
+        # model.output can be a list: [(None, 4)]
+        raw_preds = outputs[1]
+        if isinstance(raw_preds, list):
+            raw_preds = raw_preds[0]
+            
+        predictions  = tf.convert_to_tensor(raw_preds)
+        
+        # Force 2D shape in case model output is (4,) instead of (1, 4)
+        if len(predictions.shape) == 1:
+            predictions = tf.expand_dims(predictions, axis=0)
+            
+        loss         = tf.reduce_mean(predictions[:, class_idx])
 
     grads = tape.gradient(loss, conv_outputs)
 

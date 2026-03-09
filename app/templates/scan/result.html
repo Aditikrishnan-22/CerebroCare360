@@ -8,144 +8,360 @@
     text-align: center;
     margin-bottom: 1.5rem;
   }
-  .verdict-tumor    { background: linear-gradient(135deg, #fef2f2, #fff1f2); border: 1.5px solid #fecaca; }
-  .verdict-no-tumor { background: linear-gradient(135deg, #ecfdf5, #f0fdf4); border: 1.5px solid #a7f3d0; }
-  .verdict-pending  { background: linear-gradient(135deg, #eef0fd, #f5f3ff); border: 1.5px solid #c7d2fe; }
+
+  .verdict-tumor {
+    background: linear-gradient(135deg, #fef2f2, #fff1f2);
+    border: 1.5px solid #fecaca;
+  }
+
+  .verdict-no-tumor {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+    border: 1.5px solid #a7f3d0;
+  }
+
+  .verdict-pending {
+    background: linear-gradient(135deg, #eef0fd, #f5f3ff);
+    border: 1.5px solid #c7d2fe;
+  }
 
   .verdict-icon {
-    width: 64px; height: 64px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px; margin: 0 auto 1rem;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin: 0 auto 1rem;
   }
-  .icon-tumor   { background: #fee2e2; color: #dc2626; }
-  .icon-clear   { background: #d1fae5; color: #059669; }
-  .icon-pending { background: var(--primary-light); color: var(--primary); }
+
+  .icon-tumor {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  .icon-clear {
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  .icon-pending {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
 
   .verdict-label {
-    font-size: 11px; font-weight: 700; letter-spacing: 1px;
-    text-transform: uppercase; margin-bottom: 0.4rem;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
   }
-  .verdict-tumor .verdict-label    { color: #dc2626; }
-  .verdict-no-tumor .verdict-label { color: #059669; }
-  .verdict-pending .verdict-label  { color: var(--primary); }
+
+  .verdict-tumor .verdict-label {
+    color: #dc2626;
+  }
+
+  .verdict-no-tumor .verdict-label {
+    color: #059669;
+  }
+
+  .verdict-pending .verdict-label {
+    color: var(--primary);
+  }
 
   .verdict-title {
     font-family: 'Fraunces', serif;
-    font-size: 1.6rem; font-weight: 600;
+    font-size: 1.6rem;
+    font-weight: 600;
   }
-  .verdict-tumor .verdict-title    { color: #991b1b; }
-  .verdict-no-tumor .verdict-title { color: #065f46; }
-  .verdict-pending .verdict-title  { color: var(--primary-dark); }
 
-  .verdict-conf { font-size: 13.5px; margin-top: 0.5rem; }
-  .verdict-tumor .verdict-conf    { color: #b91c1c; }
-  .verdict-no-tumor .verdict-conf { color: #047857; }
-  .verdict-pending .verdict-conf  { color: var(--text-secondary); }
+  .verdict-tumor .verdict-title {
+    color: #991b1b;
+  }
+
+  .verdict-no-tumor .verdict-title {
+    color: #065f46;
+  }
+
+  .verdict-pending .verdict-title {
+    color: var(--primary-dark);
+  }
+
+  .verdict-conf {
+    font-size: 13.5px;
+    margin-top: 0.5rem;
+  }
+
+  .verdict-tumor .verdict-conf {
+    color: #b91c1c;
+  }
+
+  .verdict-no-tumor .verdict-conf {
+    color: #047857;
+  }
+
+  .verdict-pending .verdict-conf {
+    color: var(--text-secondary);
+  }
 
   /* Pending pulse */
-  .pending-pulse { display: flex; justify-content: center; gap: 6px; margin: 1rem 0 0.5rem; }
+  .pending-pulse {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 1rem 0 0.5rem;
+  }
+
   .pending-pulse span {
-    width: 10px; height: 10px; border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
     background: var(--primary);
     animation: pulse-dot 1.4s infinite ease-in-out;
   }
-  .pending-pulse span:nth-child(2) { animation-delay: 0.2s; }
-  .pending-pulse span:nth-child(3) { animation-delay: 0.4s; }
+
+  .pending-pulse span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .pending-pulse span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
   @keyframes pulse-dot {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-    40%           { transform: scale(1);   opacity: 1; }
+
+    0%,
+    80%,
+    100% {
+      transform: scale(0.6);
+      opacity: 0.4;
+    }
+
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
 
   /* Pending steps */
-  .pending-steps { display: flex; flex-direction: column; gap: 12px; margin-top: 1.25rem; }
+  .pending-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 1.25rem;
+  }
+
   .pending-step {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 16px; background: var(--surface-2);
-    border: 1px solid var(--border); border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     font-size: 13.5px;
   }
+
   .pending-step-icon {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
   }
-  .step-waiting { background: var(--primary-light); color: var(--primary); }
-  .step-done    { background: #d1fae5; color: #059669; }
-  .pending-step-text { flex: 1; }
-  .pending-step-text strong { display: block; font-weight: 600; color: var(--text-primary); }
-  .pending-step-text span   { font-size: 12px; color: var(--text-muted); }
+
+  .step-waiting {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .step-done {
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  .pending-step-text {
+    flex: 1;
+  }
+
+  .pending-step-text strong {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .pending-step-text span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
 
   /* Prob bars */
-  .prob-bar-label { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .prob-bar-label {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
   .prob-bar-track {
-    height: 10px; background: var(--surface-2);
-    border-radius: 20px; overflow: hidden; border: 1px solid var(--border);
+    height: 10px;
+    background: var(--surface-2);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
   }
+
   .prob-bar-fill {
-    height: 100%; border-radius: 20px;
-    background: var(--gradient); transition: width 1s ease;
+    height: 100%;
+    border-radius: 20px;
+    background: var(--gradient);
+    transition: width 1s ease;
   }
-  .prob-item { margin-bottom: 14px; }
-  .prob-row  { display: flex; justify-content: space-between; margin-bottom: 5px; }
-  .prob-pct  { font-size: 12px; font-weight: 600; color: var(--primary); }
+
+  .prob-item {
+    margin-bottom: 14px;
+  }
+
+  .prob-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+
+  .prob-pct {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+  }
 
   /* ── MRI Viewer with GradCAM toggle ──────────────────────────────── */
-  .mri-viewer { position: relative; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); background: #000; }
+  .mri-viewer {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #000;
+  }
+
   .mri-viewer img {
-    width: 100%; object-fit: contain;
-    max-height: 300px; display: block;
+    width: 100%;
+    object-fit: contain;
+    max-height: 300px;
+    display: block;
     transition: opacity 0.35s ease;
   }
-  .mri-viewer img.hidden { opacity: 0; position: absolute; top: 0; left: 0; }
-  .mri-viewer img.visible { opacity: 1; position: relative; }
+
+  .mri-viewer img.hidden {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+
+  .mri-viewer img.visible {
+    opacity: 1;
+    position: relative;
+    pointer-events: auto;
+  }
 
   /* Toggle pill */
   .scan-toggle {
-    display: flex; background: var(--surface-2);
-    border: 1px solid var(--border); border-radius: 30px;
-    padding: 3px; gap: 2px; margin-bottom: 10px;
+    display: flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 3px;
+    gap: 2px;
+    margin-bottom: 10px;
   }
+
   .scan-toggle-btn {
-    flex: 1; padding: 7px 10px; border-radius: 26px;
-    font-size: 12px; font-weight: 600; border: none;
-    cursor: pointer; transition: all 0.2s ease;
-    background: transparent; color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center; gap: 5px;
+    flex: 1;
+    padding: 7px 10px;
+    border-radius: 26px;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
   }
+
   .scan-toggle-btn.active {
-    background: var(--primary); color: #fff;
-    box-shadow: 0 2px 8px rgba(59,79,216,0.25);
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(59, 79, 216, 0.25);
   }
-  .scan-toggle-btn:hover:not(.active) { background: var(--surface-3); color: var(--text-primary); }
+
+  .scan-toggle-btn:hover:not(.active) {
+    background: var(--surface-3);
+    color: var(--text-primary);
+  }
 
   /* GradCAM legend */
   .gradcam-legend {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 12px; background: rgba(0,0,0,0.75);
-    border-radius: 8px; margin-top: 8px;
-    font-size: 11px; color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #fff;
   }
+
   .legend-bar {
-    height: 10px; width: 120px; border-radius: 5px;
+    height: 10px;
+    width: 120px;
+    border-radius: 5px;
     background: linear-gradient(to right, #00008b, #0000ff, #00ffff, #ffff00, #ff8c00, #ff0000);
     flex-shrink: 0;
   }
-  .legend-labels { display: flex; justify-content: space-between; width: 120px; font-size: 10px; color: #ccc; }
+
+  .legend-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 120px;
+    font-size: 10px;
+    color: #ccc;
+  }
 
   .type-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 16px; border-radius: 20px;
-    font-size: 13px; font-weight: 600;
-    background: var(--primary-light); color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--primary-light);
+    color: var(--primary);
     margin-top: 0.75rem;
   }
 
   /* Low confidence warning */
   .low-conf-warning {
-    background: #fffbeb; border: 1.5px solid #fcd34d;
-    border-radius: 10px; padding: 10px 14px; margin-top: 0.85rem;
-    display: flex; gap: 9px; align-items: flex-start;
-    font-size: 13px; color: #92400e; line-height: 1.55;
+    background: #fffbeb;
+    border: 1.5px solid #fcd34d;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 0.85rem;
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.55;
   }
 </style>
 {% endblock %}
@@ -178,7 +394,8 @@
         <div class="verdict-icon icon-pending"><i class="bi bi-hourglass-split"></i></div>
         <div class="verdict-label">Analysis Pending</div>
         <div class="verdict-title">AI Models Not Ready Yet</div>
-        <div class="verdict-conf">Your scan was uploaded successfully. Results will appear once the AI ensemble is loaded.</div>
+        <div class="verdict-conf">Your scan was uploaded successfully. Results will appear once the AI ensemble is
+          loaded.</div>
         <div class="pending-pulse"><span></span><span></span><span></span></div>
       </div>
 
@@ -244,7 +461,8 @@
         {% if prediction.low_confidence %}
         <div class="low-conf-warning mt-3" style="text-align:left;">
           <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;color:#d97706;"></i>
-          <span><strong>Low confidence prediction.</strong> The model is uncertain between multiple classes. This result should be interpreted with caution and reviewed by a qualified radiologist.</span>
+          <span><strong>Low confidence prediction.</strong> The model is uncertain between multiple classes. This result
+            should be interpreted with caution and reviewed by a qualified radiologist.</span>
         </div>
         {% endif %}
 
@@ -263,10 +481,10 @@
         </div>
         <div class="cc-card-body">
           {% set probs = [
-            ('Glioma',     prediction.prob_glioma),
-            ('Meningioma', prediction.prob_meningioma),
-            ('No Tumor',   prediction.prob_notumor),
-            ('Pituitary',  prediction.prob_pituitary)
+          ('Glioma', prediction.prob_glioma),
+          ('Meningioma', prediction.prob_meningioma),
+          ('No Tumor', prediction.prob_notumor),
+          ('Pituitary', prediction.prob_pituitary)
           ] %}
           {% for label, prob in probs %}
           <div class="prob-item">
@@ -275,7 +493,7 @@
               <span class="prob-pct">{{ "%.1f"|format(prob * 100) }}%</span>
             </div>
             <div class="prob-bar-track">
-              <div class="prob-bar-fill" style="width:{{ "%.1f"|format(prob * 100) }}%"></div>
+              <div class="prob-bar-fill" style="width:{{ " %.1f"|format(prob * 100) }}%"></div>
             </div>
           </div>
           {% endfor %}
@@ -298,8 +516,11 @@
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <span style="font-size:12px;color:var(--text-muted);">Attention scale:</span>
             <div>
-              <div class="legend-bar" style="height:10px;width:160px;border-radius:5px;background:linear-gradient(to right,#00008b,#0000ff,#00ffff,#ffff00,#ff8c00,#ff0000);"></div>
-              <div style="display:flex;justify-content:space-between;width:160px;font-size:10px;color:var(--text-muted);margin-top:2px;">
+              <div class="legend-bar"
+                style="height:10px;width:160px;border-radius:5px;background:linear-gradient(to right,#00008b,#0000ff,#00ffff,#ffff00,#ff8c00,#ff0000);">
+              </div>
+              <div
+                style="display:flex;justify-content:space-between;width:160px;font-size:10px;color:var(--text-muted);margin-top:2px;">
                 <span>Low</span><span>High</span>
               </div>
             </div>
@@ -335,15 +556,11 @@
           {% endif %}
 
           <div class="mri-viewer">
-            <img id="img-original"
-                 src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}"
-                 alt="Original MRI"
-                 class="visible" />
+            <img id="img-original" src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}"
+              alt="Original MRI" class="visible" />
             {% if prediction.model_version != 'pending' and prediction.heatmap_filename %}
-            <img id="img-gradcam"
-                 src="{{ url_for('static', filename='heatmaps/' + prediction.heatmap_filename) }}"
-                 alt="Grad-CAM Heatmap"
-                 class="hidden" />
+            <img id="img-gradcam" src="{{ url_for('static', filename='heatmaps/' + prediction.heatmap_filename) }}"
+              alt="Grad-CAM Heatmap" class="hidden" />
             {% endif %}
           </div>
 
@@ -362,9 +579,9 @@
               <td style="padding:8px 0;color:var(--text-muted);">Status</td>
               <td style="padding:8px 0;font-weight:500;text-align:right;">
                 {% if prediction.model_version == 'pending' %}
-                  <span style="color:var(--primary);">⏳ Pending</span>
+                <span style="color:var(--primary);">⏳ Pending</span>
                 {% else %}
-                  <span style="color:#059669;">✅ Complete</span>
+                <span style="color:#059669;">✅ Complete</span>
                 {% endif %}
               </td>
             </tr>
@@ -376,15 +593,16 @@
               <td style="padding:8px 0;color:var(--text-muted);">Grad-CAM</td>
               <td style="padding:8px 0;font-weight:500;text-align:right;">
                 {% if prediction.heatmap_filename %}
-                  <span style="color:#059669;">✅ Generated</span>
+                <span style="color:#059669;">✅ Generated</span>
                 {% else %}
-                  <span style="color:var(--text-muted);">—</span>
+                <span style="color:var(--text-muted);">—</span>
                 {% endif %}
               </td>
             </tr>
             <tr style="border-bottom:1px solid var(--border);">
               <td style="padding:8px 0;color:var(--text-muted);">Uploaded</td>
-              <td style="padding:8px 0;font-weight:500;text-align:right;">{{ scan.upload_date.strftime('%H:%M:%S') }}</td>
+              <td style="padding:8px 0;font-weight:500;text-align:right;">{{ scan.upload_date.strftime('%H:%M:%S') }}
+              </td>
             </tr>
             <tr>
               <td style="padding:8px 0;color:var(--text-muted);">Patient</td>
@@ -396,7 +614,8 @@
 
       <div class="cc-disclaimer">
         <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
-        <span>This result is AI-generated and for educational purposes only. It is not a medical diagnosis. Please consult a qualified neurologist.</span>
+        <span>This result is AI-generated and for educational purposes only. It is not a medical diagnosis. Please
+          consult a qualified neurologist.</span>
       </div>
 
       <div class="d-flex gap-2 mt-3">
@@ -415,18 +634,18 @@
 
 {% block extra_js %}
 <script>
-function showOriginal() {
-  document.getElementById('img-original').className = 'visible';
-  document.getElementById('img-gradcam').className  = 'hidden';
-  document.getElementById('btn-original').classList.add('active');
-  document.getElementById('btn-gradcam').classList.remove('active');
-}
+  function showOriginal() {
+    document.getElementById('img-original').className = 'visible';
+    document.getElementById('img-gradcam').className = 'hidden';
+    document.getElementById('btn-original').classList.add('active');
+    document.getElementById('btn-gradcam').classList.remove('active');
+  }
 
-function showGradcam() {
-  document.getElementById('img-original').className = 'hidden';
-  document.getElementById('img-gradcam').className  = 'visible';
-  document.getElementById('btn-gradcam').classList.add('active');
-  document.getElementById('btn-original').classList.remove('active');
-}
+  function showGradcam() {
+    document.getElementById('img-original').className = 'hidden';
+    document.getElementById('img-gradcam').className = 'visible';
+    document.getElementById('btn-gradcam').classList.add('active');
+    document.getElementById('btn-original').classList.remove('active');
+  }
 </script>
 {% endblock %}

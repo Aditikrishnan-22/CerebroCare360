@@ -46,7 +46,9 @@ def upload():
                 prob_meningioma = result['prob_meningioma'],
                 prob_notumor    = result['prob_notumor'],
                 prob_pituitary  = result['prob_pituitary'],
-                model_version   = result['model_version']
+                model_version   = result['model_version'],
+                heatmap_filename = result.get('heatmap_filename'),
+                heatmap_ready    = bool(result.get('heatmap_filename'))
             )
         except Exception as e:
             print(f'AI prediction error: {e}')
@@ -61,7 +63,8 @@ def upload():
                 prob_notumor    = 1.0,
                 prob_pituitary  = 0.0,
                 model_version   = 'pending',
-                heatmap_filename = result.get('heatmap_filename')
+                heatmap_filename = None,
+                heatmap_ready   = False
             )
 
         db.session.add(prediction)

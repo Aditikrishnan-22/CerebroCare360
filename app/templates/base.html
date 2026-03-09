@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}CerebroCare360{% endblock %}</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap"
+    rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
     :root {
       --primary: #3b4fd8;
@@ -26,13 +29,17 @@
       --danger: #dc2626;
       --radius: 12px;
       --radius-lg: 20px;
-      --shadow-sm: 0 1px 4px rgba(59,79,216,0.08);
-      --shadow: 0 4px 20px rgba(59,79,216,0.12);
-      --shadow-lg: 0 12px 40px rgba(59,79,216,0.18);
+      --shadow-sm: 0 1px 4px rgba(59, 79, 216, 0.08);
+      --shadow: 0 4px 20px rgba(59, 79, 216, 0.12);
+      --shadow-lg: 0 12px 40px rgba(59, 79, 216, 0.18);
       --navbar-height: 68px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'DM Sans', sans-serif;
@@ -45,7 +52,7 @@
     /* ── Navbar ───────────────────────────────────────────── */
     .cc-navbar {
       height: var(--navbar-height);
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       position: sticky;
@@ -92,6 +99,7 @@
     .cc-logo-text span {
       background: var(--gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -115,12 +123,15 @@
       transition: all 0.18s;
     }
 
-    .cc-nav-link:hover, .cc-nav-link.active {
+    .cc-nav-link:hover,
+    .cc-nav-link.active {
       background: var(--primary-light);
       color: var(--primary);
     }
 
-    .cc-nav-link i { font-size: 15px; }
+    .cc-nav-link i {
+      font-size: 15px;
+    }
 
     .cc-nav-right {
       margin-left: auto;
@@ -151,8 +162,15 @@
       letter-spacing: 0.3px;
     }
 
-    .badge-user { background: var(--primary-light); color: var(--primary); }
-    .badge-admin { background: #fef3c7; color: #92400e; }
+    .badge-user {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .badge-admin {
+      background: #fef3c7;
+      color: #92400e;
+    }
 
     /* ── Page wrapper ─────────────────────────────────────── */
     .cc-page {
@@ -167,6 +185,13 @@
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
       overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .cc-card:hover {
+      box-shadow: var(--shadow);
+      transform: translateY(-2px);
+      border-color: rgba(59, 79, 216, 0.15);
     }
 
     .cc-card-header {
@@ -197,7 +222,9 @@
       color: var(--text-primary);
     }
 
-    .cc-card-body { padding: 1.75rem; }
+    .cc-card-body {
+      padding: 1.75rem;
+    }
 
     /* ── Buttons ──────────────────────────────────────────── */
     .btn-cc-primary {
@@ -218,7 +245,7 @@
 
     .btn-cc-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(59,79,216,0.35);
+      box-shadow: 0 6px 20px rgba(59, 79, 216, 0.35);
       color: white;
     }
 
@@ -260,10 +287,12 @@
 
     .cc-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(59,79,216,0.1);
+      box-shadow: 0 0 0 3px rgba(59, 79, 216, 0.1);
     }
 
-    .cc-input::placeholder { color: var(--text-muted); }
+    .cc-input::placeholder {
+      color: var(--text-muted);
+    }
 
     .cc-label {
       display: block;
@@ -274,7 +303,9 @@
       letter-spacing: 0.2px;
     }
 
-    .cc-form-group { margin-bottom: 1.2rem; }
+    .cc-form-group {
+      margin-bottom: 1.2rem;
+    }
 
     /* ── Flash messages ───────────────────────────────────── */
     .cc-alert {
@@ -288,10 +319,29 @@
       margin-bottom: 1rem;
     }
 
-    .cc-alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-    .cc-alert-danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-    .cc-alert-warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-    .cc-alert-info    { background: var(--primary-light); color: var(--primary-dark); border: 1px solid #c7d2fe; }
+    .cc-alert-success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .cc-alert-danger {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .cc-alert-warning {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    .cc-alert-info {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border: 1px solid #c7d2fe;
+    }
 
     /* ── Stat chips ───────────────────────────────────────── */
     .cc-stat {
@@ -308,6 +358,7 @@
       font-weight: 600;
       background: var(--gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       line-height: 1;
     }
@@ -363,6 +414,7 @@
     .gradient-text {
       background: var(--gradient);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -373,54 +425,64 @@
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--surface-2); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surface-2);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
+
 <body>
 
-<!-- ── Navbar ──────────────────────────────────────────────── -->
-<nav class="cc-navbar">
-  <div class="container-fluid">
-    <a href="/" class="cc-logo">
-      <div class="cc-logo-icon">
-        <i class="bi bi-activity"></i>
-      </div>
-      <span class="cc-logo-text">Cerebro<span>Care360</span></span>
-    </a>
+  <!-- ── Navbar ──────────────────────────────────────────────── -->
+  <nav class="cc-navbar">
+    <div class="container-fluid">
+      <a href="/" class="cc-logo">
+        <div class="cc-logo-icon">
+          <i class="bi bi-activity"></i>
+        </div>
+        <span class="cc-logo-text">Cerebro<span>Care360</span></span>
+      </a>
 
-    {% if current_user.is_authenticated %}
-    <div class="cc-nav-links">
-      <a href="/scan/upload" class="cc-nav-link {% if request.endpoint == 'scan.upload' %}active{% endif %}">
-        <i class="bi bi-upload"></i> Upload MRI
-      </a>
-      <a href="/scan/history" class="cc-nav-link {% if request.endpoint == 'scan.history' %}active{% endif %}">
-        <i class="bi bi-clock-history"></i> History
-      </a>
-      <a href="/hospital/find" class="cc-nav-link {% if request.endpoint == 'hospital.find' %}active{% endif %}">
-        <i class="bi bi-hospital"></i> Find Care
-      </a>
-      <a href="/symptom/checker" class="cc-nav-link {% if request.endpoint == 'symptom.checker' %}active{% endif %}">
-        <i class="bi bi-clipboard2-pulse"></i> Symptom Check
-      </a>
-      <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
-        <i class="bi bi-robot"></i> CerebroBot
-      </a>
-      {% if current_user.role == 'admin' %}
-      <a href="/admin/dashboard" class="cc-nav-link {% if 'admin' in request.endpoint %}active{% endif %}">
-        <i class="bi bi-shield-check"></i> Admin
-      </a>
-      <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
-         <i class="bi bi-robot"></i> CerebroBot
-      </a>
-      {% endif %}
-    </div>
-    {% endif %}
-
-    <div class="cc-nav-right">
       {% if current_user.is_authenticated %}
+      <div class="cc-nav-links">
+        <a href="/scan/upload" class="cc-nav-link {% if request.endpoint == 'scan.upload' %}active{% endif %}">
+          <i class="bi bi-upload"></i> Upload MRI
+        </a>
+        <a href="/scan/history" class="cc-nav-link {% if request.endpoint == 'scan.history' %}active{% endif %}">
+          <i class="bi bi-clock-history"></i> History
+        </a>
+        <a href="/hospital/find" class="cc-nav-link {% if request.endpoint == 'hospital.find' %}active{% endif %}">
+          <i class="bi bi-hospital"></i> Find Care
+        </a>
+        <a href="/symptom/checker" class="cc-nav-link {% if request.endpoint == 'symptom.checker' %}active{% endif %}">
+          <i class="bi bi-clipboard2-pulse"></i> Symptom Check
+        </a>
+        <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
+          <i class="bi bi-robot"></i> CerebroBot
+        </a>
+        {% if current_user.role == 'admin' %}
+        <a href="/admin/dashboard" class="cc-nav-link {% if 'admin' in request.endpoint %}active{% endif %}">
+          <i class="bi bi-shield-check"></i> Admin
+        </a>
+        <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
+          <i class="bi bi-robot"></i> CerebroBot
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="cc-nav-right">
+        {% if current_user.is_authenticated %}
         <span class="cc-badge-role {% if current_user.role == 'admin' %}badge-admin{% else %}badge-user{% endif %}">
           {{ current_user.role | upper }}
         </span>
@@ -432,46 +494,47 @@
         <a href="/auth/logout" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
           <i class="bi bi-box-arrow-right"></i> Logout
         </a>
-      {% else %}
+        {% else %}
         <a href="/auth/login" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">Login</a>
         <a href="/auth/register" class="btn-cc-primary py-2 px-3" style="font-size:13px;">
           <i class="bi bi-person-plus"></i> Register
         </a>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<!-- ── Page content ────────────────────────────────────────── -->
-<main class="cc-page">
+  <!-- ── Page content ────────────────────────────────────────── -->
+  <main class="cc-page">
 
-  <!-- Flash messages -->
-  <div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- Flash messages -->
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-        {% for category, message in messages %}
-          <div class="cc-alert cc-alert-{{ category }}">
-            <i class="bi bi-info-circle"></i> {{ message }}
-          </div>
-        {% endfor %}
+      {% for category, message in messages %}
+      <div class="cc-alert cc-alert-{{ category }}">
+        <i class="bi bi-info-circle"></i> {{ message }}
+      </div>
+      {% endfor %}
       {% endif %}
-    {% endwith %}
-  </div>
+      {% endwith %}
+    </div>
 
-  {% block content %}{% endblock %}
-</main>
+    {% block content %}{% endblock %}
+  </main>
 
-<!-- ── Footer ─────────────────────────────────────────────── -->
-<footer class="cc-footer">
-  <div class="container">
-    <span class="gradient-text" style="font-family:'Fraunces',serif;font-weight:600;">CerebroCare360</span>
-    &nbsp;·&nbsp; AI-assisted brain tumor detection
-    &nbsp;·&nbsp; For educational purposes only
-    &nbsp;·&nbsp; Not a substitute for medical diagnosis
-  </div>
-</footer>
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer class="cc-footer">
+    <div class="container">
+      <span class="gradient-text" style="font-family:'Fraunces',serif;font-weight:600;">CerebroCare360</span>
+      &nbsp;·&nbsp; AI-assisted brain tumor detection
+      &nbsp;·&nbsp; For educational purposes only
+      &nbsp;·&nbsp; Not a substitute for medical diagnosis
+    </div>
+  </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% block extra_js %}{% endblock %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
 </body>
+
 </html>

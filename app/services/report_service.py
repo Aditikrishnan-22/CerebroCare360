@@ -4,7 +4,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import cm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, Image as RLImage
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from flask import current_app
 
@@ -44,12 +44,12 @@ def generate_report(scan, prediction, user):
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        'Title', fontSize=22, textColor=WHITE,
-        fontName='Helvetica-Bold', alignment=TA_CENTER, spaceAfter=4
+        'Title', fontSize=24, textColor=WHITE,
+        fontName='Helvetica-Bold', alignment=TA_CENTER, spaceAfter=8, leading=30
     )
     subtitle_style = ParagraphStyle(
-        'Subtitle', fontSize=10, textColor=colors.HexColor('#c7d2fe'),
-        fontName='Helvetica', alignment=TA_CENTER
+        'Subtitle', fontSize=12, textColor=colors.HexColor('#c7d2fe'),
+        fontName='Helvetica', alignment=TA_CENTER, leading=16
     )
     section_style = ParagraphStyle(
         'Section', fontSize=12, textColor=PRIMARY,
@@ -71,34 +71,24 @@ def generate_report(scan, prediction, user):
     story = []
 
     # ── Header banner ─────────────────────────────────────────
-    header_data = [[
-        Paragraph('CerebroCare360', title_style),
-    ]]
-    header_sub = [[
-        Paragraph('AI-Assisted Brain Tumor Detection Report', subtitle_style),
-    ]]
+    header_data = [
+        [Paragraph('CerebroCare360', title_style)],
+        [Paragraph('AI-Assisted Brain Tumor Detection Report', subtitle_style)]
+    ]
 
     header_table = Table(header_data, colWidths=[17*cm])
     header_table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,-1), PRIMARY),
-        ('TOPPADDING',    (0,0), (-1,-1), 18),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING',    (0,0), (-1,0), 24),
+        ('BOTTOMPADDING', (0,0), (-1,0), 6),
+        ('TOPPADDING',    (0,1), (-1,1), 2),
+        ('BOTTOMPADDING', (0,1), (-1,1), 24),
         ('LEFTPADDING',   (0,0), (-1,-1), 12),
         ('RIGHTPADDING',  (0,0), (-1,-1), 12),
-        ('ROUNDEDCORNERS', [8]),
-    ]))
-
-    sub_table = Table(header_sub, colWidths=[17*cm])
-    sub_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,-1), ACCENT),
-        ('TOPPADDING',    (0,0), (-1,-1), 6),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 14),
-        ('LEFTPADDING',   (0,0), (-1,-1), 12),
-        ('RIGHTPADDING',  (0,0), (-1,-1), 12),
+        ('ROUNDEDCORNERS', [10]),
     ]))
 
     story.append(header_table)
-    story.append(sub_table)
     story.append(Spacer(1, 0.5*cm))
 
     # ── Patient info ──────────────────────────────────────────
@@ -169,6 +159,16 @@ def generate_report(scan, prediction, user):
     ]))
     story.append(verdict_table)
     story.append(Spacer(1, 0.3*cm))
+
+    # ── GradCAM Heatmap ───────────────────────────────────────
+    if prediction.heatmap_filename:
+        heatmap_path = os.path.join(current_app.root_path, 'static', 'heatmaps', prediction.heatmap_filename)
+        if os.path.exists(heatmap_path):
+            story.append(Paragraph('GradCAM Analysis', section_style))
+            story.append(Paragraph("This highlights the regions of the MRI that contributed most to the AI model's prediction. Red/yellow areas indicate higher importance.", body_style))
+            story.append(Spacer(1, 0.2*cm))
+            story.append(RLImage(heatmap_path, width=8*cm, height=8*cm))
+            story.append(Spacer(1, 0.5*cm))
 
     # ── Probability breakdown ─────────────────────────────────
     story.append(Paragraph('Probability Breakdown', section_style))
