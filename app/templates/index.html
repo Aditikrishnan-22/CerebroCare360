@@ -14,18 +14,22 @@
   .hero::before {
     content: '';
     position: absolute;
-    top: -80px; right: -80px;
-    width: 500px; height: 500px;
-    background: radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%);
+    top: -80px;
+    right: -80px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, transparent 70%);
     pointer-events: none;
   }
 
   .hero::after {
     content: '';
     position: absolute;
-    bottom: -60px; left: -60px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(59,79,216,0.07) 0%, transparent 70%);
+    bottom: -60px;
+    left: -60px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(59, 79, 216, 0.07) 0%, transparent 70%);
     pointer-events: none;
   }
 
@@ -106,13 +110,40 @@
     align-items: center;
     justify-content: center;
     position: relative;
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);
+    animation: floatBrain 6s ease-in-out infinite, pulseGlow 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatBrain {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-15px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes pulseGlow {
+    from {
+      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2);
+    }
+
+    to {
+      box-shadow: 0 15px 50px rgba(124, 58, 237, 0.5);
+      border-color: rgba(124, 58, 237, 0.3);
+    }
   }
 
   .brain-graphic-inner i {
     font-size: 90px;
     background: var(--gradient);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
@@ -132,22 +163,44 @@
     white-space: nowrap;
   }
 
-  .chip-1 { top: 30px; right: 0; }
-  .chip-2 { bottom: 60px; right: -20px; }
-  .chip-3 { bottom: 20px; left: 10px; }
+  .chip-1 {
+    top: 30px;
+    right: 0;
+  }
+
+  .chip-2 {
+    bottom: 60px;
+    right: -20px;
+  }
+
+  .chip-3 {
+    bottom: 20px;
+    left: 10px;
+  }
 
   .chip-dot {
-    width: 8px; height: 8px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
   }
 
-  .dot-green { background: #10b981; }
-  .dot-blue  { background: var(--primary); }
-  .dot-purple { background: var(--accent); }
+  .dot-green {
+    background: #10b981;
+  }
+
+  .dot-blue {
+    background: var(--primary);
+  }
+
+  .dot-purple {
+    background: var(--accent);
+  }
 
   /* Features */
-  .features-section { padding: 4rem 0; }
+  .features-section {
+    padding: 4rem 0;
+  }
 
   .feature-card {
     background: var(--surface);
@@ -163,7 +216,9 @@
   .feature-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 3px;
     background: var(--gradient);
     opacity: 0;
@@ -171,14 +226,25 @@
   }
 
   .feature-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
   }
 
-  .feature-card:hover::before { opacity: 1; }
+  .feature-card:hover::before {
+    opacity: 1;
+  }
+
+  .feature-card .feature-icon i {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .feature-card:hover .feature-icon i {
+    transform: scale(1.2);
+  }
 
   .feature-icon {
-    width: 48px; height: 48px;
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
     background: var(--primary-light);
     color: var(--primary);
@@ -217,7 +283,8 @@
   }
 
   .hiw-num {
-    width: 44px; height: 44px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--gradient);
     color: white;
@@ -244,7 +311,9 @@
   }
 
   /* Stats */
-  .stats-section { padding: 3.5rem 0; }
+  .stats-section {
+    padding: 3.5rem 0;
+  }
 
   .stat-big {
     text-align: center;
@@ -258,6 +327,7 @@
     line-height: 1;
     background: var(--gradient);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
@@ -293,7 +363,7 @@
   }
 
   .cta-section p {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8);
     font-size: 1rem;
     margin-bottom: 2rem;
     position: relative;
@@ -318,7 +388,7 @@
 
   .btn-cta-white:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     color: var(--primary);
   }
 </style>
@@ -334,7 +404,7 @@
           <i class="bi bi-cpu"></i> AI-Powered Detection
         </div>
         <h1 class="hero-title">
-          Advanced Brain Tumor<br/>
+          Advanced Brain Tumor<br />
           Detection, <em>Simplified</em>
         </h1>
         <p class="hero-sub">
@@ -344,13 +414,13 @@
         </p>
         <div class="hero-actions">
           {% if current_user.is_authenticated %}
-             <a href="/scan/upload" class="btn-cc-primary btn-lg">
-             <i class="bi bi-upload"></i> Analyse My MRI
-             </a>
-             {% else %}
-              <a href="/auth/register" class="btn-cc-primary btn-lg">
-              <i class="bi bi-upload"></i> Analyse My MRI
-              </a>
+          <a href="/scan/upload" class="btn-cc-primary btn-lg">
+            <i class="bi bi-upload"></i> Analyse My MRI
+          </a>
+          {% else %}
+          <a href="/auth/register" class="btn-cc-primary btn-lg">
+            <i class="bi bi-upload"></i> Analyse My MRI
+          </a>
           {% endif %}
           <a href="#how-it-works" class="btn-cc-secondary btn-lg">
             How it works
@@ -358,7 +428,8 @@
         </div>
         <div class="cc-disclaimer mt-4">
           <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
-          <span>CerebroCare360 is an educational tool and does not replace professional medical diagnosis. Always consult a qualified neurologist.</span>
+          <span>CerebroCare360 is an educational tool and does not replace professional medical diagnosis. Always
+            consult a qualified neurologist.</span>
         </div>
       </div>
 
@@ -366,7 +437,20 @@
         <div class="hero-visual" style="height:340px;">
           <div class="brain-graphic"></div>
           <div class="brain-graphic-inner">
-            <i class="bi bi-activity"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+              style="width: 110px; height: 110px; stroke: url(#gradientBrain)">
+              <defs>
+                <linearGradient id="gradientBrain" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#3b4fd8" />
+                  <stop offset="100%" stop-color="#7c3aed" />
+                </linearGradient>
+              </defs>
+              <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
+              <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
+              <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
+              <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+            </svg>
           </div>
           <div class="floating-chip chip-1">
             <span class="chip-dot dot-green"></span> Ensemble AI Active
@@ -429,42 +513,48 @@
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-cpu"></i></div>
           <div class="feature-title">Ensemble AI Detection</div>
-          <p class="feature-desc">Three models — VGG16, ResNet50, EfficientNetB0 — vote together for the most accurate result possible.</p>
+          <p class="feature-desc">Three models — VGG16, ResNet50, EfficientNetB0 — vote together for the most accurate
+            result possible.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-file-earmark-medical"></i></div>
           <div class="feature-title">Downloadable PDF Reports</div>
-          <p class="feature-desc">Generate professional reports with results, confidence scores, and disclaimer — ready to share with your doctor.</p>
+          <p class="feature-desc">Generate professional reports with results, confidence scores, and disclaimer — ready
+            to share with your doctor.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-hospital"></i></div>
           <div class="feature-title">Find Specialist Care</div>
-          <p class="feature-desc">Search verified hospitals with neurology and oncology departments near you, filtered by city.</p>
+          <p class="feature-desc">Search verified hospitals with neurology and oncology departments near you, filtered
+            by city.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-clipboard2-pulse"></i></div>
           <div class="feature-title">Symptom Checker</div>
-          <p class="feature-desc">Select your symptoms and get an instant rule-based assessment of possible conditions and urgency level.</p>
+          <p class="feature-desc">Select your symptoms and get an instant rule-based assessment of possible conditions
+            and urgency level.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-clock-history"></i></div>
           <div class="feature-title">Full Scan History</div>
-          <p class="feature-desc">Every scan you upload is stored securely. Access your complete history and re-download reports anytime.</p>
+          <p class="feature-desc">Every scan you upload is stored securely. Access your complete history and re-download
+            reports anytime.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
           <div class="feature-title">Secure & Private</div>
-          <p class="feature-desc">Your data is protected with bcrypt password hashing, session authentication, and role-based access control.</p>
+          <p class="feature-desc">Your data is protected with bcrypt password hashing, session authentication, and
+            role-based access control.</p>
         </div>
       </div>
     </div>
@@ -495,7 +585,8 @@
             <div class="hiw-num">2</div>
             <div class="hiw-content">
               <h5>AI ensemble analyses the scan</h5>
-              <p>Three deep learning models process the image simultaneously and vote on the result using weighted accuracy scores.</p>
+              <p>Three deep learning models process the image simultaneously and vote on the result using weighted
+                accuracy scores.</p>
             </div>
           </div>
           <div class="hiw-step">
