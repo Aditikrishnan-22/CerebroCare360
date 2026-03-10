@@ -1,68 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}CerebroCare360{% endblock %}</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
     :root {
-      --primary: #3b4fd8;
-      --primary-dark: #2a3ab5;
-      --primary-light: #eef0fd;
-      --accent: #7c3aed;
-      --gradient: linear-gradient(135deg, #3b4fd8 0%, #7c3aed 100%);
-      --surface: #ffffff;
-      --surface-2: #f7f8fc;
-      --surface-3: #eef0fd;
-      --border: #e4e7f0;
-      --text-primary: #0f1525;
-      --text-secondary: #5a6278;
-      --text-muted: #9199b0;
-      --success: #059669;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --radius: 12px;
-      --radius-lg: 20px;
-      --shadow-sm: 0 2px 8px rgba(15, 21, 37, 0.04);
-      --shadow: 0 10px 30px rgba(59, 79, 216, 0.10);
-      --shadow-lg: 0 20px 40px rgba(124, 58, 237, 0.15);
-      --navbar-height: 68px;
+      --primary:        #2f4bd4;
+      --primary-dark:   #1e34a8;
+      --primary-light:  #eef0fd;
+      --primary-mid:    #c7d0f8;
+      --accent:         #6d28d9;
+      --accent-light:   #f3f0ff;
+      --gradient:       linear-gradient(135deg, #2f4bd4 0%, #6d28d9 100%);
+      --gradient-soft:  linear-gradient(135deg, rgba(47,75,212,0.07) 0%, rgba(109,40,217,0.07) 100%);
+
+      --surface:        #ffffff;
+      --surface-2:      #f5f6fb;
+      --surface-3:      #edf0fb;
+      --surface-4:      #e2e6f8;
+
+      --border:         #dde1f0;
+      --border-strong:  #c5cbe8;
+
+      --text-primary:   #0c1330;
+      --text-secondary: #4a5270;
+      --text-muted:     #8892b0;
+
+      --success:        #059669;
+      --success-light:  #ecfdf5;
+      --warning:        #b45309;
+      --warning-light:  #fffbeb;
+      --danger:         #c81e1e;
+      --danger-light:   #fef2f2;
+
+      --radius-sm:  8px;
+      --radius:     12px;
+      --radius-lg:  18px;
+      --radius-xl:  24px;
+
+      --shadow-xs: 0 1px 3px rgba(12,19,48,0.06);
+      --shadow-sm: 0 2px 8px rgba(12,19,48,0.07);
+      --shadow:    0 8px 24px rgba(47,75,212,0.10);
+      --shadow-lg: 0 16px 40px rgba(47,75,212,0.14);
+      --shadow-xl: 0 24px 60px rgba(109,40,217,0.18);
+
+      --navbar-h:    66px;
+      --font-serif:  'Fraunces', Georgia, serif;
+      --font-sans:   'DM Sans', system-ui, sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'DM Sans', sans-serif;
-      background-color: var(--surface-2);
-      background-image: radial-gradient(at 0% 0%, rgba(59, 79, 216, 0.05) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(124, 58, 237, 0.05) 0px, transparent 50%);
-      background-attachment: fixed;
+      font-family: var(--font-sans);
+      background: var(--surface-2);
       color: var(--text-primary);
       min-height: 100vh;
       font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Navbar ───────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(47,75,212,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47,75,212,0.022) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main, nav, footer { position: relative; z-index: 1; }
+
+    /* ══ NAVBAR ══════════════════════════════════════════════ */
     .cc-navbar {
-      height: var(--navbar-height);
-      background: rgba(255, 255, 255, 0.75);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+      height: var(--navbar-h);
+      background: rgba(255,255,255,0.90);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 1000;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+      box-shadow: var(--shadow-xs);
     }
 
     .cc-navbar .container-fluid {
@@ -77,197 +104,158 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
-    .cc-logo-icon {
-      width: 36px;
-      height: 36px;
+    .cc-logo-mark {
+      width: 34px;
+      height: 34px;
       background: var(--gradient);
-      border-radius: 10px;
+      border-radius: 9px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: white;
-      font-size: 18px;
       flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(47,75,212,0.35);
     }
+
+    .cc-logo-mark svg { width: 18px; height: 18px; }
 
     .cc-logo-text {
       font-family: 'Fraunces', serif;
-      font-weight: 600;
       font-size: 1.15rem;
       color: var(--text-primary);
-      letter-spacing: -0.3px;
+      letter-spacing: -0.2px;
     }
 
-    .cc-logo-text span {
+    .cc-logo-text em {
+      font-style: italic;
       background: var(--gradient);
       -webkit-background-clip: text;
-      background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .cc-nav-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 1.25rem;
+      flex-shrink: 0;
     }
 
     .cc-nav-links {
       display: flex;
       align-items: center;
-      gap: 4px;
-      margin-left: 2.5rem;
+      gap: 2px;
     }
 
     .cc-nav-link {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 7px 14px;
-      border-radius: 8px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
       color: var(--text-secondary);
       text-decoration: none;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 500;
-      transition: all 0.18s;
+      transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
-    .cc-nav-link:hover,
-    .cc-nav-link.active {
-      background: var(--primary-light);
+    .cc-nav-link i { font-size: 14px; opacity: 0.75; }
+
+    .cc-nav-link:hover {
+      background: var(--surface-3);
       color: var(--primary);
     }
 
-    .cc-nav-link i {
-      font-size: 15px;
+    .cc-nav-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
     }
+
+    .cc-nav-link.active i { opacity: 1; }
 
     .cc-nav-right {
       margin-left: auto;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
+    .cc-role-pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+
+    .role-user  { background: var(--primary-light); color: var(--primary); border-color: var(--primary-mid); }
+    .role-admin { background: #fef3c7; color: #78350f; border-color: #fde68a; }
+
     .cc-avatar {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--gradient);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(47,75,212,0.3);
+      transition: transform 0.15s;
     }
 
-    .cc-badge-role {
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-weight: 600;
-      letter-spacing: 0.3px;
-    }
+    .cc-avatar:hover { transform: scale(1.08); }
 
-    .badge-user {
-      background: var(--primary-light);
-      color: var(--primary);
-    }
-
-    .badge-admin {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    /* ── Page wrapper ─────────────────────────────────────── */
-    .cc-page {
-      min-height: calc(100vh - var(--navbar-height));
-      padding: 2.5rem 0;
-    }
-
-    /* ── Cards ────────────────────────────────────────────── */
-    .cc-card {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-      position: relative;
-    }
-
-    .cc-card:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-4px);
-      border-color: rgba(124, 58, 237, 0.2);
-    }
-
-    .cc-card-header {
-      padding: 1.5rem 1.75rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .cc-card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: var(--primary-light);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .cc-card-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .cc-card-body {
-      padding: 1.75rem;
-    }
-
-    /* ── Buttons ──────────────────────────────────────────── */
+    /* ══ BUTTONS ══════════════════════════════════════════════ */
     .btn-cc-primary {
       background: var(--gradient);
       color: white;
       border: none;
-      padding: 10px 24px;
-      border-radius: 9px;
-      font-size: 14px;
+      padding: 9px 22px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       text-decoration: none;
-      box-shadow: 0 4px 15px rgba(59, 79, 216, 0.25);
+      box-shadow: 0 3px 12px rgba(47,75,212,0.28);
+      letter-spacing: 0.1px;
     }
 
     .btn-cc-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(109,40,217,0.38);
       color: white;
     }
 
     .btn-cc-secondary {
       background: var(--surface);
-      color: var(--text-primary);
+      color: var(--text-secondary);
       border: 1.5px solid var(--border);
-      padding: 10px 24px;
-      border-radius: 9px;
-      font-size: 14px;
+      padding: 9px 22px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
       text-decoration: none;
     }
 
@@ -277,47 +265,104 @@
       background: var(--primary-light);
     }
 
-    /* ── Form inputs ──────────────────────────────────────── */
+    /* ══ CARDS ════════════════════════════════════════════════ */
+    .cc-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-xs);
+      overflow: hidden;
+      position: relative;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+    }
+
+    .cc-card:hover {
+      box-shadow: var(--shadow);
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+    }
+
+    .cc-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .cc-card-header::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--gradient);
+    }
+
+    .cc-card-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-sm);
+      background: var(--gradient-soft);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+      border: 1px solid var(--primary-mid);
+    }
+
+    .cc-card-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+    }
+
+    .cc-card-body { padding: 1.5rem; }
+
+    /* ══ FORMS ════════════════════════════════════════════════ */
     .cc-input {
       width: 100%;
-      padding: 11px 15px;
+      padding: 10px 14px;
       border: 1.5px solid var(--border);
-      border-radius: 9px;
+      border-radius: var(--radius-sm);
       font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
+      font-family: var(--font-sans);
       color: var(--text-primary);
       background: var(--surface);
-      transition: all 0.18s;
+      transition: border-color 0.15s, box-shadow 0.15s;
       outline: none;
+      appearance: none;
     }
 
     .cc-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(59, 79, 216, 0.1);
+      box-shadow: 0 0 0 3px rgba(47,75,212,0.1);
     }
 
-    .cc-input::placeholder {
-      color: var(--text-muted);
-    }
+    .cc-input::placeholder { color: var(--text-muted); }
 
     .cc-label {
       display: block;
-      font-size: 13px;
+      font-size: 11.5px;
       font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 6px;
-      letter-spacing: 0.2px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    .cc-form-group {
-      margin-bottom: 1.2rem;
-    }
+    .cc-form-group { margin-bottom: 1.1rem; }
 
-    /* ── Flash messages ───────────────────────────────────── */
+    /* ══ ALERTS ═══════════════════════════════════════════════ */
     .cc-alert {
-      padding: 12px 16px;
-      border-radius: 9px;
-      font-size: 14px;
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
       font-weight: 500;
       display: flex;
       align-items: center;
@@ -325,225 +370,248 @@
       margin-bottom: 1rem;
     }
 
-    .cc-alert-success {
-      background: #ecfdf5;
-      color: #065f46;
-      border: 1px solid #a7f3d0;
-    }
+    .cc-alert-success { background: var(--success-light); color: #065f46; border: 1px solid #a7f3d0; border-left: 3px solid var(--success); }
+    .cc-alert-danger  { background: var(--danger-light);  color: #991b1b; border: 1px solid #fecaca; border-left: 3px solid var(--danger); }
+    .cc-alert-warning { background: var(--warning-light); color: #78350f; border: 1px solid #fde68a; border-left: 3px solid #b45309; }
+    .cc-alert-info    { background: var(--primary-light); color: var(--primary-dark); border: 1px solid var(--primary-mid); border-left: 3px solid var(--primary); }
 
-    .cc-alert-danger {
-      background: #fef2f2;
-      color: #991b1b;
-      border: 1px solid #fecaca;
-    }
-
-    .cc-alert-warning {
-      background: #fffbeb;
-      color: #92400e;
-      border: 1px solid #fde68a;
-    }
-
-    .cc-alert-info {
-      background: var(--primary-light);
-      color: var(--primary-dark);
-      border: 1px solid #c7d2fe;
-    }
-
-    /* ── Stat chips ───────────────────────────────────────── */
+    /* ══ STATS ════════════════════════════════════════════════ */
     .cc-stat {
-      background: var(--surface-2);
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 1rem 1.25rem;
+      padding: 1.1rem 1.25rem;
       text-align: center;
+      box-shadow: var(--shadow-xs);
     }
 
     .cc-stat-value {
       font-family: 'Fraunces', serif;
-      font-size: 1.8rem;
-      font-weight: 600;
+      font-size: 1.9rem;
       background: var(--gradient);
       -webkit-background-clip: text;
-      background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
       line-height: 1;
     }
 
     .cc-stat-label {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--text-muted);
-      margin-top: 4px;
-      font-weight: 500;
+      margin-top: 5px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
 
-    /* ── Section heading ──────────────────────────────────── */
+    /* ══ SECTION HEADINGS ═════════════════════════════════════ */
     .cc-section-title {
       font-family: 'Fraunces', serif;
-      font-size: 1.5rem;
-      font-weight: 600;
+      font-size: 1.55rem;
       color: var(--text-primary);
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.25rem;
+      line-height: 1.25;
     }
 
     .cc-section-sub {
       color: var(--text-muted);
       font-size: 14px;
       margin-bottom: 1.75rem;
+      line-height: 1.6;
     }
 
-    /* ── Disclaimer ───────────────────────────────────────── */
+    .cc-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: 1px solid var(--primary-mid);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    /* ══ DISCLAIMER ═══════════════════════════════════════════ */
     .cc-disclaimer {
-      background: #fffbeb;
+      background: var(--warning-light);
       border: 1px solid #fde68a;
-      border-radius: 9px;
-      padding: 12px 16px;
+      border-left: 3px solid #b45309;
+      border-radius: var(--radius-sm);
+      padding: 11px 15px;
       font-size: 12.5px;
       color: #78350f;
       display: flex;
       gap: 10px;
       align-items: flex-start;
+      line-height: 1.5;
     }
 
-    /* ── Footer ───────────────────────────────────────────── */
+    /* ══ PAGE WRAPPER ═════════════════════════════════════════ */
+    .cc-page {
+      min-height: calc(100vh - var(--navbar-h));
+      padding: 2.5rem 0;
+      animation: pageFadeIn 0.28s ease-out both;
+    }
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══ FOOTER ═══════════════════════════════════════════════ */
     .cc-footer {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 1.5rem 0;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-muted);
+      background: var(--text-primary);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 2rem 0;
     }
 
-    /* ── Utilities ────────────────────────────────────────── */
+    .cc-footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .cc-footer-brand {
+      font-family: 'Fraunces', serif;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .cc-footer-brand em { font-style: italic; color: var(--primary-mid); }
+
+    .cc-footer-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 3px;
+    }
+
+    .cc-footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .cc-footer-links a {
+      color: rgba(255,255,255,0.38);
+      text-decoration: none;
+      font-size: 12.5px;
+      transition: color 0.15s;
+    }
+
+    .cc-footer-links a:hover { color: rgba(255,255,255,0.75); }
+
+    .cc-footer-note {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      text-align: right;
+      line-height: 1.6;
+    }
+
+    /* ══ UTILITIES ════════════════════════════════════════════ */
     .gradient-text {
       background: var(--gradient);
       -webkit-background-clip: text;
-      background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 1.5rem 0;
-    }
+    .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--surface-2);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 10px;
-    }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--surface-2); }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
   </style>
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
-
-  <!-- ── Navbar ──────────────────────────────────────────────── -->
   <nav class="cc-navbar">
     <div class="container-fluid">
       <a href="/" class="cc-logo">
-        <div class="cc-logo-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
-            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
-            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
-            <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+        <div class="cc-logo-mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+            <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
           </svg>
         </div>
-        <span class="cc-logo-text">Cerebro<span>Care360</span></span>
+        <span class="cc-logo-text">Cerebro<em>Care</em>360</span>
       </a>
 
       {% if current_user.is_authenticated %}
+      <div class="cc-nav-divider"></div>
       <div class="cc-nav-links">
         {% if current_user.role == 'admin' %}
         <a href="/admin/dashboard" class="cc-nav-link {% if 'admin' in request.endpoint %}active{% endif %}">
           <i class="bi bi-shield-check"></i> Admin
         </a>
         {% endif %}
-        <a href="/scan/upload" class="cc-nav-link {% if request.endpoint == 'scan.upload' %}active{% endif %}">
-          <i class="bi bi-upload"></i> Upload MRI
-        </a>
-        <a href="/scan/history" class="cc-nav-link {% if request.endpoint == 'scan.history' %}active{% endif %}">
-          <i class="bi bi-clock-history"></i> History
-        </a>
-        <a href="/hospital/find" class="cc-nav-link {% if request.endpoint == 'hospital.find' %}active{% endif %}">
-          <i class="bi bi-hospital"></i> Find Care
-        </a>
-        <a href="/symptom/checker" class="cc-nav-link {% if request.endpoint == 'symptom.checker' %}active{% endif %}">
-          <i class="bi bi-clipboard2-pulse"></i> Symptom Check
-        </a>
-        <a href="/chat" class="cc-nav-link {% if request.endpoint == 'chat.index' %}active{% endif %}">
-          <i class="bi bi-robot"></i> CerebroBot
-        </a>
+        <a href="/scan/upload"    class="cc-nav-link {% if request.endpoint == 'scan.upload'    %}active{% endif %}"><i class="bi bi-cloud-arrow-up"></i> Upload MRI</a>
+        <a href="/scan/history"   class="cc-nav-link {% if request.endpoint == 'scan.history'   %}active{% endif %}"><i class="bi bi-clock-history"></i> History</a>
+        <a href="/hospital/find"  class="cc-nav-link {% if request.endpoint == 'hospital.find'  %}active{% endif %}"><i class="bi bi-hospital"></i> Find Care</a>
+        <a href="/symptom/checker" class="cc-nav-link {% if request.endpoint == 'symptom.checker' %}active{% endif %}"><i class="bi bi-clipboard2-pulse"></i> Symptom Check</a>
+        <a href="/chat"           class="cc-nav-link {% if request.endpoint == 'chat.index'     %}active{% endif %}"><i class="bi bi-robot"></i> CerebroBot</a>
       </div>
       {% endif %}
 
       <div class="cc-nav-right">
         {% if current_user.is_authenticated %}
-        <span class="cc-badge-role {% if current_user.role == 'admin' %}badge-admin{% else %}badge-user{% endif %}">
-          {{ current_user.role | upper }}
-        </span>
-        <a href="/auth/profile" style="text-decoration:none;">
-          <div class="cc-avatar" title="{{ current_user.full_name }}">
-            {{ current_user.full_name[0] | upper }}
-          </div>
-        </a>
-        <a href="/auth/logout" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
-          <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
+        <span class="cc-role-pill {% if current_user.role == 'admin' %}role-admin{% else %}role-user{% endif %}">{{ current_user.role }}</span>
+        <a href="/auth/profile" class="cc-avatar" title="{{ current_user.full_name }}">{{ current_user.full_name[0]|upper }}</a>
+        <a href="/scan/upload" class="btn-cc-primary" style="padding:7px 16px;font-size:13px;"><i class="bi bi-plus-lg"></i> New Scan</a>
+        <a href="/auth/logout" class="btn-cc-secondary" style="padding:7px 14px;font-size:13px;" title="Logout"><i class="bi bi-box-arrow-right"></i></a>
         {% else %}
-        <a href="/auth/login" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">Login</a>
-        <a href="/auth/register" class="btn-cc-primary py-2 px-3" style="font-size:13px;">
-          <i class="bi bi-person-plus"></i> Register
-        </a>
+        <a href="/auth/login"    class="btn-cc-secondary" style="padding:7px 18px;font-size:13px;">Sign in</a>
+        <a href="/auth/register" class="btn-cc-primary"   style="padding:7px 18px;font-size:13px;">Get Started <i class="bi bi-arrow-right"></i></a>
         {% endif %}
       </div>
     </div>
   </nav>
 
-  <!-- ── Page content ────────────────────────────────────────── -->
   <main class="cc-page">
-
-    <!-- Flash messages -->
     <div class="container">
       {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-      {% for category, message in messages %}
+      {% if messages %}{% for category, message in messages %}
       <div class="cc-alert cc-alert-{{ category }}">
-        <i class="bi bi-info-circle"></i> {{ message }}
+        <i class="bi bi-{% if category == 'success' %}check-circle{% elif category == 'danger' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+        {{ message }}
       </div>
-      {% endfor %}
-      {% endif %}
+      {% endfor %}{% endif %}
       {% endwith %}
     </div>
-
     {% block content %}{% endblock %}
   </main>
 
-  <!-- ── Footer ─────────────────────────────────────────────── -->
   <footer class="cc-footer">
     <div class="container">
-      <span class="gradient-text" style="font-family:'Fraunces',serif;font-weight:600;">CerebroCare360</span>
-      &nbsp;·&nbsp; AI-assisted brain tumor detection
-      &nbsp;·&nbsp; For educational purposes only
-      &nbsp;·&nbsp; Not a substitute for medical diagnosis
+      <div class="cc-footer-inner">
+        <div>
+          <div class="cc-footer-brand">Cerebro<em>Care</em>360</div>
+          <div class="cc-footer-sub">AI-assisted brain tumor detection · Educational use only</div>
+        </div>
+        <div class="cc-footer-links">
+          <a href="/hospital/find">Find Care</a>
+          <a href="/symptom/checker">Symptom Check</a>
+          <a href="/scan/history">My History</a>
+          <a href="/auth/register">Get Started</a>
+        </div>
+        <div class="cc-footer-note">
+          Not a substitute for medical diagnosis.<br>
+          Always consult a qualified neurologist.
+        </div>
+      </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   {% block extra_js %}{% endblock %}
 </body>
-
 </html>

@@ -486,8 +486,23 @@
     <div class="search-bar">
       <div class="cc-form-group">
         <label class="cc-label"><i class="bi bi-map" style="font-size:11px;"></i> State</label>
-        <input type="text" name="state" class="cc-input" placeholder="e.g. Kerala"
-          value="{{ request.args.get('state', '') }}" />
+       <select id="filterState" name="state" class="cc-input">
+  <option value="">All States</option>
+  <option value="Kerala" {% if request.args.get('state')=='Kerala' %}selected{% endif %}>Kerala</option>
+  <option value="Karnataka" {% if request.args.get('state')=='Karnataka' %}selected{% endif %}>Karnataka</option>
+  <option value="Tamil Nadu" {% if request.args.get('state')=='Tamil Nadu' %}selected{% endif %}>Tamil Nadu</option>
+  <option value="Maharashtra" {% if request.args.get('state')=='Maharashtra' %}selected{% endif %}>Maharashtra</option>
+  <option value="Delhi" {% if request.args.get('state')=='Delhi' %}selected{% endif %}>Delhi</option>
+  <option value="Haryana" {% if request.args.get('state')=='Haryana' %}selected{% endif %}>Haryana</option>
+  <option value="Telangana" {% if request.args.get('state')=='Telangana' %}selected{% endif %}>Telangana</option>
+  <option value="Andhra Pradesh" {% if request.args.get('state')=='Andhra Pradesh' %}selected{% endif %}>Andhra Pradesh</option>
+  <option value="West Bengal" {% if request.args.get('state')=='West Bengal' %}selected{% endif %}>West Bengal</option>
+  <option value="Gujarat" {% if request.args.get('state')=='Gujarat' %}selected{% endif %}>Gujarat</option>
+  <option value="Rajasthan" {% if request.args.get('state')=='Rajasthan' %}selected{% endif %}>Rajasthan</option>
+  <option value="Uttar Pradesh" {% if request.args.get('state')=='Uttar Pradesh' %}selected{% endif %}>Uttar Pradesh</option>
+  <option value="Punjab" {% if request.args.get('state')=='Punjab' %}selected{% endif %}>Punjab</option>
+  <option value="Madhya Pradesh" {% if request.args.get('state')=='Madhya Pradesh' %}selected{% endif %}>Madhya Pradesh</option>
+</select>
       </div>
       <div class="cc-form-group">
         <label class="cc-label"><i class="bi bi-geo-alt" style="font-size:11px;"></i> City</label>

@@ -1,216 +1,206 @@
 {% extends "base.html" %}
-{% block title %}Register — CerebroCare360{% endblock %}
+{% block title %}Create Account — CerebroCare360{% endblock %}
 
 {% block extra_css %}
 <style>
-  .auth-wrapper {
-    min-height: calc(100vh - 68px - 60px);
-    display: flex;
-    align-items: center;
-    padding: 2rem 0;
+  :root {
+    --hp:#7c3aed;--hp-dark:#5b21b6;--hp-light:#f5f3ff;--hp-mid:#ddd6fe;
+    --pk:#db2777;--pk-light:#fdf2f8;--pk-mid:#fbcfe8;
+    --grad:linear-gradient(135deg,#7c3aed 0%,#db2777 100%);
   }
 
-  .auth-card {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    max-width: 480px;
-    width: 100%;
-    margin: 0 auto;
+  .auth-page {
+    min-height:calc(100vh - 66px);
+    display:grid;grid-template-columns:1fr 1fr;background:#faf9ff;
   }
 
-  .auth-header {
-    background: var(--gradient);
-    padding: 2rem 2rem 1.75rem;
-    text-align: center;
+  .auth-left {
+    background:linear-gradient(160deg,#2d0066 0%,#6b0050 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:3rem;position:relative;overflow:hidden;
   }
 
-  .auth-header .icon {
-    width: 72px;
-    height: 72px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.2rem;
-    padding: 3px;
-    border: 3px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-    animation: floatAuth 4s ease-in-out infinite alternate;
-    overflow: hidden;
+  .auth-left::before {
+    content:'';position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);
+    background-size:24px 24px;pointer-events:none;
   }
 
-  @keyframes floatAuth {
-    from {
-      transform: translateY(0);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    }
+  .auth-blob {
+    position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;
+    animation:blobMove 8s ease-in-out infinite alternate;
+  }
+  .ab-1{width:280px;height:280px;background:#7c3aed;top:-60px;left:-60px;}
+  .ab-2{width:220px;height:220px;background:#db2777;bottom:-40px;right:-40px;animation-delay:2s;}
+  .ab-3{width:160px;height:160px;background:#a78bfa;top:40%;left:35%;animation-delay:1s;}
 
-    to {
-      transform: translateY(-8px);
-      box-shadow: 0 16px 35px rgba(0, 0, 0, 0.3);
-    }
+  @keyframes blobMove{from{transform:translate(0,0) scale(1);}to{transform:translate(18px,18px) scale(1.1);}}
+
+  .auth-left-content{position:relative;z-index:2;text-align:center;max-width:340px;}
+
+  .auth-logo-orb{
+    width:80px;height:80px;border-radius:50%;
+    background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 1.5rem;animation:orbFloat 5s ease-in-out infinite;
+  }
+  @keyframes orbFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .auth-logo-orb svg{width:44px;height:44px;stroke:rgba(255,255,255,.9);}
+
+  .auth-left h2{font-family:'Fraunces',serif;font-size:1.9rem;color:white;margin-bottom:.75rem;line-height:1.2;}
+  .auth-left p{color:rgba(255,255,255,.68);font-size:.95rem;line-height:1.7;margin-bottom:2rem;}
+
+  .steps-list{list-style:none;padding:0;margin:0;text-align:left;}
+  .steps-list li{
+    display:flex;align-items:flex-start;gap:12px;
+    color:rgba(255,255,255,.82);font-size:13.5px;font-weight:500;
+    padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .steps-list li:last-child{border-bottom:none;}
+  .step-num{
+    width:24px;height:24px;border-radius:50%;
+    background:var(--grad);color:white;font-size:11px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
   }
 
-  .auth-header h1 {
-    font-family: 'Fraunces', serif;
-    font-size: 1.5rem;
-    color: white;
-    margin-bottom: 0.3rem;
+  .auth-right{
+    display:flex;align-items:center;justify-content:center;
+    padding:2.5rem 2rem;background:#faf9ff;overflow-y:auto;
   }
 
-  .auth-header p {
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 13.5px;
+  .auth-box{width:100%;max-width:440px;}
+
+  .auth-eyebrow{
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--hp-light);color:var(--hp);border:1px solid var(--hp-mid);
+    border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase;margin-bottom:1.25rem;
   }
 
-  .auth-body {
-    padding: 2rem;
+  .auth-title{font-family:'Fraunces',serif;font-size:2rem;color:#1a0533;margin-bottom:.4rem;letter-spacing:-.5px;}
+  .auth-sub{color:#9070b0;font-size:14px;margin-bottom:1.75rem;}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .auth-label{
+    display:block;font-size:11.5px;font-weight:700;
+    color:#9070b0;margin-bottom:5px;letter-spacing:.4px;text-transform:uppercase;
   }
 
-  .input-icon-wrap {
-    position: relative;
+  .auth-input{
+    width:100%;padding:11px 14px;border:1.5px solid #ede9fe;border-radius:10px;
+    font-size:14px;color:#1a0533;background:white;font-family:inherit;
+    outline:none;transition:border-color .15s,box-shadow .15s;
   }
+  .auth-input:focus{border-color:var(--hp);box-shadow:0 0 0 3px rgba(124,58,237,.1);}
+  .auth-input::placeholder{color:#c4b5d4;}
 
-  .input-icon-wrap .cc-input {
-    padding-left: 42px;
+  .auth-form-group{margin-bottom:1.1rem;}
+
+  .btn-auth{
+    width:100%;background:var(--grad);color:white;border:none;
+    padding:13px;border-radius:10px;font-size:15px;font-weight:700;
+    cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 6px 20px rgba(124,58,237,.3);margin-top:1.25rem;font-family:inherit;
   }
+  .btn-auth:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(219,39,119,.4);}
 
-  .input-icon-wrap .input-icon {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 16px;
-    pointer-events: none;
+  .auth-switch{text-align:center;font-size:13.5px;color:#9070b0;margin-top:1.25rem;}
+  .auth-switch a{color:var(--hp);font-weight:700;text-decoration:none;}
+  .auth-switch a:hover{color:var(--pk);}
+
+  .auth-alert{
+    padding:11px 15px;border-radius:10px;font-size:13.5px;font-weight:500;
+    display:flex;align-items:center;gap:9px;margin-bottom:1rem;
   }
+  .auth-alert-danger{background:#fdf2f8;color:#9d174d;border:1px solid #fbcfe8;border-left:3px solid #db2777;}
+  .auth-alert-success{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-left:3px solid #16a34a;}
 
-  .auth-footer-text {
-    text-align: center;
-    font-size: 13.5px;
-    color: var(--text-muted);
-    margin-top: 1.5rem;
-  }
-
-  .auth-footer-text a {
-    color: var(--primary);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .password-strength {
-    height: 4px;
-    border-radius: 4px;
-    background: var(--border);
-    margin-top: 8px;
-    overflow: hidden;
-  }
-
-  .password-strength-bar {
-    height: 100%;
-    width: 0%;
-    border-radius: 4px;
-    transition: all 0.3s;
-    background: var(--danger);
+  @media(max-width:768px){
+    .auth-page{grid-template-columns:1fr;}
+    .auth-left{display:none;}
+    .form-row{grid-template-columns:1fr;}
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-wrapper">
-  <div class="container">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="icon">
-          <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot Mascot"
-            style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; transform: scale(1.15);">
-        </div>
-        <h1>Create your account</h1>
-        <p>Join CerebroCare360 — it's free!</p>
-      </div>
-      <div class="auth-body">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-        <div class="cc-alert cc-alert-{{ category }}">
-          <i class="bi bi-exclamation-circle"></i> {{ message }}
-        </div>
-        {% endfor %}
-        {% endwith %}
+<div class="auth-page" style="margin:-2.5rem 0;padding:0;">
 
-        <form method="POST" action="/auth/register">
-          {{ form.hidden_tag() }}
-          <div class="cc-form-group">
-            <label class="cc-label">Full name</label>
-            <div class="input-icon-wrap">
-              <i class="bi bi-person input-icon"></i>
-              <input type="text" name="full_name" class="cc-input" placeholder="Your full name" required />
-            </div>
-          </div>
-          <div class="cc-form-group">
-            <label class="cc-label">Email address</label>
-            <div class="input-icon-wrap">
-              <i class="bi bi-envelope input-icon"></i>
-              <input type="email" name="email" class="cc-input" placeholder="you@example.com" required />
-            </div>
-          </div>
-          <div class="cc-form-group">
-            <label class="cc-label">Password</label>
-            <div class="input-icon-wrap">
-              <i class="bi bi-key input-icon"></i>
-              <input type="password" name="password" id="regPassword" class="cc-input"
-                placeholder="Minimum 8 characters" required />
-            </div>
-            <div class="password-strength mt-2">
-              <div class="password-strength-bar" id="strengthBar"></div>
-            </div>
-          </div>
-          <div class="cc-form-group">
-            <label class="cc-label">Confirm password</label>
-            <div class="input-icon-wrap">
-              <i class="bi bi-key-fill input-icon"></i>
-              <input type="password" name="confirm_password" class="cc-input" placeholder="Re-enter your password"
-                required />
-            </div>
-          </div>
-          <div class="cc-disclaimer mt-1 mb-3">
-            <i class="bi bi-shield-check" style="flex-shrink:0;margin-top:1px;"></i>
-            <span>By registering you agree that CerebroCare360 is for educational purposes only and does not provide
-              medical advice.</span>
-          </div>
-          <button type="submit" class="btn-cc-primary w-100 justify-content-center" style="padding:12px;">
-            <i class="bi bi-person-check"></i> Create Account
-          </button>
-        </form>
-        <div class="auth-footer-text">
-          Already have an account? <a href="/auth/login">Sign in</a>
+  <div class="auth-left">
+    <div class="auth-blob ab-1"></div>
+    <div class="auth-blob ab-2"></div>
+    <div class="auth-blob ab-3"></div>
+    <div class="auth-left-content">
+      <div class="auth-logo-orb">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+          <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+          <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+          <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+        </svg>
+      </div>
+      <h2>Get started in minutes</h2>
+      <p>Create your free account and upload your first MRI scan right away. No special equipment needed.</p>
+      <ul class="steps-list">
+        <li><div class="step-num">1</div> Create your free account</li>
+        <li><div class="step-num">2</div> Upload your brain MRI scan</li>
+        <li><div class="step-num">3</div> Get AI analysis &amp; Grad-CAM result</li>
+        <li><div class="step-num">4</div> Download report &amp; find a specialist</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-box">
+      <div class="auth-eyebrow"><i class="bi bi-person-plus"></i> Free account</div>
+      <h1 class="auth-title">Create account</h1>
+      <p class="auth-sub">Join CerebroCare360 and start analysing MRI scans today.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for cat,msg in messages %}
+      <div class="auth-alert auth-alert-{{ cat }}">
+        <i class="bi bi-{% if cat=='success' %}check-circle{% else %}exclamation-circle{% endif %}"></i> {{ msg }}
+      </div>
+      {% endfor %}{% endif %}{% endwith %}
+
+      <form method="POST" action="/auth/register">
+        {{ form.hidden_tag() if form }}
+        <div class="auth-form-group">
+          <label class="auth-label">Full Name</label>
+          <input type="text" name="full_name" class="auth-input" placeholder="Your full name" required autocomplete="name">
         </div>
+        <div class="auth-form-group">
+          <label class="auth-label">Email address</label>
+          <input type="email" name="email" class="auth-input" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-row">
+          <div class="auth-form-group">
+            <label class="auth-label">Password</label>
+            <input type="password" name="password" class="auth-input" placeholder="••••••••" required>
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-label">Confirm Password</label>
+            <input type="password" name="confirm_password" class="auth-input" placeholder="••••••••" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-auth">
+          <i class="bi bi-person-check"></i> Create Free Account
+        </button>
+      </form>
+
+      <p class="auth-switch" style="margin-top:1.25rem;">
+        Already have an account? <a href="/auth/login">Sign in</a>
+      </p>
+
+      <div style="margin-top:1.5rem;background:#f5f3ff;border-radius:10px;padding:12px 15px;
+                  font-size:12.5px;color:#7c3aed;border:1px solid #ddd6fe;display:flex;gap:9px;align-items:flex-start;">
+        <i class="bi bi-shield-check" style="flex-shrink:0;margin-top:1px;"></i>
+        <span>For educational use only. This tool does not replace professional medical advice.</span>
       </div>
     </div>
   </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-  const pw = document.getElementById('regPassword');
-  const bar = document.getElementById('strengthBar');
-  if (pw && bar) {
-    pw.addEventListener('input', () => {
-      const v = pw.value;
-      let score = 0;
-      if (v.length >= 8) score++;
-      if (/[A-Z]/.test(v)) score++;
-      if (/[0-9]/.test(v)) score++;
-      if (/[^A-Za-z0-9]/.test(v)) score++;
-      const colors = ['#dc2626', '#d97706', '#2563eb', '#059669'];
-      const widths = ['25%', '50%', '75%', '100%'];
-      bar.style.width = score > 0 ? widths[score - 1] : '0%';
-      bar.style.background = score > 0 ? colors[score - 1] : '';
-    });
-  }
-</script>
+</div>
 {% endblock %}

@@ -3,74 +3,76 @@
 
 {% block extra_css %}
 <style>
+  /* ═══════════════════════════════════════════════
+     COLOUR OVERRIDES — Soft Purple & Pink palette
+  ═══════════════════════════════════════════════ */
+  :root {
+    --hp:        #7c3aed;          /* hero primary */
+    --hp-dark:   #5b21b6;
+    --hp-light:  #f5f3ff;
+    --hp-mid:    #ddd6fe;
+    --pk:        #db2777;          /* pink accent */
+    --pk-light:  #fdf2f8;
+    --pk-mid:    #fbcfe8;
+    --grad:      linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+    --grad-soft: linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(219,39,119,0.08) 100%);
+    --grad-glow: linear-gradient(135deg, rgba(124,58,237,0.18) 0%, rgba(219,39,119,0.18) 100%);
+  }
+
+  /* ═══════════════════════════════════════════════
+     HERO
+  ═══════════════════════════════════════════════ */
   .hero {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
+    background: #faf9ff;
+    border-bottom: 1px solid #ede9fe;
     padding: 6rem 0 5rem;
     overflow: hidden;
     position: relative;
     background-image:
-      linear-gradient(rgba(59, 79, 216, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59, 79, 216, 0.03) 1px, transparent 1px);
-    background-size: 30px 30px;
+      linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 
   .hero::before {
     content: '';
     position: absolute;
-    top: -150px;
-    right: -100px;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
+    top: -160px; right: -120px;
+    width: 650px; height: 650px;
+    background: radial-gradient(circle, rgba(219,39,119,0.12) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
   }
 
   .hero::after {
     content: '';
     position: absolute;
-    bottom: -150px;
-    left: -100px;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(59, 79, 216, 0.1) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
+    bottom: -160px; left: -100px;
+    width: 550px; height: 550px;
+    background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
   }
 
-  .hero .container {
-    position: relative;
-    z-index: 2;
-  }
+  .hero .container { position: relative; z-index: 2; }
 
   .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--primary-light);
-    color: var(--primary);
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    text-transform: uppercase;
-    margin-bottom: 1.5rem;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--hp-light); color: var(--hp);
+    border: 1px solid var(--hp-mid);
+    border-radius: 20px; padding: 5px 14px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 1.5rem;
   }
 
   .hero-title {
     font-family: 'Fraunces', serif;
     font-size: clamp(2.5rem, 6vw, 4.2rem);
-    font-weight: 700;
-    line-height: 1.1;
-    color: var(--text-primary);
-    margin-bottom: 1.25rem;
-    letter-spacing: -1px;
+    font-weight: 700; line-height: 1.1;
+    color: #1a0533;
+    margin-bottom: 1.25rem; letter-spacing: -1px;
   }
 
-  .hero-title-highlight {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  .hero-highlight {
+    background: var(--grad);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -78,542 +80,721 @@
   }
 
   .hero-sub {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    line-height: 1.7;
-    max-width: 540px;
-    margin-bottom: 2.5rem;
+    font-size: 1.05rem; color: #5b4f72;
+    line-height: 1.75; max-width: 530px; margin-bottom: 2.5rem;
   }
 
-  .hero-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn-hero-primary {
+    background: var(--grad);
+    color: white; border: none;
+    padding: 13px 30px; border-radius: 50px;
+    font-size: 15px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none; cursor: pointer;
+    box-shadow: 0 6px 24px rgba(124,58,237,0.35);
+    transition: all 0.22s ease;
   }
 
-  .btn-cc-primary.btn-lg {
-    padding: 13px 32px;
-    font-size: 15px;
-    border-radius: 10px;
+  .btn-hero-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(219,39,119,0.4);
+    color: white;
   }
 
-  .btn-cc-secondary.btn-lg {
-    padding: 13px 32px;
-    font-size: 15px;
-    border-radius: 10px;
+  .btn-hero-secondary {
+    background: white; color: var(--hp);
+    border: 2px solid var(--hp-mid);
+    padding: 11px 28px; border-radius: 50px;
+    font-size: 15px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none; cursor: pointer;
+    transition: all 0.18s ease;
   }
 
+  .btn-hero-secondary:hover {
+    border-color: var(--hp); background: var(--hp-light); color: var(--hp);
+  }
+
+  /* disclaimer */
+  .hero-disclaimer {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: #fffbeb; border: 1px solid #fde68a;
+    border-left: 3px solid #f59e0b;
+    border-radius: 10px; padding: 11px 15px;
+    font-size: 12.5px; color: #78350f; margin-top: 1.75rem;
+    max-width: 540px; line-height: 1.5;
+  }
+
+  /* ═══════════════════════════════════════════════
+     HERO VISUAL — MRI MOCKUP
+  ═══════════════════════════════════════════════ */
   .hero-visual {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
+    height: 380px;
   }
 
-  .brain-graphic {
-    width: 320px;
-    height: 320px;
-    background: var(--gradient);
-    border-radius: 50%;
-    opacity: 0.08;
+  /* outer glow ring */
+  .mri-glow {
     position: absolute;
+    width: 360px; height: 360px; border-radius: 50%;
+    background: var(--grad-glow); filter: blur(40px);
+    animation: glowPulse 4s ease-in-out infinite alternate;
   }
 
-  .brain-graphic-inner {
-    width: 240px;
-    height: 240px;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);
-    animation: floatBrain 6s ease-in-out infinite, pulseGlow 4s ease-in-out infinite alternate;
+  @keyframes glowPulse {
+    from { transform: scale(0.95); opacity: 0.7; }
+    to   { transform: scale(1.05); opacity: 1; }
   }
 
-  @keyframes floatBrain {
-    0% {
-      transform: translateY(0px);
-    }
-
-    50% {
-      transform: translateY(-15px);
-    }
-
-    100% {
-      transform: translateY(0px);
-    }
-  }
-
-  @keyframes pulseGlow {
-    from {
-      box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2);
-    }
-
-    to {
-      box-shadow: 0 15px 50px rgba(124, 58, 237, 0.5);
-      border-color: rgba(124, 58, 237, 0.3);
-    }
-  }
-
-  .brain-graphic-inner i {
-    font-size: 90px;
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .floating-chip {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 12px;
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-    animation: floatChip 5s ease-in-out infinite alternate;
-  }
-
-  @keyframes floatChip {
-    from {
-      transform: translateY(0px) rotate(0deg);
-    }
-
-    to {
-      transform: translateY(-8px) rotate(1deg);
-    }
-  }
-
-  .chip-1 {
-    top: 30px;
-    right: -20px;
-    animation-delay: 0s;
-  }
-
-  .chip-2 {
-    bottom: 60px;
-    right: -40px;
-    animation-delay: 1.5s;
-  }
-
-  .chip-3 {
-    bottom: 20px;
-    left: -10px;
-    animation-delay: 0.7s;
-  }
-
-  .chip-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    box-shadow: 0 0 10px currentColor;
-  }
-
-  .dot-green {
-    background: #10b981;
-  }
-
-  .dot-blue {
-    background: var(--primary);
-  }
-
-  .dot-purple {
-    background: var(--accent);
-  }
-
-  /* Features */
-  .features-section {
-    padding: 4rem 0;
-  }
-
-  .feature-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
-    height: 100%;
-    transition: all 0.2s;
-    position: relative;
+  /* MRI scan card */
+  .mri-card {
+    width: 240px; height: 240px;
+    background: #0f0520;
+    border-radius: 20px;
+    border: 2px solid rgba(124,58,237,0.4);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 2;
+    box-shadow: 0 20px 60px rgba(124,58,237,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    animation: mriFloat 6s ease-in-out infinite;
     overflow: hidden;
   }
 
-  .feature-card::before {
-    content: '';
+  @keyframes mriFloat {
+    0%,100% { transform: translateY(0) rotate(-1deg); }
+    50%      { transform: translateY(-14px) rotate(1deg); }
+  }
+
+  /* Brain SVG inside dark card */
+  .mri-brain {
+    width: 150px; height: 150px;
+    position: relative; z-index: 2;
+  }
+
+  /* scan line animation */
+  .mri-scanline {
     position: absolute;
+    left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(124,58,237,0.8), rgba(219,39,119,0.8), transparent);
     top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--gradient);
-    opacity: 0;
-    transition: opacity 0.2s;
+    animation: scanLine 3s ease-in-out infinite;
+    z-index: 3;
   }
 
-  .feature-card:hover {
-    transform: translateY(-8px);
-    box-shadow: var(--shadow-lg);
+  @keyframes scanLine {
+    0%   { top: 0%;    opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 100%;  opacity: 0; }
   }
 
-  .feature-card:hover::before {
-    opacity: 1;
+  /* corner brackets on MRI card */
+  .mri-corner {
+    position: absolute;
+    width: 18px; height: 18px;
+    border-color: rgba(124,58,237,0.7);
+    border-style: solid;
+    z-index: 4;
   }
 
-  .feature-card .feature-icon i {
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  .mri-corner.tl { top: 10px; left: 10px;  border-width: 2px 0 0 2px; }
+  .mri-corner.tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+  .mri-corner.bl { bottom: 10px; left: 10px;  border-width: 0 0 2px 2px; }
+  .mri-corner.br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+  /* status dot */
+  .mri-status {
+    position: absolute; bottom: 12px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 6px;
+    font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.7);
+    letter-spacing: 1.5px; text-transform: uppercase; z-index: 4;
   }
 
-  .feature-card:hover .feature-icon i {
-    transform: scale(1.2);
+  .mri-status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+    animation: blinkDot 2s ease-in-out infinite;
   }
 
-  .feature-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: var(--primary-light);
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    margin-bottom: 1.1rem;
+  @keyframes blinkDot {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
   }
 
-  .feature-title {
-    font-weight: 600;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
+  /* floating chips */
+  .floating-chip {
+    position: absolute;
+    background: white;
+    border-radius: 12px; padding: 10px 14px;
+    font-size: 13px; font-weight: 600; color: #1a0533;
+    box-shadow: 0 8px 28px rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.12);
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap; z-index: 5;
   }
 
-  .feature-desc {
-    font-size: 13.5px;
-    color: var(--text-secondary);
-    line-height: 1.6;
+  .chip-1 { top: 25px;  right: -15px; animation: chipA 5s ease-in-out infinite alternate; }
+  .chip-2 { bottom: 60px; right: -35px; animation: chipA 5s ease-in-out infinite alternate; animation-delay: 1.3s; }
+  .chip-3 { bottom: 18px; left: -5px;  animation: chipA 5s ease-in-out infinite alternate; animation-delay: 0.7s; }
+
+  @keyframes chipA {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-9px); }
   }
 
-  /* How it works */
-  .hiw-section {
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 4rem 0;
+  .chip-dot {
+    width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
   }
 
-  .hiw-step {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.25rem;
+  /* floating medical icons */
+  .med-icon {
+    position: absolute; z-index: 3;
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; background: white;
+    box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+    border: 1px solid rgba(124,58,237,0.15);
+    animation: medFloat 7s ease-in-out infinite;
   }
 
-  .hiw-num {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: var(--gradient);
-    color: white;
-    font-family: 'Fraunces', serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+  .mi-1 { top: 50px;  left: 10px;  animation-delay: 0s;   color: #db2777; }
+  .mi-2 { top: 15px;  left: 50%;   animation-delay: 1.5s; color: #7c3aed; transform: translateX(-50%); }
+  .mi-3 { bottom: 10px; right: 10px; animation-delay: 0.8s; color: #db2777; }
+
+  @keyframes medFloat {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-10px) scale(1.05); }
   }
 
-  .hiw-content h5 {
-    font-weight: 600;
-    font-size: 0.95rem;
-    margin-bottom: 0.3rem;
-    color: var(--text-primary);
+  .mi-2 { animation: medFloat2 7s ease-in-out infinite; animation-delay: 1.5s; }
+  @keyframes medFloat2 {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-10px); }
   }
 
-  .hiw-content p {
-    font-size: 13.5px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-  }
+  /* ═══════════════════════════════════════════════
+     STATS — animated counters
+  ═══════════════════════════════════════════════ */
+  .stats-section { padding: 3.5rem 0; background: white; border-bottom: 1px solid #f3e8ff; }
 
-  /* Stats */
-  .stats-section {
-    padding: 3.5rem 0;
-  }
-
-  .stat-big {
-    text-align: center;
-    padding: 1.5rem;
-  }
+  .stat-big { text-align: center; padding: 1rem; }
 
   .stat-big .value {
     font-family: 'Fraunces', serif;
-    font-size: 2.8rem;
-    font-weight: 600;
-    line-height: 1;
-    background: var(--gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
+    font-size: 2.8rem; font-weight: 700; line-height: 1;
+    background: var(--grad);
+    -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .stat-big .label {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 6px;
-    font-weight: 500;
+    font-size: 13px; color: #9070b0; margin-top: 6px; font-weight: 500;
   }
 
-  /* CTA */
-  .cta-section {
-    background: var(--gradient);
-    padding: 4rem 0;
-    text-align: center;
+  /* ═══════════════════════════════════════════════
+     PULSE / HEARTBEAT BAR
+  ═══════════════════════════════════════════════ */
+  .pulse-bar {
+    background: linear-gradient(135deg, #2d0066 0%, #6b0050 100%);
+    padding: 1.2rem 0; overflow: hidden; position: relative;
+  }
+
+  .pulse-container {
+    display: flex; align-items: center;
+    justify-content: center; gap: 1.5rem;
     position: relative;
-    overflow: hidden;
+  }
+
+  .pulse-label {
+    color: rgba(255,255,255,0.6); font-size: 12px;
+    font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; white-space: nowrap;
+  }
+
+  .pulse-svg { flex: 1; max-width: 500px; overflow: visible; }
+
+  .pulse-path {
+    fill: none;
+    stroke: url(#pulseGrad);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 800;
+    stroke-dashoffset: 800;
+    animation: drawPulse 2.5s ease-out forwards, loopPulse 4s linear 2.5s infinite;
+  }
+
+  @keyframes drawPulse {
+    to { stroke-dashoffset: 0; }
+  }
+
+  @keyframes loopPulse {
+    0%   { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -800; }
+  }
+
+  .pulse-dot {
+    fill: #f472b6;
+    filter: drop-shadow(0 0 6px #f472b6);
+    animation: pulseDot 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulseDot { from { r: 4; } to { r: 6; } }
+
+  /* ═══════════════════════════════════════════════
+     FEATURES
+  ═══════════════════════════════════════════════ */
+  .features-section { padding: 5rem 0 4rem; background: #faf9ff; }
+
+  .feature-card {
+    background: white;
+    border: 1px solid #ede9fe;
+    border-radius: 18px; padding: 1.75rem; height: 100%;
+    transition: all 0.22s ease;
+    position: relative; overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--grad); opacity: 0; transition: opacity 0.22s;
+  }
+
+  .feature-card:hover { transform: translateY(-7px); box-shadow: 0 20px 50px rgba(124,58,237,0.14); }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon {
+    width: 50px; height: 50px; border-radius: 14px;
+    background: var(--grad-soft); color: var(--hp);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 1.1rem; border: 1px solid var(--hp-mid);
+    transition: transform 0.22s;
+  }
+
+  .feature-card:hover .feature-icon { transform: scale(1.12); }
+  .feature-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; color: #1a0533; }
+  .feature-desc  { font-size: 13.5px; color: #5b4f72; line-height: 1.65; }
+
+  /* ═══════════════════════════════════════════════
+     HOW IT WORKS
+  ═══════════════════════════════════════════════ */
+  .hiw-section {
+    background: white;
+    border-top: 1px solid #ede9fe;
+    border-bottom: 1px solid #ede9fe;
+    padding: 5rem 0;
+  }
+
+  .hiw-step { display: flex; align-items: flex-start; gap: 1.25rem; }
+
+  .hiw-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--grad); color: white;
+    font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba(124,58,237,0.35);
+  }
+
+  .hiw-content h5 { font-weight: 700; font-size: 0.97rem; margin-bottom: 0.3rem; color: #1a0533; }
+  .hiw-content p  { font-size: 13.5px; color: #5b4f72; line-height: 1.65; }
+
+  /* ═══════════════════════════════════════════════
+     FIND CARE TEASER
+  ═══════════════════════════════════════════════ */
+  .findcare-section { padding: 5rem 0; background: #faf9ff; }
+
+  .findcare-banner {
+    background: linear-gradient(135deg, #2d0066 0%, #6b0050 100%);
+    border-radius: 24px; padding: 3.5rem;
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 2rem; align-items: center;
+  }
+
+  .findcare-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 22px 22px; pointer-events: none;
+  }
+
+  /* animated hospital icons floating in banner */
+  .hosp-float {
+    position: absolute; font-size: 22px;
+    animation: hospDrift 8s ease-in-out infinite;
+    opacity: 0.12; pointer-events: none;
+  }
+
+  .hf-1 { top: 15%;  left:  8%; animation-delay: 0s;   font-size: 26px; }
+  .hf-2 { top: 60%;  left: 18%; animation-delay: 2s;   font-size: 20px; }
+  .hf-3 { top: 20%;  right: 22%; animation-delay: 1s;  font-size: 24px; }
+  .hf-4 { bottom:15%;right: 35%; animation-delay: 3s;  font-size: 18px; }
+  .hf-5 { bottom:30%;left: 40%; animation-delay: 1.5s; font-size: 22px; }
+
+  @keyframes hospDrift {
+    0%,100% { transform: translateY(0) rotate(0deg);   opacity: 0.12; }
+    50%      { transform: translateY(-18px) rotate(5deg); opacity: 0.22; }
+  }
+
+  .findcare-text { position: relative; z-index: 2; }
+
+  .findcare-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 4px 13px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 1rem;
+  }
+
+  .findcare-title {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem; color: white;
+    margin-bottom: 0.75rem; line-height: 1.2;
+  }
+
+  .findcare-sub {
+    color: rgba(255,255,255,0.72); font-size: 1rem; line-height: 1.7;
+    max-width: 480px; margin-bottom: 1.5rem;
+  }
+
+  /* hospital stat pills */
+  .findcare-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.75rem; }
+
+  .hosp-pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 6px 14px;
+    color: white; font-size: 12.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .hosp-pill i { font-size: 13px; opacity: 0.8; }
+
+  .btn-findcare {
+    background: white; color: var(--hp);
+    border: none; padding: 12px 28px; border-radius: 50px;
+    font-size: 14.5px; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none; transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    position: relative; z-index: 2;
+  }
+
+  .btn-findcare:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.2); color: var(--hp); }
+
+  /* right side hospital cards preview */
+  .findcare-preview { position: relative; z-index: 2; min-width: 200px; }
+
+  .hosp-mini {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 14px; padding: 12px 16px;
+    color: white; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 12px;
+    min-width: 210px;
+    animation: miniFloat 6s ease-in-out infinite;
+  }
+
+  .hosp-mini:nth-child(2) { animation-delay: 1s; margin-left: 20px; }
+  .hosp-mini:nth-child(3) { animation-delay: 2s; }
+
+  @keyframes miniFloat {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+
+  .hosp-mini-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+
+  .hosp-mini-name { font-size: 12.5px; font-weight: 700; }
+  .hosp-mini-loc  { font-size: 11px; opacity: 0.65; }
+
+  .hosp-mini-stars { margin-left: auto; font-size: 10px; color: #fbbf24; }
+
+  /* ═══════════════════════════════════════════════
+     CTA
+  ═══════════════════════════════════════════════ */
+  .cta-section {
+    background: var(--grad);
+    padding: 4.5rem 0; text-align: center;
+    position: relative; overflow: hidden;
   }
 
   .cta-section::before {
     content: '';
-    position: absolute;
-    inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E");
   }
 
   .cta-section h2 {
-    font-family: 'Fraunces', serif;
-    font-size: 2rem;
-    color: white;
-    margin-bottom: 1rem;
-    position: relative;
+    font-family: 'Fraunces', serif; font-size: 2.2rem;
+    color: white; margin-bottom: 1rem; position: relative;
   }
 
   .cta-section p {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 1rem;
-    margin-bottom: 2rem;
-    position: relative;
+    color: rgba(255,255,255,0.8); font-size: 1rem;
+    margin-bottom: 2rem; position: relative;
   }
 
   .btn-cta-white {
-    background: white;
-    color: var(--primary);
-    border: none;
-    padding: 13px 32px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    position: relative;
+    background: white; color: var(--hp); border: none;
+    padding: 13px 32px; border-radius: 50px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    text-decoration: none; position: relative;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.15);
   }
 
-  .btn-cta-white:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-    color: var(--primary);
+  .btn-cta-white:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(0,0,0,0.22); color: var(--hp); }
+
+  /* ═══════════════════════════════════════════════
+     RESPONSIVE
+  ═══════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .floating-chip, .med-icon { display: none; }
+    .findcare-banner { grid-template-columns: 1fr; }
+    .findcare-preview { display: none; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Hero -->
+
+<!-- ══ HERO ══════════════════════════════════════════════════════ -->
 <section class="hero">
   <div class="container">
     <div class="row align-items-center g-5">
+
       <div class="col-lg-6">
         <div class="hero-eyebrow">
-          <i class="bi bi-cpu"></i> AI-Powered Detection
+          <i class="bi bi-cpu-fill"></i> AI-Powered Ensemble Detection
         </div>
         <h1 class="hero-title">
-          Advanced Brain Tumor<br />
-          Detection, <span class="hero-title-highlight">Simplified</span>
+          Advanced Brain Tumor<br>
+          Detection, <span class="hero-highlight">Simplified</span>
         </h1>
         <p class="hero-sub">
-          CerebroCare360 uses an ensemble of three deep learning models
-          to analyse MRI scans and detect brain tumors with clinical-grade accuracy.
+          CerebroCare360 uses an ensemble of three deep learning models to analyse MRI scans
+          and detect brain tumors with clinical-grade accuracy.
           Get instant results, downloadable reports, and specialist guidance.
         </p>
         <div class="hero-actions">
           {% if current_user.is_authenticated %}
-          <a href="/scan/upload" class="btn-cc-primary btn-lg">
-            <i class="bi bi-upload"></i> Analyse My MRI
-          </a>
+          <a href="/scan/upload" class="btn-hero-primary"><i class="bi bi-cloud-arrow-up"></i> Analyse My MRI</a>
           {% else %}
-          <a href="/auth/register" class="btn-cc-primary btn-lg">
-            <i class="bi bi-upload"></i> Analyse My MRI
-          </a>
+          <a href="/auth/register" class="btn-hero-primary"><i class="bi bi-cloud-arrow-up"></i> Analyse My MRI</a>
           {% endif %}
-          <a href="#how-it-works" class="btn-cc-secondary btn-lg">
-            How it works
-          </a>
+          <a href="#how-it-works" class="btn-hero-secondary"><i class="bi bi-play-circle"></i> How it works</a>
         </div>
-        <div class="cc-disclaimer mt-4">
-          <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
-          <span>CerebroCare360 is an educational tool and does not replace professional medical diagnosis. Always
-            consult a qualified neurologist.</span>
+        <div class="hero-disclaimer">
+          <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;color:#f59e0b;"></i>
+          <span>CerebroCare360 is an educational tool and does not replace professional medical diagnosis. Always consult a qualified neurologist.</span>
         </div>
       </div>
 
+      <!-- ANIMATED MRI VISUAL -->
       <div class="col-lg-6 d-none d-lg-block">
-        <div class="hero-visual" style="height:340px;">
-          <div class="brain-graphic"></div>
-          <div class="brain-graphic-inner">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-              style="width: 110px; height: 110px; stroke: url(#gradientBrain)">
+        <div class="hero-visual">
+          <div class="mri-glow"></div>
+
+          <!-- Floating medical icons -->
+          <div class="med-icon mi-1"><i class="bi bi-heart-pulse-fill"></i></div>
+          <div class="med-icon mi-2"><i class="bi bi-hospital-fill"></i></div>
+          <div class="med-icon mi-3"><i class="bi bi-activity"></i></div>
+
+          <!-- MRI scan card -->
+          <div class="mri-card">
+            <div class="mri-scanline"></div>
+            <div class="mri-corner tl"></div>
+            <div class="mri-corner tr"></div>
+            <div class="mri-corner bl"></div>
+            <div class="mri-corner br"></div>
+
+            <!-- brain SVG on dark background -->
+            <svg class="mri-brain" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+              stroke-linecap="round" stroke-linejoin="round">
               <defs>
-                <linearGradient id="gradientBrain" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#3b4fd8" />
-                  <stop offset="100%" stop-color="#7c3aed" />
+                <linearGradient id="brainGradHP" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a78bfa"/>
+                  <stop offset="100%" stop-color="#f472b6"/>
                 </linearGradient>
               </defs>
-              <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
-              <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
-              <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
-              <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
+              <path stroke="url(#brainGradHP)" stroke-width="1.4"
+                d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+              <path stroke="url(#brainGradHP)" stroke-width="1.4"
+                d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+              <path stroke="url(#brainGradHP)" stroke-width="1.4"
+                d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+              <path stroke="url(#brainGradHP)" stroke-width="1.4"
+                d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
             </svg>
+
+            <div class="mri-status">
+              <div class="mri-status-dot"></div> Analysing
+            </div>
           </div>
+
+          <!-- Floating info chips -->
           <div class="floating-chip chip-1">
-            <span class="chip-dot dot-green"></span> Ensemble AI Active
+            <span class="chip-dot" style="background:#10b981;color:#10b981;box-shadow:0 0 8px #10b981;"></span>
+            Ensemble AI Active
           </div>
           <div class="floating-chip chip-2">
-            <span class="chip-dot dot-blue"></span> 93%+ Accuracy
+            <span class="chip-dot" style="background:#7c3aed;color:#7c3aed;box-shadow:0 0 8px #7c3aed;"></span>
+            93%+ Accuracy
           </div>
           <div class="floating-chip chip-3">
-            <span class="chip-dot dot-purple"></span> 4 Tumor Classes
+            <span class="chip-dot" style="background:#db2777;color:#db2777;box-shadow:0 0 8px #db2777;"></span>
+            4 Tumor Classes
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- Stats -->
+<!-- ══ STATS — animated counters ════════════════════════════════ -->
 <section class="stats-section">
   <div class="container">
     <div class="row g-4">
       <div class="col-6 col-md-3">
         <div class="stat-big">
-          <div class="value">93%+</div>
+          <div class="value" data-target="93" data-suffix="%+">0%</div>
           <div class="label">Detection Accuracy</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="stat-big">
-          <div class="value">3</div>
+          <div class="value" data-target="3" data-suffix="">0</div>
           <div class="label">AI Models in Ensemble</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="stat-big">
-          <div class="value">4</div>
+          <div class="value" data-target="4" data-suffix="">0</div>
           <div class="label">Tumor Types Detected</div>
         </div>
       </div>
       <div class="col-6 col-md-3">
         <div class="stat-big">
-          <div class="value">&lt;5s</div>
-          <div class="label">Analysis Time</div>
+          <div class="value" data-target="40" data-suffix="+">0+</div>
+          <div class="label">Verified Hospitals</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Features -->
+<!-- ══ HEARTBEAT PULSE BAR ═══════════════════════════════════════ -->
+<div class="pulse-bar">
+  <div class="container">
+    <div class="pulse-container">
+      <span class="pulse-label">AI Monitoring</span>
+      <svg class="pulse-svg" height="50" viewBox="0 0 500 50">
+        <defs>
+          <linearGradient id="pulseGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a78bfa"/>
+            <stop offset="50%" stop-color="#f472b6"/>
+            <stop offset="100%" stop-color="#a78bfa"/>
+          </linearGradient>
+        </defs>
+        <path class="pulse-path"
+          d="M0,25 L60,25 L80,25 L90,5 L100,45 L110,10 L120,40 L130,25 L160,25 L180,25 L190,8 L200,42 L210,12 L220,38 L230,25 L270,25 L290,25 L300,6 L310,44 L320,11 L330,39 L340,25 L380,25 L400,25 L410,7 L420,43 L430,13 L440,37 L450,25 L500,25"/>
+        <circle class="pulse-dot" cx="450" cy="25" r="4"/>
+      </svg>
+      <span class="pulse-label">Real-time Analysis</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FEATURES ══════════════════════════════════════════════════ -->
 <section class="features-section">
   <div class="container">
-    <div class="text-center mb-4">
-      <p class="hero-eyebrow mx-auto" style="width:fit-content;">
+    <div class="text-center mb-5">
+      <div class="hero-eyebrow mx-auto" style="width:fit-content;">
         <i class="bi bi-stars"></i> Platform Features
-      </p>
-      <h2 class="cc-section-title" style="font-size:1.9rem;">Everything you need in one place</h2>
+      </div>
+      <h2 style="font-family:'Fraunces',serif;font-size:2rem;color:#1a0533;margin-bottom:0.5rem;">
+        Everything you need in one place
+      </h2>
+      <p style="color:#9070b0;font-size:15px;">Built for accuracy, explainability, and real-world usability.</p>
     </div>
     <div class="row g-4">
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-cpu"></i></div>
           <div class="feature-title">Ensemble AI Detection</div>
-          <p class="feature-desc">Three models — VGG16, ResNet50, EfficientNetB0 — vote together for the most accurate
-            result possible.</p>
+          <p class="feature-desc">Three models — VGG16, ResNet50, EfficientNetB0 — vote together using weighted accuracy for the most reliable result.</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="bi bi-thermometer-half"></i></div>
+          <div class="feature-title">Grad-CAM Heatmaps</div>
+          <p class="feature-desc">Visual explanations overlaid on your MRI — see exactly which regions of the scan drove the AI's prediction.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-file-earmark-medical"></i></div>
           <div class="feature-title">Downloadable PDF Reports</div>
-          <p class="feature-desc">Generate professional reports with results, confidence scores, and disclaimer — ready
-            to share with your doctor.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4">
-        <div class="feature-card">
-          <div class="feature-icon"><i class="bi bi-hospital"></i></div>
-          <div class="feature-title">Find Specialist Care</div>
-          <p class="feature-desc">Search verified hospitals with neurology and oncology departments near you, filtered
-            by city.</p>
+          <p class="feature-desc">Generate professional reports with results, confidence scores, and medical disclaimer — ready to share with your doctor.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-clipboard2-pulse"></i></div>
           <div class="feature-title">Symptom Checker</div>
-          <p class="feature-desc">Select your symptoms and get an instant rule-based assessment of possible conditions
-            and urgency level.</p>
+          <p class="feature-desc">Select your symptoms and get an instant rule-based assessment of possible conditions and urgency level.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-clock-history"></i></div>
           <div class="feature-title">Full Scan History</div>
-          <p class="feature-desc">Every scan you upload is stored securely. Access your complete history and re-download
-            reports anytime.</p>
+          <p class="feature-desc">Every scan you upload is stored securely. Access your complete history and re-download reports anytime.</p>
         </div>
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="feature-card">
           <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
-          <div class="feature-title">Secure & Private</div>
-          <p class="feature-desc">Your data is protected with bcrypt password hashing, session authentication, and
-            role-based access control.</p>
+          <div class="feature-title">Secure &amp; Private</div>
+          <p class="feature-desc">Your data is protected with bcrypt password hashing, session authentication, and role-based access control.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- How it works -->
+<!-- ══ HOW IT WORKS ══════════════════════════════════════════════ -->
 <section class="hiw-section" id="how-it-works">
   <div class="container">
     <div class="row align-items-center g-5">
       <div class="col-lg-5">
-        <p class="hero-eyebrow" style="width:fit-content;">
+        <div class="hero-eyebrow" style="width:fit-content;">
           <i class="bi bi-diagram-3"></i> Process
-        </p>
-        <h2 class="cc-section-title" style="font-size:1.9rem;">How CerebroCare360 works</h2>
-        <p class="cc-section-sub" style="margin-bottom:0;">From upload to actionable guidance in under a minute.</p>
+        </div>
+        <h2 style="font-family:'Fraunces',serif;font-size:2rem;color:#1a0533;margin-bottom:0.5rem;">
+          How CerebroCare360 works
+        </h2>
+        <p style="color:#9070b0;font-size:14.5px;margin-bottom:0;">From upload to actionable guidance in under a minute.</p>
       </div>
       <div class="col-lg-7">
         <div class="d-flex flex-column gap-4">
           <div class="hiw-step">
             <div class="hiw-num">1</div>
             <div class="hiw-content">
-              <h5>Create an account & upload your MRI</h5>
+              <h5>Create an account &amp; upload your MRI</h5>
               <p>Register securely and upload your brain MRI scan in JPG or PNG format.</p>
             </div>
           </div>
@@ -621,22 +802,21 @@
             <div class="hiw-num">2</div>
             <div class="hiw-content">
               <h5>AI ensemble analyses the scan</h5>
-              <p>Three deep learning models process the image simultaneously and vote on the result using weighted
-                accuracy scores.</p>
+              <p>Three deep learning models process the image simultaneously and vote on the result using weighted accuracy scores.</p>
             </div>
           </div>
           <div class="hiw-step">
             <div class="hiw-num">3</div>
             <div class="hiw-content">
               <h5>Review your results instantly</h5>
-              <p>See tumor presence, type, confidence score, and a full probability breakdown per class.</p>
+              <p>See tumor presence, type, confidence score, and a full probability breakdown per class with Grad-CAM overlay.</p>
             </div>
           </div>
           <div class="hiw-step">
             <div class="hiw-num">4</div>
             <div class="hiw-content">
-              <h5>Download report & find a specialist</h5>
-              <p>Generate a PDF report and use the hospital finder to locate the nearest neurology centre.</p>
+              <h5>Download report &amp; find a specialist</h5>
+              <p>Generate a PDF report and use the hospital finder to locate the nearest neurology centre in your state.</p>
             </div>
           </div>
         </div>
@@ -645,7 +825,75 @@
   </div>
 </section>
 
-<!-- CTA -->
+<!-- ══ FIND CARE TEASER ══════════════════════════════════════════ -->
+<section class="findcare-section">
+  <div class="container">
+    <div class="findcare-banner">
+
+      <!-- Floating hospital icons -->
+      <span class="hosp-float hf-1"><i class="bi bi-hospital-fill" style="color:white;"></i></span>
+      <span class="hosp-float hf-2"><i class="bi bi-heart-pulse-fill" style="color:white;"></i></span>
+      <span class="hosp-float hf-3"><i class="bi bi-capsule" style="color:white;"></i></span>
+      <span class="hosp-float hf-4"><i class="bi bi-clipboard2-pulse-fill" style="color:white;"></i></span>
+      <span class="hosp-float hf-5"><i class="bi bi-activity" style="color:white;"></i></span>
+
+      <div class="findcare-text">
+        <div class="findcare-eyebrow">
+          <i class="bi bi-geo-alt-fill"></i> Hospital Finder
+        </div>
+        <h2 class="findcare-title">
+          Find specialist care<br>near you — instantly
+        </h2>
+        <p class="findcare-sub">
+          Search 40+ verified neurology hospitals and MRI centres across India.
+          Filter by state, city, rating, and facility type.
+        </p>
+
+        <div class="findcare-pills">
+          <div class="hosp-pill"><i class="bi bi-hospital"></i> 40+ Hospitals</div>
+          <div class="hosp-pill"><i class="bi bi-geo-alt"></i> All Indian States</div>
+          <div class="hosp-pill"><i class="bi bi-scan"></i> MRI Centres</div>
+          <div class="hosp-pill"><i class="bi bi-star-fill"></i> Rated &amp; Verified</div>
+        </div>
+
+        <a href="/hospital/find" class="btn-findcare">
+          <i class="bi bi-search"></i> Find Hospitals Near Me
+        </a>
+      </div>
+
+      <!-- Animated hospital mini-cards -->
+      <div class="findcare-preview">
+        <div class="hosp-mini">
+          <div class="hosp-mini-icon"><i class="bi bi-hospital-fill"></i></div>
+          <div>
+            <div class="hosp-mini-name">AIIMS Delhi</div>
+            <div class="hosp-mini-loc"><i class="bi bi-geo-alt"></i> New Delhi</div>
+          </div>
+          <div class="hosp-mini-stars">★★★★★</div>
+        </div>
+        <div class="hosp-mini">
+          <div class="hosp-mini-icon"><i class="bi bi-hospital-fill"></i></div>
+          <div>
+            <div class="hosp-mini-name">Amrita AIMS</div>
+            <div class="hosp-mini-loc"><i class="bi bi-geo-alt"></i> Kochi, Kerala</div>
+          </div>
+          <div class="hosp-mini-stars">★★★★★</div>
+        </div>
+        <div class="hosp-mini">
+          <div class="hosp-mini-icon"><i class="bi bi-scan"></i></div>
+          <div>
+            <div class="hosp-mini-name">Elite Scanning</div>
+            <div class="hosp-mini-loc"><i class="bi bi-geo-alt"></i> Thrissur, Kerala</div>
+          </div>
+          <div class="hosp-mini-stars">★★★★☆</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ═══════════════════════════════════════════════════════ -->
 <section class="cta-section">
   <div class="container">
     <h2>Ready to get started?</h2>
@@ -655,4 +903,34 @@
     </a>
   </div>
 </section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* ── Animated stat counters ── */
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current + suffix;
+    if (current >= target) clearInterval(timer);
+  }, 40);
+}
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('[data-target]').forEach(animateCounter);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+
+const statsSection = document.querySelector('.stats-section');
+if (statsSection) observer.observe(statsSection);
+</script>
 {% endblock %}
