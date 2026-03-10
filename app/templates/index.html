@@ -6,31 +6,42 @@
   .hero {
     background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 5rem 0 4rem;
+    padding: 6rem 0 5rem;
     overflow: hidden;
     position: relative;
+    background-image:
+      linear-gradient(rgba(59, 79, 216, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 79, 216, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
   }
 
   .hero::before {
     content: '';
     position: absolute;
-    top: -80px;
-    right: -80px;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, transparent 70%);
+    top: -150px;
+    right: -100px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 60%);
     pointer-events: none;
+    z-index: 0;
   }
 
   .hero::after {
     content: '';
     position: absolute;
-    bottom: -60px;
-    left: -60px;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(59, 79, 216, 0.07) 0%, transparent 70%);
+    bottom: -150px;
+    left: -100px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(59, 79, 216, 0.1) 0%, transparent 60%);
     pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero .container {
+    position: relative;
+    z-index: 2;
   }
 
   .hero-eyebrow {
@@ -50,19 +61,27 @@
 
   .hero-title {
     font-family: 'Fraunces', serif;
-    font-size: clamp(2.2rem, 5vw, 3.5rem);
-    font-weight: 600;
-    line-height: 1.15;
+    font-size: clamp(2.5rem, 6vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.1;
     color: var(--text-primary);
     margin-bottom: 1.25rem;
-    letter-spacing: -0.5px;
+    letter-spacing: -1px;
+  }
+
+  .hero-title-highlight {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
   }
 
   .hero-sub {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
     line-height: 1.7;
-    max-width: 520px;
+    max-width: 540px;
     margin-bottom: 2.5rem;
   }
 
@@ -149,33 +168,49 @@
 
   .floating-chip {
     position: absolute;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 12.5px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--text-primary);
-    box-shadow: var(--shadow);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
     display: flex;
     align-items: center;
     gap: 8px;
     white-space: nowrap;
+    animation: floatChip 5s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatChip {
+    from {
+      transform: translateY(0px) rotate(0deg);
+    }
+
+    to {
+      transform: translateY(-8px) rotate(1deg);
+    }
   }
 
   .chip-1 {
     top: 30px;
-    right: 0;
+    right: -20px;
+    animation-delay: 0s;
   }
 
   .chip-2 {
     bottom: 60px;
-    right: -20px;
+    right: -40px;
+    animation-delay: 1.5s;
   }
 
   .chip-3 {
     bottom: 20px;
-    left: 10px;
+    left: -10px;
+    animation-delay: 0.7s;
   }
 
   .chip-dot {
@@ -183,6 +218,7 @@
     height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 0 10px currentColor;
   }
 
   .dot-green {
@@ -405,7 +441,7 @@
         </div>
         <h1 class="hero-title">
           Advanced Brain Tumor<br />
-          Detection, <em>Simplified</em>
+          Detection, <span class="hero-title-highlight">Simplified</span>
         </h1>
         <p class="hero-sub">
           CerebroCare360 uses an ensemble of three deep learning models

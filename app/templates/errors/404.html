@@ -4,15 +4,32 @@
 {% block content %}
 <div style="min-height:60vh;display:flex;align-items:center;justify-content:center;">
   <div style="text-align:center;padding:2rem;">
-    <div style="font-family:'Fraunces',serif;font-size:8rem;font-weight:600;
-                background:linear-gradient(135deg,#3b4fd8,#7c3aed);
-                -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-                line-height:1;">404</div>
-    <h2 style="font-family:'Fraunces',serif;font-size:1.6rem;margin-bottom:0.75rem;">
-      Page Not Found
+    <div
+      style="width: 120px; height: 120px; margin: 0 auto 1.5rem; border-radius: 50%; border: 4px solid white; box-shadow: 0 16px 40px rgba(124, 58, 237, 0.3); overflow: hidden; animation: float404 4s ease-in-out infinite alternate;">
+      <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}"
+        style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);" alt="Lost CerebroBot">
+    </div>
+    <style>
+      @keyframes float404 {
+        from {
+          transform: translateY(0);
+        }
+
+        to {
+          transform: translateY(-10px);
+        }
+      }
+    </style>
+
+    <div style="font-family:'Fraunces',serif;font-size:8rem;font-weight:700;
+                background:var(--gradient);
+                -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+                line-height:1;margin-bottom: 0.5rem;">404</div>
+    <h2 style="font-family:'Fraunces',serif;font-size:1.8rem;margin-bottom:0.75rem;">
+      Looks like you're lost!
     </h2>
     <p style="color:var(--text-muted);font-size:15px;max-width:400px;margin:0 auto 2rem;">
-      The page you're looking for doesn't exist or has been moved.
+      CerebroBot couldn't find the page you're looking for, but he can help guide you back.
     </p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <a href="/" class="btn-cc-primary">

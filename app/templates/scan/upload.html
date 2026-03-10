@@ -3,83 +3,212 @@
 {% block extra_css %}
 <style>
   .upload-zone {
-    border: 2px dashed var(--border);
+    border: 2px dashed rgba(124, 58, 237, 0.4);
     border-radius: var(--radius-lg);
-    padding: 3.5rem 2rem;
+    padding: 4rem 2rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
-    background: var(--surface);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(247, 248, 252, 0.9));
     position: relative;
+    overflow: hidden;
   }
-  .upload-zone:hover, .upload-zone.drag-over {
+
+  .upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(124, 58, 237, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .upload-zone:hover,
+  .upload-zone.drag-over {
     border-color: var(--primary);
-    background: var(--primary-light);
+    background: linear-gradient(145deg, #ffffff, #eef0fd);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(59, 79, 216, 0.12);
   }
+
   .upload-zone input[type=file] {
-    position: absolute; inset: 0;
-    opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
   }
+
   .upload-icon {
-    width: 72px; height: 72px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: var(--primary-light);
-    color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 32px;
-    margin: 0 auto 1.25rem;
+    background: var(--gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.3);
+    animation: floatIcon 4s ease-in-out infinite alternate;
   }
-  .upload-title { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.4rem; }
-  .upload-sub { font-size: 13.5px; color: var(--text-muted); }
-  .upload-rules {
-    display: flex; flex-wrap: wrap; gap: 8px;
-    justify-content: center; margin-top: 1.25rem;
+
+  @keyframes floatIcon {
+    from {
+      transform: translateY(0);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.2);
+    }
+
+    to {
+      transform: translateY(-8px);
+      box-shadow: 0 18px 40px rgba(124, 58, 237, 0.4);
+    }
   }
-  .upload-rule-chip {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
+
+  .upload-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 2;
+    color: var(--text-primary);
+  }
+
+  .upload-sub {
+    font-size: 14px;
     color: var(--text-secondary);
-    font-weight: 500;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 1.5rem;
   }
+
+  .upload-rules {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .upload-rule-chip {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--primary-dark);
+    font-weight: 700;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  }
+
   .preview-box {
     display: none;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    background: var(--surface);
+    animation: fadeIn 0.4s ease-out forwards;
   }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .preview-box img {
-    width: 100%; max-height: 280px;
-    object-fit: contain; background: #000;
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    background: radial-gradient(circle, #2a2a35 0%, #050510 100%);
   }
+
   .preview-info {
-    padding: 10px 14px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    background: var(--surface-2);
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--surface);
     border-top: 1px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .info-list { list-style: none; padding: 0; margin: 0; }
+
+  .info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
   .info-list li {
-    display: flex; align-items: flex-start;
-    gap: 10px; padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13.5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
   }
-  .info-list li:last-child { border-bottom: none; }
-  .info-list li i { color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+
+  .info-list li strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .info-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .info-list li i {
+    font-size: 18px;
+    background: var(--primary-light);
+    color: var(--primary);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .title-highlight {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container" style="max-width:960px;">
   <div class="mb-4">
-    <h1 class="cc-section-title">Upload MRI Scan</h1>
-    <p class="cc-section-sub">Upload a brain MRI image to receive an AI-powered analysis</p>
+    <h1 class="cc-section-title"><i class="bi bi-cloud-arrow-up title-highlight" style="margin-right: 8px;"></i> Upload
+      <span class="title-highlight">MRI Scan</span>
+    </h1>
+    <p class="cc-section-sub">Upload a brain MRI image securely to receive an AI-powered diagnostic analysis within
+      seconds.</p>
   </div>
 
   <div class="row g-4">
@@ -96,9 +225,8 @@
           <form method="POST" action="/scan/upload" enctype="multipart/form-data" id="uploadForm">
             {{ form.hidden_tag() }}
             <div class="upload-zone" id="uploadZone">
-              <input type="file" name="mri_image" id="mriFile"
-                     accept=".jpg,.jpeg,.png" required />
-              <div class="upload-icon"><i class="bi bi-file-earmark-medical"></i></div>
+              <input type="file" name="mri_image" id="mriFile" accept=".jpg,.jpeg,.png" required />
+              <div class="upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
               <div class="upload-title">Drag & drop or click to browse</div>
               <div class="upload-sub">Select your brain MRI scan file</div>
               <div class="upload-rules">
@@ -120,10 +248,12 @@
 
             <div class="cc-disclaimer mt-3 mb-4">
               <i class="bi bi-exclamation-triangle" style="flex-shrink:0;margin-top:1px;"></i>
-              <span>Only upload brain MRI scans. Uploading non-MRI images will produce meaningless results. This tool is for educational use only.</span>
+              <span>Only upload brain MRI scans. Uploading non-MRI images will produce meaningless results. This tool is
+                for educational use only.</span>
             </div>
 
-            <button type="submit" class="btn-cc-primary w-100 justify-content-center" style="padding:12px;" id="submitBtn" disabled>
+            <button type="submit" class="btn-cc-primary w-100 justify-content-center" style="padding:12px;"
+              id="submitBtn" disabled>
               <i class="bi bi-cpu"></i> Analyse with AI Ensemble
             </button>
           </form>
@@ -145,11 +275,13 @@
             </li>
             <li>
               <i class="bi bi-diagram-3"></i>
-              <div><strong>3 models vote:</strong> VGG16, ResNet50, and EfficientNetB0 each analyse your scan and their predictions are weighted by accuracy.</div>
+              <div><strong>3 models vote:</strong> VGG16, ResNet50, and EfficientNetB0 each analyse your scan and their
+                predictions are weighted by accuracy.</div>
             </li>
             <li>
               <i class="bi bi-bar-chart"></i>
-              <div><strong>Results include:</strong> Tumor presence, tumor type, confidence score, and probability per class.</div>
+              <div><strong>Results include:</strong> Tumor presence, tumor type, confidence score, and probability per
+                class.</div>
             </li>
             <li>
               <i class="bi bi-file-earmark-pdf"></i>
@@ -184,7 +316,7 @@
   const uploadZone = document.getElementById('uploadZone');
   const uploadForm = document.getElementById('uploadForm');
 
-  fileInput.addEventListener('change', function() {
+  fileInput.addEventListener('change', function () {
     const file = this.files[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
@@ -200,7 +332,7 @@
   uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); });
 
   // Loading spinner on submit
-  uploadForm.addEventListener('submit', function() {
+  uploadForm.addEventListener('submit', function () {
     submitBtn.disabled = true;
     submitBtn.innerHTML = `
       <span class="spinner-border spinner-border-sm" role="status"

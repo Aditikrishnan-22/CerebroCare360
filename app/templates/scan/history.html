@@ -3,56 +3,114 @@
 {% block extra_css %}
 <style>
   .history-row {
-    display: flex; align-items: center; gap: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--border);
     transition: background 0.15s;
   }
-  .history-row:hover { background: var(--surface-2); }
-  .history-row:last-child { border-bottom: none; }
+
+  .history-row:hover {
+    background: var(--surface-2);
+  }
+
+  .history-row:last-child {
+    border-bottom: none;
+  }
+
   .history-thumb {
-    width: 56px; height: 56px;
-    border-radius: 10px; object-fit: cover;
-    background: #000; flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #000;
+    flex-shrink: 0;
     border: 1px solid var(--border);
   }
-  .history-meta { flex: 1; min-width: 0; }
-  .history-date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .history-result { font-size: 14px; font-weight: 600; }
-  .history-conf { font-size: 12px; color: var(--text-muted); margin-left: 8px; }
+
+  .history-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .history-date {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .history-result {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .history-conf {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 8px;
+  }
+
   .badge-tumor {
-    background: #fee2e2; color: #dc2626;
-    border-radius: 20px; padding: 3px 10px;
-    font-size: 11.5px; font-weight: 600;
+    background: #fee2e2;
+    color: #dc2626;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
   }
+
   .badge-clear {
-    background: #d1fae5; color: #059669;
-    border-radius: 20px; padding: 3px 10px;
-    font-size: 11.5px; font-weight: 600;
+    background: #d1fae5;
+    color: #059669;
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
   }
+
   .badge-pending {
-    background: var(--primary-light); color: var(--primary);
-    border-radius: 20px; padding: 3px 10px;
-    font-size: 11.5px; font-weight: 600;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
   }
+
   .empty-state {
-    text-align: center; padding: 4rem 2rem;
+    text-align: center;
+    padding: 4rem 2rem;
     color: var(--text-muted);
   }
-  .empty-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
   .filter-bar {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 1rem 1.25rem;
-    display: flex; gap: 10px; flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
     align-items: center;
     margin-bottom: 1.5rem;
   }
-  .filter-bar input, .filter-bar select {
-    flex: 1; min-width: 140px;
+
+  .filter-bar input,
+  .filter-bar select {
+    flex: 1;
+    min-width: 140px;
   }
-  .hidden { display: none !important; }
+
+  .hidden {
+    display: none !important;
+  }
 </style>
 {% endblock %}
 
@@ -78,13 +136,15 @@
     </div>
     <div class="col-4">
       <div class="cc-stat">
-        <div class="cc-stat-value">{{ scans | selectattr('prediction') | selectattr('prediction.has_tumor') | list | length }}</div>
+        <div class="cc-stat-value">{{ scans | selectattr('prediction') | selectattr('prediction.has_tumor') | list |
+          length }}</div>
         <div class="cc-stat-label">Tumor Detected</div>
       </div>
     </div>
     <div class="col-4">
       <div class="cc-stat">
-        <div class="cc-stat-value">{{ scans | selectattr('prediction') | rejectattr('prediction.has_tumor') | list | length }}</div>
+        <div class="cc-stat-value">{{ scans | selectattr('prediction') | rejectattr('prediction.has_tumor') | list |
+          length }}</div>
         <div class="cc-stat-label">Clear Scans</div>
       </div>
     </div>
@@ -92,8 +152,8 @@
 
   <!-- Filter bar -->
   <div class="filter-bar">
-    <input type="text" class="cc-input" id="searchInput"
-           placeholder="🔍  Search by scan ID or date..." style="max-width:280px;" />
+    <input type="text" class="cc-input" id="searchInput" placeholder="🔍  Search by scan ID or date..."
+      style="max-width:280px;" />
     <select class="cc-input" id="filterResult" style="max-width:180px;">
       <option value="all">All Results</option>
       <option value="tumor">Tumor Detected</option>
@@ -108,37 +168,33 @@
 
   <div class="cc-card" id="historyList">
     {% for scan in scans %}
-    <div class="history-row"
-         data-id="{{ scan.id }}"
-         data-date="{{ scan.upload_date.strftime('%d %b %Y') }}"
-         data-result="{% if scan.prediction %}{% if scan.prediction.has_tumor %}tumor{% else %}clear{% endif %}{% else %}pending{% endif %}">
-      <img class="history-thumb"
-           src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}"
-           alt="MRI" />
+    <div class="history-row" data-id="{{ scan.id }}" data-date="{{ scan.upload_date.strftime('%d %b %Y') }}"
+      data-result="{% if scan.prediction %}{% if scan.prediction.has_tumor %}tumor{% else %}clear{% endif %}{% else %}pending{% endif %}">
+      <img class="history-thumb" src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}" alt="MRI" />
       <div class="history-meta">
         <div class="d-flex align-items-center gap-2 flex-wrap">
           <span class="history-result">
             {% if scan.prediction %}
-              {% if scan.prediction.has_tumor %}
-                {{ scan.prediction.tumor_type | capitalize }} Tumor
-              {% else %}
-                No Tumor
-              {% endif %}
+            {% if scan.prediction.has_tumor %}
+            {{ scan.prediction.tumor_type | capitalize }} Tumor
             {% else %}
-              Pending
+            No Tumor
+            {% endif %}
+            {% else %}
+            Pending
             {% endif %}
           </span>
           {% if scan.prediction %}
-            {% if scan.prediction.has_tumor %}
-              <span class="badge-tumor">Tumor</span>
-            {% else %}
-              <span class="badge-clear">Clear</span>
-            {% endif %}
-            <span class="history-conf">
-              {{ "%.1f"|format(scan.prediction.confidence * 100) }}% confidence
-            </span>
+          {% if scan.prediction.has_tumor %}
+          <span class="badge-tumor">Tumor</span>
           {% else %}
-            <span class="badge-pending">Pending</span>
+          <span class="badge-clear">Clear</span>
+          {% endif %}
+          <span class="history-conf">
+            {{ "%.1f"|format(scan.prediction.confidence * 100) }}% confidence
+          </span>
+          {% else %}
+          <span class="badge-pending">Pending</span>
           {% endif %}
         </div>
         <div class="history-date">
@@ -163,20 +219,41 @@
 
   <div id="noResults" class="cc-card hidden">
     <div class="empty-state">
-      <i class="bi bi-search"></i>
+      <div
+        style="width: 80px; height: 80px; margin: 0 auto 1rem; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2); animation: floatEmpty 4s ease-in-out infinite alternate;">
+        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot"
+          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);">
+      </div>
+      <style>
+        @keyframes floatEmpty {
+          from {
+            transform: translateY(0);
+          }
+
+          to {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 35px rgba(124, 58, 237, 0.4);
+          }
+        }
+      </style>
       <h5 style="font-weight:600;">No matching scans</h5>
-      <p style="font-size:14px;">Try a different search or filter.</p>
+      <p style="font-size:14px;">I couldn't find any scans matching that filter.</p>
     </div>
   </div>
 
   {% else %}
   <div class="cc-card">
     <div class="empty-state">
-      <i class="bi bi-file-earmark-medical"></i>
-      <h5 style="font-weight:600;">No scans yet</h5>
-      <p style="font-size:14px;">Upload your first MRI scan to get started.</p>
-      <a href="/scan/upload" class="btn-cc-primary mt-2">
-        <i class="bi bi-upload"></i> Upload MRI
+      <div
+        style="width: 90px; height: 90px; margin: 0 auto 1.5rem; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2); animation: floatEmpty 4s ease-in-out infinite alternate;">
+        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot"
+          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);">
+      </div>
+      <h5 style="font-weight:700;">No scans yet</h5>
+      <p style="font-size:15px; color: var(--text-secondary); max-width: 300px; margin: 0 auto 1.5rem;">Upload your
+        first MRI scan and I'll analyze it for you in seconds.</p>
+      <a href="/scan/upload" class="btn-cc-primary">
+        <i class="bi bi-cloud-arrow-up"></i> Upload MRI
       </a>
     </div>
   </div>
@@ -186,20 +263,20 @@
 
 {% block extra_js %}
 <script>
-  const searchInput  = document.getElementById('searchInput');
+  const searchInput = document.getElementById('searchInput');
   const filterSelect = document.getElementById('filterResult');
-  const filterCount  = document.getElementById('filterCount');
-  const noResults    = document.getElementById('noResults');
+  const filterCount = document.getElementById('filterCount');
+  const noResults = document.getElementById('noResults');
 
   function applyFilters() {
-    const query  = searchInput.value.toLowerCase().trim();
+    const query = searchInput.value.toLowerCase().trim();
     const filter = filterSelect.value;
-    const rows   = document.querySelectorAll('.history-row');
-    let visible  = 0;
+    const rows = document.querySelectorAll('.history-row');
+    let visible = 0;
 
     rows.forEach(row => {
-      const id     = row.dataset.id;
-      const date   = row.dataset.date.toLowerCase();
+      const id = row.dataset.id;
+      const date = row.dataset.date.toLowerCase();
       const result = row.dataset.result;
 
       const matchSearch = !query || id.includes(query) || date.includes(query);

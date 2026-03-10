@@ -4,11 +4,9 @@ from functools import wraps
 from app.blueprints.admin import admin_bp
 from app.extensions import db
 from app.models.hospital import Hospital
-from app.models.symptom_rule import SymptomRule
 from app.models.user import User
 from app.models.mri_scan import MRIScan
 from app.models.report import Report
-import json
 
 
 def admin_required(f):
@@ -32,14 +30,12 @@ def dashboard():
         'total_reports':   Report.query.count(),
     }
     hospitals = Hospital.query.order_by(Hospital.name).all()
-    rules     = SymptomRule.query.all()
     users     = User.query.order_by(User.id.desc()).all()
     return render_template('admin/dashboard.html',
-                           stats=stats, hospitals=hospitals,
-                           rules=rules, users=users)
+                           stats=stats, hospitals=hospitals, users=users)
 
 
-# ── HOSPITAL HELPERS ────────────────────────────────────────────
+# ── HOSPITAL MANAGEMENT ─────────────────────────────────────────
 def _hospital_from_form(h):
     h.name          = request.form.get('name', '').strip()
     h.address       = request.form.get('address', '').strip()
@@ -128,7 +124,7 @@ def toggle_user_role(user_id):
         return redirect(url_for('admin.dashboard'))
     user.role = 'admin' if user.role == 'user' else 'user'
     db.session.commit()
-    flash(f'{user.full_name} promoted to {user.role.upper()}.', 'success')
+    flash(f'{user.full_name} is now {user.role.upper()}.', 'success')
     return redirect(url_for('admin.dashboard'))
 
 
@@ -168,51 +164,3 @@ def user_scans(user_id):
     user  = User.query.get_or_404(user_id)
     scans = MRIScan.query.filter_by(user_id=user_id).order_by(MRIScan.upload_date.desc()).all()
     return render_template('admin/user_scans.html', user=user, scans=scans)
-
-
-# ── SYMPTOM RULES ────────────────────────────────────────────────
-@admin_bp.route('/rules/add', methods=['POST'])
-@login_required
-@admin_required
-def add_rule():
-    keys = request.form.getlist('symptom_keys')
-    rule = SymptomRule(
-        symptom_keys=json.dumps(keys),
-        condition=request.form.get('condition'),
-        department=request.form.get('department'),
-        urgency=request.form.get('urgency'),
-        advice=request.form.get('advice'),
-    )
-    db.session.add(rule)
-    db.session.commit()
-    flash('Symptom rule added.', 'success')
-    return redirect(url_for('admin.dashboard'))
-
-
-@admin_bp.route('/rules/edit/<int:rule_id>', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def edit_rule(rule_id):
-    rule = SymptomRule.query.get_or_404(rule_id)
-    if request.method == 'POST':
-        keys = request.form.getlist('symptom_keys')
-        rule.symptom_keys = json.dumps(keys)
-        rule.condition    = request.form.get('condition')
-        rule.department   = request.form.get('department')
-        rule.urgency      = request.form.get('urgency')
-        rule.advice       = request.form.get('advice')
-        db.session.commit()
-        flash('Symptom rule updated.', 'success')
-        return redirect(url_for('admin.dashboard'))
-    return render_template('admin/rules.html', rule=rule)
-
-
-@admin_bp.route('/rules/delete/<int:rule_id>')
-@login_required
-@admin_required
-def delete_rule(rule_id):
-    rule = SymptomRule.query.get_or_404(rule_id)
-    db.session.delete(rule)
-    db.session.commit()
-    flash('Symptom rule deleted.', 'success')
-    return redirect(url_for('admin.dashboard'))

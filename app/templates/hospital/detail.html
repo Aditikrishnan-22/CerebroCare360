@@ -3,38 +3,113 @@
 {% block extra_css %}
 <style>
   .detail-hero {
-    background: linear-gradient(135deg, #eef0fd 0%, #f5f3ff 100%);
+    background: var(--surface);
     border-bottom: 1px solid var(--border);
-    padding: 2rem 0 1.75rem;
+    padding: 3rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .detail-hero::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    right: -50px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .detail-hero-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+  }
+
+  .detail-hero-text {
+    flex: 1;
+    z-index: 2;
+  }
+
+  .detail-hero-image {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.25);
+    overflow: hidden;
+    flex-shrink: 0;
+    animation: floatHospital 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatHospital {
+    from {
+      transform: translateY(0);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.2);
+    }
+
+    to {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 50px rgba(124, 58, 237, 0.4);
+    }
   }
 
   .type-chip {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 5px 14px; border-radius: 20px;
-    font-size: 12px; font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
     margin-bottom: 0.75rem;
   }
-  .chip-public  { background: #fffbeb; color: #92400e; }
-  .chip-private { background: #ecfdf5; color: #065f46; }
-  .chip-clinic  { background: #fdf2f8; color: #9333ea; }
+
+  .chip-public {
+    background: #fffbeb;
+    color: #92400e;
+  }
+
+  .chip-private {
+    background: #ecfdf5;
+    color: #065f46;
+  }
+
+  .chip-clinic {
+    background: #fdf2f8;
+    color: #9333ea;
+  }
 
   .detail-name {
     font-family: 'Fraunces', serif;
-    font-size: 1.9rem; font-weight: 600;
-    color: var(--text-primary); line-height: 1.2;
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
     margin-bottom: 0.5rem;
   }
 
   .detail-location {
-    font-size: 14px; color: var(--text-muted);
-    display: flex; align-items: center; gap: 6px;
+    font-size: 14px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .rating-big {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: #fffbeb; border: 1px solid #fde68a;
-    border-radius: 10px; padding: 8px 16px;
-    font-weight: 700; font-size: 1.1rem; color: #d97706;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #d97706;
   }
 
   /* ── Section cards ─────────────────────────────────────────── */
@@ -45,22 +120,35 @@
     margin-bottom: 1.25rem;
     overflow: hidden;
   }
+
   .detail-section-header {
     padding: 1rem 1.4rem;
     border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     background: var(--surface-2);
   }
+
   .detail-section-icon {
-    width: 34px; height: 34px; border-radius: 8px;
-    background: var(--primary-light); color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
   }
+
   .detail-section-title {
-    font-weight: 700; font-size: 0.92rem;
+    font-weight: 700;
+    font-size: 0.92rem;
     color: var(--text-primary);
   }
+
   .detail-section-body {
     padding: 1.25rem 1.4rem;
   }
@@ -71,51 +159,134 @@
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 8px;
   }
+
   .facility-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 9px 12px; border-radius: 8px;
-    font-size: 13px; font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
     border: 1px solid;
   }
-  .fac-mri-item      { background: #ecfdf5; color: #059669; border-color: #a7f3d0; }
-  .fac-surgery-item  { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
-  .fac-radiation-item{ background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
-  .fac-chemo-item    { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
-  .fac-biopsy-item   { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
-  .fac-gamma-item    { background: #fdf4ff; color: #a21caf; border-color: #f0abfc; }
-  .fac-other-item    { background: var(--surface-2); color: var(--text-secondary); border-color: var(--border); }
+
+  .fac-mri-item {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+  }
+
+  .fac-surgery-item {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+  }
+
+  .fac-radiation-item {
+    background: #fff7ed;
+    color: #ea580c;
+    border-color: #fed7aa;
+  }
+
+  .fac-chemo-item {
+    background: #faf5ff;
+    color: #7c3aed;
+    border-color: #ddd6fe;
+  }
+
+  .fac-biopsy-item {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+  }
+
+  .fac-gamma-item {
+    background: #fdf4ff;
+    color: #a21caf;
+    border-color: #f0abfc;
+  }
+
+  .fac-other-item {
+    background: var(--surface-2);
+    color: var(--text-secondary);
+    border-color: var(--border);
+  }
 
   /* ── Doctors list ──────────────────────────────────────────── */
   .doctor-item {
-    display: flex; align-items: center; gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     padding: 10px 0;
     border-bottom: 1px solid var(--border);
   }
-  .doctor-item:last-child { border-bottom: none; }
-  .doctor-avatar {
-    width: 38px; height: 38px; border-radius: 50%;
-    background: var(--primary-light); color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0;
+
+  .doctor-item:last-child {
+    border-bottom: none;
   }
-  .doctor-name { font-weight: 600; font-size: 13.5px; color: var(--text-primary); }
-  .doctor-role { font-size: 12px; color: var(--text-muted); }
+
+  .doctor-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .doctor-name {
+    font-weight: 600;
+    font-size: 13.5px;
+    color: var(--text-primary);
+  }
+
+  .doctor-role {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
 
   /* ── Contact table ─────────────────────────────────────────── */
   .contact-row {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 10px 0; border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
     font-size: 13.5px;
   }
-  .contact-row:last-child { border-bottom: none; }
-  .contact-icon {
-    width: 32px; height: 32px; border-radius: 8px;
-    background: var(--primary-light); color: var(--primary);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
+
+  .contact-row:last-child {
+    border-bottom: none;
   }
-  .contact-label { font-size: 11px; color: var(--text-muted); font-weight: 500; }
-  .contact-value { font-weight: 600; color: var(--text-primary); }
+
+  .contact-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .contact-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .contact-value {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
 
   /* ── MRI section ───────────────────────────────────────────── */
   .mri-highlight {
@@ -123,13 +294,22 @@
     border: 1.5px solid #a7f3d0;
     border-radius: var(--radius);
     padding: 1rem 1.25rem;
-    display: flex; align-items: center; gap: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
+
   .mri-highlight-icon {
-    width: 46px; height: 46px; border-radius: 12px;
-    background: #d1fae5; color: #059669;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px; flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #d1fae5;
+    color: #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
   }
 
   /* ── Map ───────────────────────────────────────────────────── */
@@ -139,79 +319,112 @@
     border: 1px solid var(--border);
     height: 280px;
     background: var(--surface-2);
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; gap: 10px;
-    color: var(--text-muted); font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 13px;
   }
+
   .map-container iframe {
-    width: 100%; height: 100%; border: none;
+    width: 100%;
+    height: 100%;
+    border: none;
   }
 
   /* ── Action buttons ────────────────────────────────────────── */
   .btn-gmaps {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: #4285F4; color: #fff;
-    border: none; border-radius: 10px;
-    padding: 11px 20px; font-size: 13.5px; font-weight: 600;
-    text-decoration: none; transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #4285F4;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
     cursor: pointer;
   }
-  .btn-gmaps:hover { background: #3367d6; color: #fff; transform: translateY(-1px); }
+
+  .btn-gmaps:hover {
+    background: #3367d6;
+    color: #fff;
+    transform: translateY(-1px);
+  }
 
   .btn-call {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: #ecfdf5; color: #059669;
-    border: 1.5px solid #a7f3d0; border-radius: 10px;
-    padding: 11px 20px; font-size: 13.5px; font-weight: 600;
-    text-decoration: none; transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1.5px solid #a7f3d0;
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
   }
-  .btn-call:hover { background: #d1fae5; color: #059669; }
+
+  .btn-call:hover {
+    background: #d1fae5;
+    color: #059669;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 {% set facs = hospital.facilities.split(',') if hospital.facilities else [] %}
 {% set docs = hospital.doctors.split(',') if hospital.doctors else [] %}
-{% set maps_url = 'https://www.google.com/maps/search/?api=1&query=' + (hospital.name + ' ' + hospital.city + ' ' + (hospital.state or ''))|urlencode %}
+{% set maps_url = 'https://www.google.com/maps/search/?api=1&query=' + (hospital.name + ' ' + hospital.city + ' ' +
+(hospital.state or ''))|urlencode %}
 
 <!-- Back + Hero -->
 <div class="detail-hero">
   <div class="container">
-    <a href="/hospital/find" class="btn-cc-secondary mb-3" style="font-size:13px;padding:7px 14px;">
+    <a href="/hospital/find" class="btn-cc-secondary mb-4" style="font-size:13px;padding:7px 14px;">
       <i class="bi bi-arrow-left"></i> Back to Find Care
     </a>
 
-    <div class="row align-items-start g-4">
-      <div class="col-lg-8">
+    <div class="detail-hero-content">
+      <div class="detail-hero-text">
         <div class="type-chip
           {% if hospital.hospital_type == 'Public' %}chip-public
           {% elif hospital.hospital_type == 'Clinic' %}chip-clinic
           {% else %}chip-private{% endif %}">
-          <i class="bi {% if hospital.hospital_type == 'Public' %}bi-bank{% elif hospital.hospital_type == 'Clinic' %}bi-clipboard2-pulse{% else %}bi-building{% endif %}"></i>
+          <i
+            class="bi {% if hospital.hospital_type == 'Public' %}bi-bank{% elif hospital.hospital_type == 'Clinic' %}bi-clipboard2-pulse{% else %}bi-building{% endif %}"></i>
           {{ hospital.hospital_type }}
           {% if hospital.is_mri_center %}&nbsp;·&nbsp;<i class="bi bi-broadcast"></i> MRI Centre{% endif %}
         </div>
         <div class="detail-name">{{ hospital.name }}</div>
-        <div class="detail-location">
-          <i class="bi bi-geo-alt-fill" style="color:var(--primary);font-size:12px;"></i>
-          {{ hospital.address }}{% if hospital.address %}, {% endif %}{{ hospital.city }}{% if hospital.state %}, {{ hospital.state }}{% endif %}
+        <div class="detail-location mb-3">
+          <i class="bi bi-geo-alt-fill" style="color:var(--primary);font-size:14px;"></i>
+          <span style="font-size: 15px;">{{ hospital.address }}{% if hospital.address %}, {% endif %}{{ hospital.city
+            }}{% if hospital.state %}, {{ hospital.state }}{% endif %}</span>
         </div>
-        {% if hospital.accreditation %}
-        <div class="mt-2">
-          <span style="background:var(--primary-light);color:var(--primary);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;">
+
+        <div class="d-flex align-items-center gap-3 flex-wrap mb-4">
+          {% if hospital.rating %}
+          <div class="rating-big">
+            <i class="bi bi-star-fill"></i> {{ hospital.rating }} / 5.0
+          </div>
+          {% endif %}
+          {% if hospital.accreditation %}
+          <span
+            style="background:var(--primary-light);color:var(--primary);padding:8px 16px;border-radius:10px;font-size:14px;font-weight:600;">
             <i class="bi bi-patch-check"></i> {{ hospital.accreditation }}
           </span>
+          {% endif %}
         </div>
-        {% endif %}
-      </div>
-      <div class="col-lg-4 text-lg-end">
-        {% if hospital.rating %}
-        <div class="rating-big mb-3">
-          <i class="bi bi-star-fill"></i> {{ hospital.rating }} / 5.0
-        </div>
-        <br>
-        {% endif %}
-        <div class="d-flex gap-2 flex-wrap justify-content-lg-end">
+
+        <div class="d-flex gap-2 flex-wrap">
           <a href="{{ maps_url }}" target="_blank" class="btn-gmaps">
             <i class="bi bi-map-fill"></i> Open in Google Maps
           </a>
@@ -221,6 +434,10 @@
           </a>
           {% endif %}
         </div>
+      </div>
+      <div class="detail-hero-image d-none d-lg-block">
+        <img src="{{ url_for('static', filename='img/hospital_banner_alt.png') }}" alt="Medical Facility Illustration"
+          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.1);">
       </div>
     </div>
   </div>
@@ -244,19 +461,19 @@
             {% for fac in facs %}
             {% set f = fac.strip() %}
             {% if 'MRI' in f %}
-              <div class="facility-item fac-mri-item"><i class="bi bi-broadcast"></i> {{ f }}</div>
+            <div class="facility-item fac-mri-item"><i class="bi bi-broadcast"></i> {{ f }}</div>
             {% elif 'Surgery' in f %}
-              <div class="facility-item fac-surgery-item"><i class="bi bi-scissors"></i> {{ f }}</div>
+            <div class="facility-item fac-surgery-item"><i class="bi bi-scissors"></i> {{ f }}</div>
             {% elif 'Radiation' in f %}
-              <div class="facility-item fac-radiation-item"><i class="bi bi-radioactive"></i> {{ f }}</div>
+            <div class="facility-item fac-radiation-item"><i class="bi bi-radioactive"></i> {{ f }}</div>
             {% elif 'Chemo' in f %}
-              <div class="facility-item fac-chemo-item"><i class="bi bi-capsule"></i> {{ f }}</div>
+            <div class="facility-item fac-chemo-item"><i class="bi bi-capsule"></i> {{ f }}</div>
             {% elif 'Biopsy' in f %}
-              <div class="facility-item fac-biopsy-item"><i class="bi bi-eyedropper"></i> {{ f }}</div>
+            <div class="facility-item fac-biopsy-item"><i class="bi bi-eyedropper"></i> {{ f }}</div>
             {% elif 'Gamma' in f %}
-              <div class="facility-item fac-gamma-item"><i class="bi bi-lightning"></i> {{ f }}</div>
+            <div class="facility-item fac-gamma-item"><i class="bi bi-lightning"></i> {{ f }}</div>
             {% else %}
-              <div class="facility-item fac-other-item"><i class="bi bi-check-circle"></i> {{ f }}</div>
+            <div class="facility-item fac-other-item"><i class="bi bi-check-circle"></i> {{ f }}</div>
             {% endif %}
             {% endfor %}
           </div>
@@ -268,7 +485,8 @@
       {% if hospital.is_mri_center %}
       <div class="detail-section">
         <div class="detail-section-header">
-          <div class="detail-section-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-broadcast"></i></div>
+          <div class="detail-section-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-broadcast"></i>
+          </div>
           <div class="detail-section-title">MRI Scan Centre</div>
         </div>
         <div class="detail-section-body">
@@ -363,7 +581,8 @@
             <div class="contact-icon"><i class="bi bi-telephone-fill"></i></div>
             <div>
               <div class="contact-label">Phone</div>
-              <a href="tel:{{ hospital.phone }}" class="contact-value" style="color:inherit;text-decoration:none;">{{ hospital.phone }}</a>
+              <a href="tel:{{ hospital.phone }}" class="contact-value" style="color:inherit;text-decoration:none;">{{
+                hospital.phone }}</a>
             </div>
           </div>
           {% endif %}
@@ -372,7 +591,8 @@
             <div class="contact-icon"><i class="bi bi-envelope-fill"></i></div>
             <div>
               <div class="contact-label">Email</div>
-              <a href="mailto:{{ hospital.email }}" class="contact-value" style="color:inherit;text-decoration:none;">{{ hospital.email }}</a>
+              <a href="mailto:{{ hospital.email }}" class="contact-value" style="color:inherit;text-decoration:none;">{{
+                hospital.email }}</a>
             </div>
           </div>
           {% endif %}
@@ -381,7 +601,8 @@
             <div class="contact-icon"><i class="bi bi-globe"></i></div>
             <div>
               <div class="contact-label">Website</div>
-              <a href="{{ hospital.website }}" target="_blank" class="contact-value" style="color:var(--primary);text-decoration:none;">
+              <a href="{{ hospital.website }}" target="_blank" class="contact-value"
+                style="color:var(--primary);text-decoration:none;">
                 {{ hospital.website | replace('https://','') | replace('http://','') }}
               </a>
             </div>
@@ -403,7 +624,8 @@
       <!-- Disclaimer -->
       <div class="cc-disclaimer mt-3">
         <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
-        <span>Hospital information is for reference only. Always confirm details directly with the hospital before visiting.</span>
+        <span>Hospital information is for reference only. Always confirm details directly with the hospital before
+          visiting.</span>
       </div>
 
     </div>
