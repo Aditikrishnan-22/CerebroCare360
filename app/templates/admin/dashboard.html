@@ -197,6 +197,15 @@
         </div>
       </div>
     </div>
+    <div class="col-6 col-lg-3">
+      <div class="admin-stat" style="border-color:#fecaca;">
+        <div class="admin-stat-icon" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-exclamation-triangle"></i></div>
+        <div>
+          <div class="admin-stat-value" style="color:#dc2626;">{{ stats.failed_scans }}</div>
+          <div class="admin-stat-label">Failed Predictions</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Tab switcher — 2 tabs only -->
@@ -331,6 +340,9 @@
               <th>Email</th>
               <th>Role</th>
               <th>Scans</th>
+              <th>Tumors</th>
+              <th>Failed</th>
+              <th>Last Scan</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -367,8 +379,27 @@
                 {% endif %}
               </td>
               <td>
-                <span style="font-weight:600;">{{ u.scans|length }}</span>
+                <span style="font-weight:600;">{{ user_stats[u.id].total }}</span>
                 <span style="font-size:11.5px;color:var(--text-muted);margin-left:4px;">scans</span>
+              </td>
+              <td>
+                {% if user_stats[u.id].tumor > 0 %}
+                <span style="font-weight:700;color:#dc2626;">{{ user_stats[u.id].tumor }}</span>
+                {% else %}
+                <span style="color:var(--text-muted);">0</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if user_stats[u.id].failed > 0 %}
+                <span style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">
+                  {{ user_stats[u.id].failed }} failed
+                </span>
+                {% else %}
+                <span style="color:#059669;font-size:12px;">✓ OK</span>
+                {% endif %}
+              </td>
+              <td style="font-size:12px;color:var(--text-muted);">
+                {{ user_stats[u.id].last_scan.strftime('%d %b %Y') if user_stats[u.id].last_scan else '—' }}
               </td>
               <td>
                 {% if u.is_active %}
@@ -380,7 +411,7 @@
               <td>
                 {% if u.id != current_user.id %}
                 <div style="display:flex;gap:5px;flex-wrap:wrap;">
-                  <a href="/admin/users/{{ u.id }}/scans" class="action-btn btn-view" title="View Scans">
+                  <a href="{{ url_for('admin.user_scans', user_id=u.id) }}" class="action-btn btn-view" title="View Scans">
                     <i class="bi bi-eye"></i> Scans
                   </a>
                   <a href="/admin/users/toggle-role/{{ u.id }}"
@@ -395,6 +426,11 @@
                     <i class="bi {{ 'bi-person-check' if not u.is_active else 'bi-person-slash' }}"></i>
                     {{ 'Activate' if not u.is_active else 'Deactivate' }}
                   </a>
+                  <button class="action-btn btn-edit"
+                    onclick="openResetModal({{ u.id }}, '{{ u.full_name }}')"
+                    title="Reset Password">
+                    <i class="bi bi-key"></i> Reset PW
+                  </button>
                   <a href="/admin/users/delete/{{ u.id }}"
                      class="action-btn btn-delete"
                      onclick="return confirm('Permanently delete {{ u.full_name }} and ALL their data?')">
@@ -706,5 +742,51 @@ function filterTable(inputEl, rowClass) {
     row.style.display = row.dataset.search.includes(q) ? '' : 'none';
   });
 }
+
+// ── Password reset modal ──
+function openResetModal(userId, userName) {
+  document.getElementById('reset-modal-name').textContent = userName;
+  document.getElementById('reset-pw-form').action = '/admin/users/' + userId + '/reset-password';
+  document.getElementById('reset-pw-input').value = '';
+  openModal('reset-pw-modal');
+}
 </script>
+
+<!-- ══ PASSWORD RESET MODAL ══ -->
+<div class="admin-modal-overlay" id="reset-pw-modal">
+  <div class="admin-modal" style="max-width:420px;">
+    <div class="admin-modal-header">
+      <div class="admin-modal-title">
+        <i class="bi bi-key" style="color:var(--primary);margin-right:6px;"></i>
+        Reset Password — <span id="reset-modal-name"></span>
+      </div>
+      <button class="btn-close-modal" onclick="closeModal('reset-pw-modal')">×</button>
+    </div>
+    <form method="POST" id="reset-pw-form">
+      <div class="admin-modal-body">
+        <p style="font-size:13.5px;color:var(--text-secondary);margin-bottom:1.25rem;line-height:1.6;">
+          Set a new temporary password for this user. Make sure to communicate
+          the new password to them securely. They should change it after logging in.
+        </p>
+        <div class="cc-form-group">
+          <label class="cc-label">New Password <span style="color:#dc2626;">*</span></label>
+          <input type="text" name="new_password" id="reset-pw-input" class="cc-input"
+            placeholder="Min. 6 characters" required minlength="6"
+            style="font-family:monospace;letter-spacing:.05em;">
+        </div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;font-size:12.5px;color:#78350f;display:flex;gap:8px;margin-top:.75rem;">
+          <i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;flex-shrink:0;margin-top:1px;"></i>
+          <span>This will immediately override their current password. The user will need to use this new password to log in.</span>
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-cc-secondary" onclick="closeModal('reset-pw-modal')">Cancel</button>
+        <button type="submit" class="btn-cc-primary">
+          <i class="bi bi-check-lg"></i> Reset Password
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 {% endblock %}

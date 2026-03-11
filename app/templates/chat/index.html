@@ -10,7 +10,6 @@
     --grad-soft:linear-gradient(135deg,rgba(124,58,237,.08) 0%,rgba(219,39,119,.08) 100%);
   }
 
-  /* ── Layout ─────────────────────────────────── */
   .bot-page { background:#faf9ff; padding:2rem 0 3rem; }
 
   .bot-layout {
@@ -20,24 +19,14 @@
     align-items:start;
   }
 
-  /* ── Sidebar ────────────────────────────────── */
-  .bot-sidebar {
-    position:sticky;
-    top:82px;
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-  }
+  /* ── Sidebar ── */
+  .bot-sidebar { position:sticky;top:82px;display:flex;flex-direction:column;gap:1rem; }
 
   .bot-profile-card {
     background:linear-gradient(160deg,#2d0066 0%,#6b0050 100%);
-    border-radius:20px;
-    padding:1.75rem;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
+    border-radius:20px;padding:1.75rem;text-align:center;
+    position:relative;overflow:hidden;
   }
-
   .bot-profile-card::before {
     content:'';position:absolute;inset:0;
     background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
@@ -46,364 +35,222 @@
 
   .bot-avatar-wrap {
     width:76px;height:76px;border-radius:50%;
-    background:rgba(255,255,255,.15);
-    border:2.5px solid rgba(255,255,255,.3);
+    background:rgba(255,255,255,.15);border:2.5px solid rgba(255,255,255,.3);
     display:flex;align-items:center;justify-content:center;
-    margin:0 auto 1rem;
-    overflow:hidden;
+    margin:0 auto 1rem;overflow:hidden;
     animation:botFloat 5s ease-in-out infinite alternate;
     position:relative;z-index:1;
   }
-
-  .bot-avatar-wrap img {
-    width:100%;height:100%;object-fit:cover;transform:scale(1.15);
-  }
+  .bot-avatar-wrap img { width:100%;height:100%;object-fit:cover;transform:scale(1.15); }
 
   @keyframes botFloat {
     from{transform:translateY(0) rotate(-2deg);}
     to{transform:translateY(-8px) rotate(2deg);}
   }
-
-  /* speaking ring */
   .bot-avatar-wrap.speaking::after {
     content:'';position:absolute;inset:-5px;border-radius:50%;
     border:2px solid rgba(219,39,119,.7);
     animation:speakRing 1s ease-in-out infinite;
   }
+  @keyframes speakRing{0%{transform:scale(1);opacity:.8;}100%{transform:scale(1.2);opacity:0;}}
 
-  @keyframes speakRing {
-    0%{transform:scale(1);opacity:.8;}
-    100%{transform:scale(1.2);opacity:0;}
-  }
-
-  .bot-name {
-    font-family:'Fraunces',serif;font-size:1.2rem;color:white;
-    margin-bottom:.2rem;position:relative;z-index:1;
-  }
-
-  .bot-tagline {
-    font-size:12px;color:rgba(255,255,255,.65);
-    line-height:1.5;position:relative;z-index:1;margin-bottom:1rem;
-  }
-
+  .bot-name { font-family:'Fraunces',serif;font-size:1.2rem;color:white;margin-bottom:.2rem;position:relative;z-index:1; }
+  .bot-tagline { font-size:12px;color:rgba(255,255,255,.65);line-height:1.5;position:relative;z-index:1;margin-bottom:1rem; }
   .bot-status {
     display:inline-flex;align-items:center;gap:6px;
     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-    border-radius:20px;padding:4px 12px;
-    font-size:11.5px;color:rgba(255,255,255,.85);font-weight:600;
+    border-radius:20px;padding:4px 12px;font-size:11.5px;color:rgba(255,255,255,.85);font-weight:600;
     position:relative;z-index:1;
   }
-
-  .status-dot {
-    width:7px;height:7px;border-radius:50%;background:#4ade80;
-    animation:statusPulse 2s ease-in-out infinite;
-  }
-
+  .status-dot { width:7px;height:7px;border-radius:50%;background:#4ade80;animation:statusPulse 2s ease-in-out infinite; }
   @keyframes statusPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-  /* scan context card */
-  .scan-ctx-card {
-    background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.25rem;
-  }
-
+  /* scan card — no result shown */
+  .scan-ctx-card { background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.25rem; }
   .scan-ctx-title {
     font-size:11.5px;font-weight:700;color:#9070b0;
     text-transform:uppercase;letter-spacing:.5px;
     margin-bottom:.85rem;display:flex;align-items:center;gap:6px;
   }
-
-  .scan-ctx-result {
-    border-radius:10px;padding:10px 14px;
-    font-size:13px;font-weight:600;margin-bottom:.85rem;
+  .scan-date-pill {
     display:flex;align-items:center;gap:8px;
+    background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;
+    padding:10px 14px;font-size:13px;color:#5b4f72;margin-bottom:.85rem;
   }
+  .scan-date-pill i { color:var(--hp); }
 
-  .scr-tumor { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
-  .scr-clear { background:#ecfdf5;color:#059669;border:1px solid #a7f3d0; }
-  .scr-none  { background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe; }
-
-  .scan-ctx-detail {
-    font-size:12px;color:#9070b0;line-height:1.6;
-    border-top:1px solid #f3e8ff;padding-top:.75rem;
-    margin-top:.5rem;
-  }
-
-  /* TTS toggle card */
-  .tts-card {
-    background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.1rem 1.25rem;
-  }
-
-  .tts-toggle-row {
-    display:flex;align-items:center;justify-content:space-between;
-    font-size:13.5px;font-weight:600;color:#1a0533;
-  }
-
+  /* TTS card */
+  .tts-card { background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.1rem 1.25rem; }
+  .tts-toggle-row { display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:600;color:#1a0533; }
   .tts-toggle-row span { display:flex;align-items:center;gap:7px;color:#5b4f72; }
 
+  /* voice speed slider */
+  .speed-row { display:flex;align-items:center;gap:10px;margin-top:.85rem;padding-top:.75rem;border-top:1px solid #f3e8ff; }
+  .speed-label { font-size:12px;color:#9070b0;font-weight:600;white-space:nowrap; }
+  .speed-slider {
+    flex:1;-webkit-appearance:none;appearance:none;height:4px;
+    border-radius:4px;background:#e5e7eb;outline:none;cursor:pointer;
+  }
+  .speed-slider::-webkit-slider-thumb {
+    -webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+    background:var(--hp);cursor:pointer;box-shadow:0 1px 4px rgba(124,58,237,.4);
+  }
+  .speed-val { font-size:12px;font-weight:700;color:var(--hp);min-width:28px;text-align:right; }
+
   /* toggle switch */
-  .toggle-switch {
-    position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer;
-  }
-
+  .toggle-switch { position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer; }
   .toggle-switch input { display:none; }
-
-  .toggle-track {
-    position:absolute;inset:0;border-radius:12px;
-    background:#e5e7eb;transition:background .2s;
-  }
-
+  .toggle-track { position:absolute;inset:0;border-radius:12px;background:#e5e7eb;transition:background .2s; }
   .toggle-switch input:checked ~ .toggle-track { background:var(--grad); }
-
-  .toggle-thumb {
-    position:absolute;width:18px;height:18px;border-radius:50%;
-    background:white;top:3px;left:3px;transition:transform .2s;
-    box-shadow:0 1px 4px rgba(0,0,0,.2);
-  }
-
+  .toggle-thumb { position:absolute;width:18px;height:18px;border-radius:50%;background:white;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2); }
   .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(18px); }
 
   /* quick actions */
   .quick-actions { background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.1rem 1.25rem; }
-
-  .qa-title {
-    font-size:11.5px;font-weight:700;color:#9070b0;
-    text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;
-  }
-
+  .qa-title { font-size:11.5px;font-weight:700;color:#9070b0;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem; }
   .qa-btn {
-    display:flex;align-items:center;gap:8px;
-    width:100%;background:none;border:1px solid #ede9fe;
-    border-radius:9px;padding:8px 12px;
-    font-size:12.5px;font-weight:600;color:#5b4f72;
-    cursor:pointer;transition:all .15s;text-align:left;
-    margin-bottom:6px;font-family:inherit;
+    display:flex;align-items:center;gap:8px;width:100%;background:none;border:1px solid #ede9fe;
+    border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:600;color:#5b4f72;
+    cursor:pointer;transition:all .15s;text-align:left;margin-bottom:6px;font-family:inherit;
   }
+  .qa-btn:last-child{margin-bottom:0;}
+  .qa-btn i{color:var(--hp);font-size:13px;flex-shrink:0;}
+  .qa-btn:hover{border-color:var(--hp);background:var(--hp-light);color:var(--hp);}
 
-  .qa-btn:last-child { margin-bottom:0; }
-  .qa-btn i { color:var(--hp);font-size:13px;flex-shrink:0; }
-  .qa-btn:hover { border-color:var(--hp);background:var(--hp-light);color:var(--hp); }
-
-  /* ── Chat area ──────────────────────────────── */
+  /* ── Chat area ── */
   .chat-main { display:flex;flex-direction:column;gap:1rem; }
 
+  /* ── Emergency banner ── */
+  .emergency-banner {
+    display:none;
+    background:#fef2f2;border:1.5px solid #fca5a5;border-left:4px solid #dc2626;
+    border-radius:12px;padding:12px 16px;
+    animation:msgIn .25s ease;
+  }
+  .emergency-banner.show { display:flex;gap:10px;align-items:flex-start; }
+  .emergency-banner i { color:#dc2626;font-size:18px;flex-shrink:0;margin-top:1px; }
+  .emergency-banner-body { flex:1; }
+  .emergency-banner-title { font-size:13.5px;font-weight:700;color:#dc2626;margin-bottom:3px; }
+  .emergency-banner-text { font-size:12.5px;color:#7f1d1d;line-height:1.5; }
+  .emergency-close {
+    background:none;border:none;color:#fca5a5;font-size:16px;cursor:pointer;
+    padding:0;line-height:1;margin-left:auto;align-self:flex-start;
+  }
+  .emergency-close:hover{color:#dc2626;}
+
   .chat-window {
-    background:white;
-    border:1px solid #ede9fe;
-    border-radius:20px;
-    height:520px;
-    overflow-y:auto;
-    padding:1.5rem;
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-    scroll-behavior:smooth;
-    position:relative;
+    background:white;border:1px solid #ede9fe;border-radius:20px;
+    height:520px;overflow-y:auto;padding:1.5rem;
+    display:flex;flex-direction:column;gap:1rem;
+    scroll-behavior:smooth;position:relative;
     box-shadow:0 4px 24px rgba(124,58,237,.06);
   }
 
-  /* watermark brain */
   .chat-watermark {
     position:absolute;top:50%;left:50%;
-    transform:translate(-50%,-50%);
-    width:220px;height:220px;
+    transform:translate(-50%,-50%);width:220px;height:220px;
     opacity:.05;pointer-events:none;z-index:0;
     animation:wmFloat 8s ease-in-out infinite alternate;
   }
+  @keyframes wmFloat{from{transform:translate(-50%,-50%) scale(1);}to{transform:translate(-50%,-54%) scale(1.05);}}
 
-  @keyframes wmFloat {
-    from{transform:translate(-50%,-50%) scale(1);}
-    to{transform:translate(-50%,-54%) scale(1.05);}
-  }
+  .msg { display:flex;gap:10px;align-items:flex-start;animation:msgIn .22s ease;position:relative;z-index:2; }
+  @keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .msg.user{flex-direction:row-reverse;}
 
-  /* messages */
-  .msg {
-    display:flex;gap:10px;align-items:flex-start;
-    animation:msgIn .22s ease;position:relative;z-index:2;
-  }
+  .msg-avatar { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:2px;overflow:hidden; }
+  .msg-avatar.bot { background:none;border:2px solid rgba(124,58,237,.2);padding:0;box-shadow:0 3px 12px rgba(124,58,237,.2); }
+  .msg-avatar.bot img { width:100%;height:100%;object-fit:cover;transform:scale(1.15); }
+  .msg-avatar.user { background:var(--grad);color:white;font-size:13px;font-weight:700;flex-shrink:0; }
 
-  @keyframes msgIn {
-    from{opacity:0;transform:translateY(8px);}
-    to{opacity:1;transform:translateY(0);}
-  }
+  .msg-bubble { max-width:75%;padding:11px 15px;border-radius:14px;font-size:14px;line-height:1.65; }
+  .msg.bot .msg-bubble { background:white;border:1px solid rgba(124,58,237,.12);color:#1a0533;border-top-left-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.04); }
+  .msg.user .msg-bubble { background:var(--grad);color:white;border-top-right-radius:4px;box-shadow:0 4px 14px rgba(124,58,237,.25); }
 
-  .msg.user { flex-direction:row-reverse; }
+  /* message action buttons */
+  .msg-actions { display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap; }
 
-  .msg-avatar {
-    width:36px;height:36px;border-radius:50%;
-    display:flex;align-items:center;justify-content:center;
-    font-size:15px;flex-shrink:0;margin-top:2px;
-    overflow:hidden;
-  }
-
-  .msg-avatar.bot {
-    background:none;
-    border:2px solid rgba(124,58,237,.2);
-    padding:0;
-    box-shadow:0 3px 12px rgba(124,58,237,.2);
-  }
-
-  .msg-avatar.bot img {
-    width:100%;height:100%;object-fit:cover;transform:scale(1.15);
-  }
-
-  .msg-avatar.user {
-    background:var(--grad);color:white;font-size:13px;font-weight:700;
-    flex-shrink:0;
-  }
-
-  .msg-bubble {
-    max-width:75%;padding:11px 15px;border-radius:14px;
-    font-size:14px;line-height:1.65;
-  }
-
-  .msg.bot .msg-bubble {
-    background:white;border:1px solid rgba(124,58,237,.12);
-    color:#1a0533;border-top-left-radius:4px;
-    box-shadow:0 2px 10px rgba(0,0,0,.04);
-  }
-
-  .msg.user .msg-bubble {
-    background:var(--grad);color:white;
-    border-top-right-radius:4px;
-    box-shadow:0 4px 14px rgba(124,58,237,.25);
-  }
-
-  /* TTS play button on bot messages */
-  .msg-tts-btn {
+  .msg-action-btn {
     display:inline-flex;align-items:center;gap:5px;
     background:none;border:1px solid #ede9fe;border-radius:20px;
     padding:3px 10px;font-size:11px;font-weight:600;color:#9070b0;
-    cursor:pointer;margin-top:6px;transition:all .15s;font-family:inherit;
+    cursor:pointer;transition:all .15s;font-family:inherit;
   }
+  .msg-action-btn:hover { border-color:var(--hp);color:var(--hp);background:var(--hp-light); }
+  .msg-action-btn.playing { border-color:var(--pk);color:var(--pk);background:var(--pk-light); }
+  .msg-action-btn.copied { border-color:#059669;color:#059669;background:#ecfdf5; }
 
-  .msg-tts-btn:hover { border-color:var(--hp);color:var(--hp);background:var(--hp-light); }
-  .msg-tts-btn.playing { border-color:var(--pk);color:var(--pk);background:var(--pk-light); }
-
-  .msg-actions { display:flex;align-items:center;gap:6px;margin-top:5px; }
-
-  /* typing indicator */
-  .typing-indicator {
-    display:flex;gap:4px;padding:11px 15px;
-    background:white;border:1px solid rgba(124,58,237,.12);
-    border-radius:14px;border-top-left-radius:4px;width:fit-content;
+  /* follow-up chips */
+  .followup-wrap {
+    display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;
+    animation:msgIn .3s ease;
   }
-
-  .t-dot {
-    width:7px;height:7px;border-radius:50%;background:#c4b5d4;
-    animation:tBounce 1.2s infinite;
+  .followup-chip {
+    background:white;border:1.5px solid #ddd6fe;border-radius:20px;
+    padding:5px 13px;font-size:12px;font-weight:600;color:var(--hp);
+    cursor:pointer;transition:all .15s;font-family:inherit;
+    display:flex;align-items:center;gap:5px;
   }
+  .followup-chip:hover { background:var(--hp-light);border-color:var(--hp); }
+  .followup-chip i { font-size:11px; }
 
+  /* typing */
+  .typing-indicator { display:flex;gap:4px;padding:11px 15px;background:white;border:1px solid rgba(124,58,237,.12);border-radius:14px;border-top-left-radius:4px;width:fit-content; }
+  .t-dot { width:7px;height:7px;border-radius:50%;background:#c4b5d4;animation:tBounce 1.2s infinite; }
   .t-dot:nth-child(2){animation-delay:.2s;}
   .t-dot:nth-child(3){animation-delay:.4s;}
-
   @keyframes tBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
 
-  /* ── Input area ─────────────────────────────── */
-  .chat-input-area {
-    background:white;border:1px solid #ede9fe;border-radius:16px;
-    padding:1rem;display:flex;flex-direction:column;gap:.75rem;
-    box-shadow:0 4px 20px rgba(124,58,237,.07);
-  }
-
+  /* input area */
+  .chat-input-area { background:white;border:1px solid #ede9fe;border-radius:16px;padding:1rem;display:flex;flex-direction:column;gap:.75rem;box-shadow:0 4px 20px rgba(124,58,237,.07); }
   .chat-input-row { display:flex;gap:10px;align-items:flex-end; }
 
   .chat-input {
     flex:1;border:1.5px solid #ede9fe;border-radius:12px;
     padding:11px 14px;font-size:14px;font-family:inherit;
     resize:none;outline:none;min-height:46px;max-height:120px;
-    color:#1a0533;background:#faf9ff;transition:border-color .15s,box-shadow .15s;
-    line-height:1.5;
+    color:#1a0533;background:#faf9ff;transition:border-color .15s,box-shadow .15s;line-height:1.5;
   }
+  .chat-input:focus { border-color:var(--hp);box-shadow:0 0 0 3px rgba(124,58,237,.1);background:white; }
+  .chat-input::placeholder{color:#c4b5d4;}
 
-  .chat-input:focus {
-    border-color:var(--hp);box-shadow:0 0 0 3px rgba(124,58,237,.1);background:white;
-  }
-
-  .chat-input::placeholder { color:#c4b5d4; }
-
-  /* voice button */
   .btn-voice {
-    width:46px;height:46px;border-radius:50%;
-    background:var(--hp-light);border:1.5px solid var(--hp-mid);
-    color:var(--hp);font-size:18px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    transition:all .2s;flex-shrink:0;position:relative;
+    width:46px;height:46px;border-radius:50%;background:var(--hp-light);border:1.5px solid var(--hp-mid);
+    color:var(--hp);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;flex-shrink:0;
   }
+  .btn-voice:hover{background:var(--hp);color:white;border-color:transparent;}
+  .btn-voice.recording { background:var(--pk);color:white;border-color:transparent;animation:recPulse 1s ease-in-out infinite; }
+  @keyframes recPulse{0%,100%{box-shadow:0 0 0 4px rgba(219,39,119,.2);}50%{box-shadow:0 0 0 10px rgba(219,39,119,.05);}}
 
-  .btn-voice:hover { background:var(--hp);color:white;border-color:transparent; }
-
-  .btn-voice.recording {
-    background:var(--pk);color:white;border-color:transparent;
-    box-shadow:0 0 0 6px rgba(219,39,119,.2);
-    animation:recPulse 1s ease-in-out infinite;
-  }
-
-  @keyframes recPulse {
-    0%,100%{box-shadow:0 0 0 4px rgba(219,39,119,.2);}
-    50%{box-shadow:0 0 0 10px rgba(219,39,119,.05);}
-  }
-
-  /* send button */
   .btn-send {
-    background:var(--grad);color:white;border:none;
-    padding:11px 22px;border-radius:12px;font-size:14px;font-weight:700;
-    cursor:pointer;display:flex;align-items:center;gap:7px;
-    box-shadow:0 4px 14px rgba(124,58,237,.3);transition:all .2s;
-    font-family:inherit;flex-shrink:0;height:46px;
+    background:var(--grad);color:white;border:none;padding:11px 22px;border-radius:12px;
+    font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;
+    box-shadow:0 4px 14px rgba(124,58,237,.3);transition:all .2s;font-family:inherit;flex-shrink:0;height:46px;
   }
+  .btn-send:hover{transform:translateY(-1px);box-shadow:0 7px 20px rgba(219,39,119,.4);}
+  .btn-send:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 
-  .btn-send:hover { transform:translateY(-1px);box-shadow:0 7px 20px rgba(219,39,119,.4); }
-  .btn-send:disabled { opacity:.5;cursor:not-allowed;transform:none; }
-
-  /* voice status bar */
-  .voice-status {
-    display:none;align-items:center;gap:8px;
-    background:var(--pk-light);border:1px solid var(--pk-mid);border-radius:10px;
-    padding:8px 14px;font-size:13px;color:var(--pk);font-weight:600;
-  }
-
-  .voice-status.show { display:flex; }
-
-  .voice-wave { display:flex;align-items:center;gap:2px;height:16px; }
-  .voice-wave span {
-    width:3px;border-radius:3px;background:var(--pk);
-    animation:waveBar 0.8s ease-in-out infinite alternate;
-    transform-origin:bottom;
-  }
+  .voice-status { display:none;align-items:center;gap:8px;background:var(--pk-light);border:1px solid var(--pk-mid);border-radius:10px;padding:8px 14px;font-size:13px;color:var(--pk);font-weight:600; }
+  .voice-status.show{display:flex;}
+  .voice-wave{display:flex;align-items:center;gap:2px;height:16px;}
+  .voice-wave span{width:3px;border-radius:3px;background:var(--pk);animation:waveBar 0.8s ease-in-out infinite alternate;transform-origin:bottom;}
   .voice-wave span:nth-child(1){height:4px;animation-delay:0s;}
   .voice-wave span:nth-child(2){height:10px;animation-delay:.1s;}
   .voice-wave span:nth-child(3){height:14px;animation-delay:.2s;}
   .voice-wave span:nth-child(4){height:8px;animation-delay:.15s;}
   .voice-wave span:nth-child(5){height:4px;animation-delay:.05s;}
-
   @keyframes waveBar{from{transform:scaleY(.4);}to{transform:scaleY(1);}}
 
-  /* suggested questions */
-  .suggested-wrap {
-    display:flex;flex-wrap:wrap;gap:7px;
-    padding:.75rem 0 .25rem;
-  }
+  .suggested-wrap{display:flex;flex-wrap:wrap;gap:7px;padding:.75rem 0 .25rem;}
+  .sq-btn{background:white;border:1.5px solid #ede9fe;border-radius:20px;padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--hp);cursor:pointer;transition:all .15s;font-family:inherit;}
+  .sq-btn:hover{background:var(--hp-light);border-color:var(--hp);}
 
-  .sq-btn {
-    background:white;border:1.5px solid #ede9fe;border-radius:20px;
-    padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--hp);
-    cursor:pointer;transition:all .15s;font-family:inherit;
-  }
+  .bot-disclaimer{background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;border-radius:10px;padding:10px 14px;font-size:12.5px;color:#78350f;display:flex;gap:9px;align-items:flex-start;line-height:1.5;}
 
-  .sq-btn:hover { background:var(--hp-light);border-color:var(--hp); }
-
-  /* ── Disclaimer ─────────────────────────────── */
-  .bot-disclaimer {
-    background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;
-    border-radius:10px;padding:10px 14px;
-    font-size:12.5px;color:#78350f;
-    display:flex;gap:9px;align-items:flex-start;line-height:1.5;
-  }
-
-  /* responsive */
-  @media(max-width:900px) {
-    .bot-layout { grid-template-columns:1fr; }
-    .bot-sidebar { position:static; }
+  @media(max-width:900px){
+    .bot-layout{grid-template-columns:1fr;}
+    .bot-sidebar{position:static;}
   }
 </style>
 {% endblock %}
@@ -412,7 +259,6 @@
 <div class="bot-page">
 <div class="container">
 
-  <!-- Header -->
   <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
     <div>
       <div style="display:inline-flex;align-items:center;gap:7px;background:var(--hp-light);color:var(--hp);border:1px solid var(--hp-mid);border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:.75rem;">
@@ -425,63 +271,51 @@
 
   <div class="bot-layout">
 
-    <!-- ══ SIDEBAR ════════════════════════════ -->
+    <!-- ══ SIDEBAR ══ -->
     <div class="bot-sidebar">
 
-      <!-- Bot profile -->
       <div class="bot-profile-card">
         <div class="bot-avatar-wrap" id="botAvatarWrap">
           <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot">
         </div>
         <div class="bot-name">CerebroBot</div>
-        <div class="bot-tagline">Powered by Claude AI · Specialised in neurological education</div>
+        <div class="bot-tagline">Powered by Groq AI · Specialised in neurological education</div>
         <div class="bot-status"><div class="status-dot"></div> Online &amp; Ready</div>
       </div>
 
-      <!-- Scan context card -->
+      <!-- Scan card — date only, no result spoiler -->
       <div class="scan-ctx-card">
         <div class="scan-ctx-title"><i class="bi bi-cpu"></i> Your Latest Scan</div>
-
         {% if latest_scan and latest_prediction %}
-          {% if latest_prediction.has_tumor %}
-          <div class="scan-ctx-result scr-tumor">
-            <i class="bi bi-exclamation-circle-fill"></i>
+          <div class="scan-date-pill">
+            <i class="bi bi-calendar3"></i>
             <div>
-              <div style="font-weight:700;">{{ latest_prediction.tumor_type|capitalize }} Detected</div>
-              <div style="font-size:11.5px;font-weight:500;opacity:.8;">{{ '%.1f'|format(latest_prediction.confidence * 100) }}% confidence</div>
+              <div style="font-weight:700;font-size:13px;color:#1a0533;">Scan on {{ latest_scan.upload_date.strftime('%d %b %Y') }}</div>
+              <div style="font-size:11.5px;color:#9070b0;margin-top:1px;">Result available — ask me about it!</div>
             </div>
           </div>
-          {% else %}
-          <div class="scan-ctx-result scr-clear">
-            <i class="bi bi-check-circle-fill"></i>
-            <div>
-              <div style="font-weight:700;">No Tumor Detected</div>
-              <div style="font-size:11.5px;font-weight:500;opacity:.8;">{{ '%.1f'|format(latest_prediction.confidence * 100) }}% confidence</div>
-            </div>
-          </div>
-          {% endif %}
-          <div class="scan-ctx-detail">
-            <div style="margin-bottom:4px;"><strong style="color:#5b4f72;">Scan date:</strong> {{ latest_scan.upload_date.strftime('%d %b %Y') }}</div>
-            <div><strong style="color:#5b4f72;">Model:</strong> {{ latest_prediction.model_version }}</div>
-          </div>
-          <a href="/scan/result/{{ latest_scan.id }}" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:.85rem;background:var(--grad);color:white;padding:9px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+          <a href="/scan/result/{{ latest_scan.id }}"
+            style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--grad);color:white;padding:9px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .2s;"
+            onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
             <i class="bi bi-eye"></i> View Full Result
           </a>
         {% else %}
-          <div class="scan-ctx-result scr-none">
-            <i class="bi bi-image"></i>
+          <div class="scan-date-pill" style="background:#faf9ff;border-color:#e5e7eb;color:#9070b0;">
+            <i class="bi bi-image" style="color:#c4b5d4;"></i>
             <div>
-              <div style="font-weight:700;">No scan yet</div>
-              <div style="font-size:11.5px;font-weight:500;opacity:.8;">Upload an MRI to get started</div>
+              <div style="font-weight:700;color:#5b4f72;">No scan uploaded yet</div>
+              <div style="font-size:11.5px;margin-top:1px;">Upload an MRI to get started</div>
             </div>
           </div>
-          <a href="/scan/upload" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:.85rem;background:var(--grad);color:white;padding:9px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+          <a href="/scan/upload"
+            style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--grad);color:white;padding:9px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .2s;"
+            onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
             <i class="bi bi-cloud-arrow-up"></i> Upload MRI Scan
           </a>
         {% endif %}
       </div>
 
-      <!-- TTS toggle -->
+      <!-- TTS + voice speed -->
       <div class="tts-card">
         <div class="tts-toggle-row">
           <span><i class="bi bi-volume-up" style="color:var(--hp);"></i> Auto-read replies</span>
@@ -491,12 +325,15 @@
             <div class="toggle-thumb"></div>
           </label>
         </div>
-        <div style="font-size:12px;color:#c4b5d4;margin-top:6px;">
-          Bot will speak each reply automatically. Toggle off for silent mode.
+        <div style="font-size:12px;color:#c4b5d4;margin-top:6px;">Toggle off for silent mode.</div>
+        <div class="speed-row">
+          <span class="speed-label"><i class="bi bi-speedometer2" style="color:var(--hp);"></i> Speed</span>
+          <input type="range" class="speed-slider" id="speedSlider" min="0.5" max="2" step="0.1" value="0.95">
+          <span class="speed-val" id="speedVal">0.95×</span>
         </div>
       </div>
 
-      <!-- Quick actions -->
+      <!-- Quick questions -->
       <div class="quick-actions">
         <div class="qa-title">Quick Questions</div>
         <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-question-circle"></i> What is a glioma?</button>
@@ -513,8 +350,20 @@
 
     </div>
 
-    <!-- ══ CHAT MAIN ═══════════════════════════ -->
+    <!-- ══ CHAT MAIN ══ -->
     <div class="chat-main">
+
+      <!-- Emergency banner (hidden by default) -->
+      <div class="emergency-banner" id="emergencyBanner">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div class="emergency-banner-body">
+          <div class="emergency-banner-title">⚠️ These may be serious symptoms</div>
+          <div class="emergency-banner-text">
+            Severe headache, sudden vision changes, vomiting, seizures, or loss of consciousness require <strong>immediate medical attention</strong>. Please call emergency services or go to the nearest hospital now. Do not wait.
+          </div>
+        </div>
+        <button class="emergency-close" onclick="document.getElementById('emergencyBanner').classList.remove('show')">✕</button>
+      </div>
 
       <!-- Chat window -->
       <div class="chat-window" id="chatWindow">
@@ -544,20 +393,19 @@
             <div class="msg-bubble">
               👋 Hi <strong>{{ current_user.full_name.split()[0] }}</strong>! I'm CerebroBot, your neurological AI assistant.<br><br>
               {% if latest_scan and latest_prediction %}
-                {% if latest_prediction.has_tumor %}
-                I can see your latest scan from <strong>{{ latest_scan.upload_date.strftime('%d %b %Y') }}</strong> showed a <strong>{{ latest_prediction.tumor_type|capitalize }}</strong> result with <strong>{{ '%.1f'|format(latest_prediction.confidence * 100) }}%</strong> confidence. I can help you understand what this means, what questions to ask your doctor, and what next steps to consider.<br><br>
-                {% else %}
-                I can see your latest scan from <strong>{{ latest_scan.upload_date.strftime('%d %b %Y') }}</strong> came back <strong>clear — no tumor detected</strong> ({{ '%.1f'|format(latest_prediction.confidence * 100) }}% confidence). I'm happy to answer any questions you have about this result or brain health in general.<br><br>
-                {% endif %}
-                Remember: I'm here to <strong>educate and guide</strong>, not to diagnose. Always follow up with your neurologist for medical advice.<br><br>
+                I have context from your latest scan (<strong>{{ latest_scan.upload_date.strftime('%d %b %Y') }}</strong>). Ask me anything about it — I'm happy to explain your results, what they mean, or what to do next.<br><br>
               {% else %}
                 I can help you understand brain tumor types, MRI scans, symptoms, and when to seek medical care. You haven't uploaded a scan yet — <a href="/scan/upload" style="color:var(--hp);font-weight:700;">upload one here</a> for AI analysis.<br><br>
               {% endif %}
+              Remember: I'm here to <strong>educate and guide</strong>, not to diagnose. Always follow up with your neurologist for medical advice.<br><br>
               <strong>How can I help you today?</strong>
             </div>
             <div class="msg-actions">
-              <button class="msg-tts-btn" onclick="speakMessage(this, document.querySelector('#welcomeMsg .msg-bubble').innerText)">
+              <button class="msg-action-btn" onclick="speakMessage(this, document.querySelector('#welcomeMsg .msg-bubble').innerText)">
                 <i class="bi bi-volume-up"></i> Listen
+              </button>
+              <button class="msg-action-btn" onclick="copyMessage(this, document.querySelector('#welcomeMsg .msg-bubble').innerText)">
+                <i class="bi bi-copy"></i> Copy
               </button>
             </div>
           </div>
@@ -573,9 +421,8 @@
         <button onclick="stopVoice()" style="margin-left:auto;background:none;border:none;color:var(--pk);font-size:13px;cursor:pointer;font-weight:700;font-family:inherit;">✕ Cancel</button>
       </div>
 
-      <!-- Input area -->
+      <!-- Input -->
       <div class="chat-input-area">
-        <!-- Suggested questions (disappear after first message) -->
         <div class="suggested-wrap" id="suggestedWrap">
           <button class="sq-btn" onclick="askSuggested(this)">What is a glioma?</button>
           <button class="sq-btn" onclick="askSuggested(this)">What do my results mean?</button>
@@ -585,15 +432,12 @@
         </div>
 
         <div class="chat-input-row">
-          <!-- Voice button -->
           <button class="btn-voice" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
             <i class="bi bi-mic" id="voiceIcon"></i>
           </button>
-
           <textarea class="chat-input" id="chatInput"
             placeholder="Type your question, or tap the mic to speak…"
             rows="1" onkeydown="handleKey(event)"></textarea>
-
           <button class="btn-send" id="sendBtn" onclick="sendMessage()">
             <i class="bi bi-send-fill"></i> Send
           </button>
@@ -613,83 +457,139 @@
 
 {% block extra_js %}
 <script>
-// ═══════════════════════════════════════════════════
-//  SCAN CONTEXT (injected from Flask)
-// ═══════════════════════════════════════════════════
-const SCAN_CONTEXT = {
-  hasScan: {{ 'true' if latest_scan else 'false' }},
-  hasTumor: {{ 'true' if latest_prediction and latest_prediction.has_tumor else 'false' }},
-  tumorType: "{{ latest_prediction.tumor_type|capitalize if latest_prediction and latest_prediction.has_tumor else 'None' }}",
-  confidence: {{ '%.1f'|format(latest_prediction.confidence * 100) if latest_prediction else 0 }},
-  scanDate: "{{ latest_scan.upload_date.strftime('%d %b %Y') if latest_scan else '' }}",
-  modelVersion: "{{ latest_prediction.model_version if latest_prediction else '' }}",
-  probGlioma: {{ '%.1f'|format(latest_prediction.prob_glioma * 100) if latest_prediction else 0 }},
-  probMeningioma: {{ '%.1f'|format(latest_prediction.prob_meningioma * 100) if latest_prediction else 0 }},
-  probPituitary: {{ '%.1f'|format(latest_prediction.prob_pituitary * 100) if latest_prediction else 0 }},
-  probNotumor: {{ '%.1f'|format(latest_prediction.prob_notumor * 100) if latest_prediction else 0 }},
-  gradcam: {{ 'true' if latest_prediction and latest_prediction.heatmap_filename else 'false' }}
+// ═══════════════════════════════════════════════
+//  SESSION — backend handles all scan context
+// ═══════════════════════════════════════════════
+const SESSION_ID = {{ session_id }};
+const USER_NAME  = "{{ current_user.full_name.split()[0] }}";
+
+// ═══════════════════════════════════════════════
+//  EMERGENCY KEYWORDS
+// ═══════════════════════════════════════════════
+const EMERGENCY_KEYWORDS = [
+  'severe headache','worst headache','sudden headache',
+  'vision loss','can\'t see','losing vision','blurred vision',
+  'vomiting','throwing up','seizure','convulsion','blackout',
+  'unconscious','fainted','collapsed','can\'t speak','slurred speech',
+  'face drooping','arm weakness','sudden numbness','paralysis',
+  'can\'t walk','loss of balance','emergency','call ambulance'
+];
+
+function checkEmergency(text) {
+  const lower = text.toLowerCase();
+  const hit = EMERGENCY_KEYWORDS.some(kw => lower.includes(kw));
+  const banner = document.getElementById('emergencyBanner');
+  if (hit) banner.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════
+//  FOLLOW-UP CHIPS
+// ═══════════════════════════════════════════════
+const FOLLOWUP_MAP = {
+  glioma:      ['What grade is a glioma?','Can glioma be cured?','What are glioma symptoms?'],
+  meningioma:  ['Is meningioma dangerous?','Can meningioma be removed?','What causes meningioma?'],
+  pituitary:   ['What hormones does pituitary control?','What are pituitary tumor symptoms?','Is pituitary surgery safe?'],
+  mri:         ['How long does an MRI take?','What is contrast MRI?','How is brain MRI different from CT?'],
+  gradcam:     ['What does a red heatmap mean?','How accurate is Grad-CAM?','Which model generates Grad-CAM?'],
+  doctor:      ['What type of doctor treats brain tumors?','How do I prepare for a neurology appointment?'],
+  symptom:     ['Are headaches always a sign of tumor?','What is the most common brain tumor symptom?'],
+  default:     ['Tell me about MRI scans','What are the types of brain tumors?','When should I seek medical care?']
 };
 
-const USER_NAME = "{{ current_user.full_name.split()[0] }}";
+function getFollowups(replyText) {
+  const lower = replyText.toLowerCase();
+  if (lower.includes('glioma')) return FOLLOWUP_MAP.glioma;
+  if (lower.includes('meningioma')) return FOLLOWUP_MAP.meningioma;
+  if (lower.includes('pituitary')) return FOLLOWUP_MAP.pituitary;
+  if (lower.includes('grad-cam') || lower.includes('gradcam') || lower.includes('heatmap')) return FOLLOWUP_MAP.gradcam;
+  if (lower.includes('mri') || lower.includes('scan')) return FOLLOWUP_MAP.mri;
+  if (lower.includes('doctor') || lower.includes('neurologist') || lower.includes('specialist')) return FOLLOWUP_MAP.doctor;
+  if (lower.includes('symptom') || lower.includes('headache')) return FOLLOWUP_MAP.symptom;
+  return FOLLOWUP_MAP.default;
+}
 
-// ═══════════════════════════════════════════════════
+function renderFollowups(replyText) {
+  const chips = getFollowups(replyText);
+  const wrap = document.createElement('div');
+  wrap.className = 'followup-wrap';
+  chips.forEach(q => {
+    const btn = document.createElement('button');
+    btn.className = 'followup-chip';
+    btn.innerHTML = `<i class="bi bi-arrow-right-circle"></i> ${q}`;
+    btn.onclick = () => {
+      wrap.remove();
+      chatInput.value = q;
+      autoResize();
+      sendMessage();
+    };
+    wrap.appendChild(btn);
+  });
+  chatWindow.appendChild(wrap);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// ═══════════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════════════════════
-let conversationHistory = [];
+// ═══════════════════════════════════════════════
+// conversationHistory removed — backend stores messages in DB
 let currentUtterance = null;
 let isRecording = false;
 let recognition = null;
 let activeTtsBtn = null;
+let ttsRate = 0.95;
 
-const chatWindow = document.getElementById('chatWindow');
-const chatInput  = document.getElementById('chatInput');
-const sendBtn    = document.getElementById('sendBtn');
-const voiceBtn   = document.getElementById('voiceBtn');
-const voiceIcon  = document.getElementById('voiceIcon');
-const voiceStatus= document.getElementById('voiceStatus');
-const voiceStatusText = document.getElementById('voiceStatusText');
-const autoReadToggle  = document.getElementById('autoReadToggle');
-const botAvatarWrap   = document.getElementById('botAvatarWrap');
-const suggestedWrap   = document.getElementById('suggestedWrap');
+const chatWindow   = document.getElementById('chatWindow');
+const chatInput    = document.getElementById('chatInput');
+const sendBtn      = document.getElementById('sendBtn');
+const voiceBtn     = document.getElementById('voiceBtn');
+const voiceIcon    = document.getElementById('voiceIcon');
+const voiceStatus  = document.getElementById('voiceStatus');
+const voiceStatusText  = document.getElementById('voiceStatusText');
+const autoReadToggle   = document.getElementById('autoReadToggle');
+const botAvatarWrap    = document.getElementById('botAvatarWrap');
+const suggestedWrap    = document.getElementById('suggestedWrap');
+const speedSlider      = document.getElementById('speedSlider');
+const speedVal         = document.getElementById('speedVal');
 
-// ═══════════════════════════════════════════════════
-//  TTS HELPERS
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+//  VOICE SPEED
+// ═══════════════════════════════════════════════
+speedSlider.addEventListener('input', () => {
+  ttsRate = parseFloat(speedSlider.value);
+  speedVal.textContent = ttsRate.toFixed(2).replace(/\.?0+$/,'') + '×';
+});
+
+// ═══════════════════════════════════════════════
+//  TTS
+// ═══════════════════════════════════════════════
 function buildTTSText(text) {
-  // Strip HTML tags for TTS
   const tmp = document.createElement('div');
   tmp.innerHTML = text;
   return tmp.innerText.replace(/\s+/g,' ').trim();
 }
 
 function speakMessage(btn, text) {
-  // If same button clicked while playing — stop
   if (activeTtsBtn === btn && currentUtterance) {
     window.speechSynthesis.cancel();
     stopTTS();
     return;
   }
-
-  // Stop any current speech
   window.speechSynthesis.cancel();
   if (activeTtsBtn) stopTTSBtn(activeTtsBtn);
 
   const clean = buildTTSText(text);
   const utter = new SpeechSynthesisUtterance(clean);
-  utter.lang = 'en-IN';
-  utter.rate = 0.95;
+  utter.lang  = 'en-IN';
+  utter.rate  = ttsRate;
   utter.pitch = 1.05;
 
-  // Prefer a female voice if available
   const voices = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v =>
-    v.lang.startsWith('en') && v.name.toLowerCase().includes('female')
-  ) || voices.find(v => v.lang.startsWith('en'));
+  const preferred = voices.find(v => v.lang.startsWith('en') && v.name.toLowerCase().includes('female'))
+                 || voices.find(v => v.lang.startsWith('en'));
   if (preferred) utter.voice = preferred;
 
   currentUtterance = utter;
   activeTtsBtn = btn;
-
   btn.innerHTML = '<i class="bi bi-stop-circle-fill"></i> Stop';
   btn.classList.add('playing');
   botAvatarWrap.classList.add('speaking');
@@ -700,7 +600,6 @@ function speakMessage(btn, text) {
     currentUtterance = null;
     activeTtsBtn = null;
   };
-
   window.speechSynthesis.speak(utter);
 }
 
@@ -717,23 +616,36 @@ function stopTTS() {
   activeTtsBtn = null;
 }
 
-// Preload voices
 if (window.speechSynthesis) {
   window.speechSynthesis.getVoices();
   window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices());
 }
 
-// ═══════════════════════════════════════════════════
-//  VOICE INPUT
-// ═══════════════════════════════════════════════════
-function initRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) return null;
+// ═══════════════════════════════════════════════
+//  COPY
+// ═══════════════════════════════════════════════
+function copyMessage(btn, text) {
+  const clean = buildTTSText(text);
+  navigator.clipboard.writeText(clean).then(() => {
+    btn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.innerHTML = '<i class="bi bi-copy"></i> Copy';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
 
-  const rec = new SpeechRecognition();
+// ═══════════════════════════════════════════════
+//  VOICE INPUT
+// ═══════════════════════════════════════════════
+function initRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const rec = new SR();
   rec.continuous = false;
   rec.interimResults = true;
-  rec.lang = ''; // auto-detect
+  rec.lang = '';
 
   rec.onstart = () => {
     isRecording = true;
@@ -742,7 +654,6 @@ function initRecognition() {
     voiceStatus.classList.add('show');
     voiceStatusText.textContent = 'Listening… speak now';
   };
-
   rec.onresult = (e) => {
     let interim = '', final = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -750,10 +661,9 @@ function initRecognition() {
       else interim += e.results[i][0].transcript;
     }
     chatInput.value = final || interim;
-    voiceStatusText.textContent = interim ? `Hearing: "${interim}"` : 'Listening… speak now';
+    voiceStatusText.textContent = interim ? `Hearing: "${interim}"` : 'Listening…';
     autoResize();
   };
-
   rec.onend = () => {
     isRecording = false;
     voiceBtn.classList.remove('recording');
@@ -761,50 +671,36 @@ function initRecognition() {
     voiceStatus.classList.remove('show');
     if (chatInput.value.trim()) sendMessage();
   };
-
   rec.onerror = (e) => {
     isRecording = false;
     voiceBtn.classList.remove('recording');
     voiceIcon.className = 'bi bi-mic';
     voiceStatus.classList.remove('show');
-    if (e.error === 'not-allowed') {
-      appendMessage('bot', '⚠️ Microphone access was denied. Please allow microphone permissions in your browser settings to use voice input.');
-    }
+    if (e.error === 'not-allowed')
+      appendMessage('bot', '⚠️ Microphone access denied. Please allow microphone permissions in your browser settings.');
   };
-
   return rec;
 }
 
 function toggleVoice() {
-  // Stop TTS before recording
   stopTTS();
-
-  if (isRecording) {
-    stopVoice();
-    return;
-  }
-
+  if (isRecording) { stopVoice(); return; }
   if (!recognition) recognition = initRecognition();
-
   if (!recognition) {
-    appendMessage('bot', '⚠️ Your browser doesn\'t support voice input. Please type your question instead. (Supported browsers: Chrome, Edge)');
+    appendMessage('bot', '⚠️ Voice input is not supported in this browser. Please use Chrome or Edge.');
     return;
   }
-
-  try { recognition.start(); }
-  catch(e) {
-    voiceStatusText.textContent = 'Error starting microphone';
-  }
+  try { recognition.start(); } catch(e) {}
 }
 
 function stopVoice() {
   if (recognition && isRecording) recognition.stop();
 }
 
-// ═══════════════════════════════════════════════════
-//  CHAT FUNCTIONS
-// ═══════════════════════════════════════════════════
-function appendMessage(role, html, rawText) {
+// ═══════════════════════════════════════════════
+//  CHAT
+// ═══════════════════════════════════════════════
+function appendMessage(role, html) {
   const isBot = role === 'bot' || role === 'assistant';
   const div = document.createElement('div');
   div.className = `msg ${isBot ? 'bot' : 'user'}`;
@@ -813,26 +709,31 @@ function appendMessage(role, html, rawText) {
     ? `<div class="msg-avatar bot"><img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="Bot"></div>`
     : `<div class="msg-avatar user">${USER_NAME[0].toUpperCase()}</div>`;
 
-  const ttsBtn = isBot
-    ? `<div class="msg-actions"><button class="msg-tts-btn" onclick="speakMessage(this, this.closest('.msg').querySelector('.msg-bubble').innerText)"><i class="bi bi-volume-up"></i> Listen</button></div>`
-    : '';
+  const actionsHTML = isBot ? `
+    <div class="msg-actions">
+      <button class="msg-action-btn" onclick="speakMessage(this, this.closest('.msg').querySelector('.msg-bubble').innerText)">
+        <i class="bi bi-volume-up"></i> Listen
+      </button>
+      <button class="msg-action-btn" onclick="copyMessage(this, this.closest('.msg').querySelector('.msg-bubble').innerText)">
+        <i class="bi bi-copy"></i> Copy
+      </button>
+    </div>` : '';
 
   div.innerHTML = `
     ${avatarHTML}
     <div>
       <div class="msg-bubble">${html.replace(/\n/g,'<br>')}</div>
-      ${ttsBtn}
+      ${actionsHTML}
     </div>
   `;
 
   chatWindow.appendChild(div);
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
-  // Auto-read if enabled and it's a bot message
   if (isBot && autoReadToggle.checked) {
     setTimeout(() => {
-      const btn = div.querySelector('.msg-tts-btn');
-      const text = rawText || div.querySelector('.msg-bubble').innerText;
+      const btn = div.querySelector('.msg-action-btn');
+      const text = div.querySelector('.msg-bubble').innerText;
       if (btn) speakMessage(btn, text);
     }, 300);
   }
@@ -863,11 +764,15 @@ async function sendMessage() {
   const text = chatInput.value.trim();
   if (!text) return;
 
-  // Hide suggestions
   suggestedWrap.style.display = 'none';
 
+  // Remove old follow-up chips before sending
+  document.querySelectorAll('.followup-wrap').forEach(el => el.remove());
+
+  // Check emergency keywords
+  checkEmergency(text);
+
   appendMessage('user', text);
-  conversationHistory.push({ role: 'user', content: text });
 
   chatInput.value = '';
   chatInput.style.height = 'auto';
@@ -875,22 +780,16 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const res = await fetch('/chat/send', {
+    const res = await fetch('{{ url_for("chat.send") }}', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: conversationHistory,
-        scan_context: SCAN_CONTEXT
-      })
+      body: JSON.stringify({ message: text, session_id: SESSION_ID })
     });
-
     const data = await res.json();
     removeTyping();
-
     const reply = data.reply || 'Sorry, I encountered an error. Please try again.';
     appendMessage('bot', reply);
-    conversationHistory.push({ role: 'assistant', content: reply });
-
+    renderFollowups(reply);
   } catch(err) {
     removeTyping();
     appendMessage('bot', 'Sorry, I could not connect. Please check your connection and try again.');

@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Scan #{{ scan.id }} — Admin View{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --hp:#7c3aed;--hp-dark:#5b21b6;--hp-light:#f5f3ff;--hp-mid:#ddd6fe;
+    --pk:#db2777;--pk-light:#fdf2f8;--pk-mid:#fbcfe8;
+    --grad:linear-gradient(135deg,#7c3aed 0%,#db2777 100%);
+  }
+  .detail-page { background:#faf9ff; padding:2.5rem 0 4rem; }
+
+  .back-link {
+    display:inline-flex;align-items:center;gap:7px;color:#7c3aed;
+    text-decoration:none;font-weight:600;font-size:14px;margin-bottom:1.5rem;
+    transition:gap .15s;
+  }
+  .back-link:hover { gap:11px;color:#5b21b6; }
+
+  .detail-grid { display:grid;grid-template-columns:1fr 1fr;gap:1.5rem; }
+  @media(max-width:768px){ .detail-grid{grid-template-columns:1fr;} }
+
+  .d-card {
+    background:white;border:1px solid #ede9fe;border-radius:18px;
+    overflow:hidden;
+  }
+  .d-card-header {
+    background:var(--grad);padding:1rem 1.25rem;
+    display:flex;align-items:center;gap:10px;
+  }
+  .d-card-header h3 { color:white;font-size:15px;font-weight:700;margin:0; }
+  .d-card-header i  { color:rgba(255,255,255,.85);font-size:17px; }
+  .d-card-body { padding:1.25rem; }
+
+  .mri-img-wrap {
+    background:#0f0520;border-radius:12px;overflow:hidden;
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+    margin-bottom:1rem;
+  }
+  .mri-img-wrap img { width:100%;height:100%;object-fit:cover; }
+  .mri-no-img {
+    width:80px;height:80px;border-radius:50%;
+    background:rgba(124,58,237,.15);border:1.5px solid rgba(124,58,237,.3);
+    display:flex;align-items:center;justify-content:center;font-size:32px;color:#a78bfa;
+  }
+
+  .heatmap-wrap {
+    background:#0f0520;border-radius:12px;overflow:hidden;
+    aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  }
+  .heatmap-wrap img { width:100%;height:100%;object-fit:cover; }
+  .heatmap-placeholder {
+    text-align:center;color:rgba(255,255,255,.4);font-size:13px;padding:2rem;
+  }
+
+  .info-row {
+    display:flex;align-items:center;justify-content:space-between;
+    padding:9px 0;border-bottom:1px solid #f3e8ff;font-size:13.5px;
+  }
+  .info-row:last-child { border-bottom:none; }
+  .info-label { color:#9070b0;font-weight:600; }
+  .info-val   { color:#1a0533;font-weight:700; }
+
+  .prob-row { margin-bottom:.6rem; }
+  .prob-label {
+    display:flex;justify-content:space-between;
+    font-size:12.5px;font-weight:600;color:#5b4f72;margin-bottom:4px;
+  }
+  .prob-bar-bg { background:#f3e8ff;border-radius:6px;height:8px;overflow:hidden; }
+  .prob-bar    { height:100%;border-radius:6px;transition:width .6s ease; }
+
+  .result-pill {
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 18px;border-radius:20px;font-size:14px;font-weight:700;
+    margin-bottom:1rem;
+  }
+  .rp-tumor { background:#fef2f2;color:#dc2626;border:1.5px solid #fecaca; }
+  .rp-clear { background:#ecfdf5;color:#059669;border:1.5px solid #a7f3d0; }
+  .rp-pending { background:#fffbeb;color:#d97706;border:1.5px solid #fde68a; }
+
+  .user-chip {
+    display:inline-flex;align-items:center;gap:8px;
+    background:#f5f3ff;border:1px solid #ddd6fe;border-radius:12px;
+    padding:8px 14px;font-size:13px;color:#5b4f72;margin-bottom:1.25rem;
+  }
+  .user-chip strong { color:#1a0533; }
+  .user-avatar-xs {
+    width:28px;height:28px;border-radius:50%;background:var(--grad);
+    color:white;display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;flex-shrink:0;
+  }
+
+  .action-panel {
+    background:white;border:1px solid #ede9fe;border-radius:18px;
+    padding:1.25rem;margin-top:1.5rem;
+  }
+  .action-panel-title {
+    font-size:11.5px;font-weight:700;color:#9070b0;
+    text-transform:uppercase;letter-spacing:.5px;margin-bottom:1rem;
+    display:flex;align-items:center;gap:6px;
+  }
+  .action-row { display:flex;gap:10px;flex-wrap:wrap; }
+
+  .btn-admin-action {
+    padding:9px 18px;border-radius:10px;font-size:13.5px;font-weight:700;
+    cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    text-decoration:none;border:1.5px solid;transition:all .15s;font-family:inherit;
+  }
+  .btn-rerun  { background:#fffbeb;color:#d97706;border-color:#fde68a; }
+  .btn-rerun:hover { background:#d97706;color:white;border-color:transparent; }
+  .btn-del-scan { background:#fef2f2;color:#dc2626;border-color:#fecaca; }
+  .btn-del-scan:hover { background:#dc2626;color:white;border-color:transparent; }
+  .btn-view-user { background:#f5f3ff;color:#7c3aed;border-color:#ddd6fe; }
+  .btn-view-user:hover { background:#7c3aed;color:white;border-color:transparent; }
+
+  /* confirm delete modal */
+  .confirm-overlay {
+    display:none;position:fixed;inset:0;background:rgba(15,5,32,.55);
+    backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:1rem;
+  }
+  .confirm-overlay.show { display:flex; }
+  .confirm-modal {
+    background:white;border-radius:18px;padding:2rem;max-width:380px;width:100%;
+    box-shadow:0 20px 50px rgba(0,0,0,.2);animation:popIn .2s ease;
+  }
+  @keyframes popIn{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+  .confirm-icon {
+    width:56px;height:56px;border-radius:50%;background:#fef2f2;
+    border:1.5px solid #fecaca;display:flex;align-items:center;justify-content:center;
+    font-size:24px;color:#dc2626;margin:0 auto 1rem;
+  }
+  .confirm-modal h4 { font-family:'Fraunces',serif;text-align:center;color:#1a0533;margin-bottom:.5rem; }
+  .confirm-modal p  { font-size:13.5px;color:#6b7280;text-align:center;margin-bottom:1.5rem; }
+  .confirm-btns { display:flex;gap:10px; }
+  .btn-cancel-confirm {
+    flex:1;background:white;color:#374151;border:1.5px solid #d1d5db;
+    padding:10px;border-radius:9px;font-size:13.5px;font-weight:700;
+    cursor:pointer;font-family:inherit;
+  }
+  .btn-do-confirm {
+    flex:1;background:#dc2626;color:white;border:none;padding:10px;
+    border-radius:9px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-do-confirm:hover { background:#b91c1c; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+  <div class="container">
+
+    <a href="{{ url_for('admin.user_scans', user_id=user.id) }}" class="back-link">
+      <i class="bi bi-arrow-left"></i> Back to {{ user.full_name }}'s Scans
+    </a>
+
+    <!-- User chip -->
+    <div class="user-chip">
+      <div class="user-avatar-xs">{{ user.full_name[0]|upper }}</div>
+      <span>Scan belonging to <strong>{{ user.full_name }}</strong> — {{ user.email }}</span>
+    </div>
+
+    <!-- Result pill -->
+    {% if not prediction %}
+      <div class="result-pill rp-pending"><i class="bi bi-hourglass-split"></i> No Prediction</div>
+    {% elif prediction.model_version == 'pending' %}
+      <div class="result-pill rp-pending"><i class="bi bi-exclamation-triangle"></i> Prediction Failed</div>
+    {% elif prediction.has_tumor %}
+      <div class="result-pill rp-tumor">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        Tumor Detected — {{ prediction.tumor_type|capitalize if prediction.tumor_type else 'Unknown' }}
+      </div>
+    {% else %}
+      <div class="result-pill rp-clear"><i class="bi bi-check-circle-fill"></i> No Tumor Detected</div>
+    {% endif %}
+
+    <!-- Main grid -->
+    <div class="detail-grid">
+
+      <!-- LEFT: MRI Image + Scan info -->
+      <div>
+        <div class="d-card">
+          <div class="d-card-header">
+            <i class="bi bi-image"></i>
+            <h3>MRI Image — Scan #{{ scan.id }}</h3>
+          </div>
+          <div class="d-card-body">
+            <div class="mri-img-wrap">
+              {% if scan.image_filename %}
+              <img src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}" alt="MRI Scan">
+              {% else %}
+              <div class="mri-no-img"><i class="bi bi-image"></i></div>
+              {% endif %}
+            </div>
+
+            <div class="info-row">
+              <span class="info-label">Scan ID</span>
+              <span class="info-val">#{{ scan.id }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Upload Date</span>
+              <span class="info-val">{{ scan.upload_date.strftime('%d %b %Y, %H:%M') if scan.upload_date else '—' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Original Filename</span>
+              <span class="info-val" style="font-size:12px;word-break:break-all;">{{ scan.original_name or '—' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">File Size</span>
+              <span class="info-val">{{ '%.1f KB'|format(scan.file_size / 1024) if scan.file_size else '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Grad-CAM + Prediction -->
+      <div>
+        <div class="d-card mb-3">
+          <div class="d-card-header">
+            <i class="bi bi-fire"></i>
+            <h3>Grad-CAM Heatmap</h3>
+          </div>
+          <div class="d-card-body">
+            <div class="heatmap-wrap">
+              {% if prediction and prediction.heatmap_filename %}
+              <img src="{{ url_for('static', filename='heatmaps/' + prediction.heatmap_filename) }}" alt="Grad-CAM">
+              {% else %}
+              <div class="heatmap-placeholder">
+                <i class="bi bi-thermometer" style="font-size:32px;display:block;margin-bottom:.5rem;"></i>
+                No Grad-CAM available
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if prediction %}
+        <div class="d-card">
+          <div class="d-card-header">
+            <i class="bi bi-graph-up"></i>
+            <h3>Prediction Breakdown</h3>
+          </div>
+          <div class="d-card-body">
+            <div class="info-row">
+              <span class="info-label">Model Version</span>
+              <span class="info-val">{{ prediction.model_version }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Overall Confidence</span>
+              <span class="info-val">{{ '%.1f'|format(prediction.confidence * 100) }}%</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Tumor Type</span>
+              <span class="info-val">{{ prediction.tumor_type|capitalize if prediction.tumor_type else 'N/A' }}</span>
+            </div>
+            <div class="info-row" style="margin-bottom:1rem;">
+              <span class="info-label">Grad-CAM Ready</span>
+              <span class="info-val">{{ 'Yes' if prediction.heatmap_ready else 'No' }}</span>
+            </div>
+
+            <!-- Probability bars -->
+            <div style="margin-top:.75rem;">
+              {% set bars = [
+                ('Glioma',      prediction.prob_glioma,      '#dc2626', '#fef2f2'),
+                ('Meningioma',  prediction.prob_meningioma,  '#ea580c', '#fff7ed'),
+                ('Pituitary',   prediction.prob_pituitary,   '#7c3aed', '#faf5ff'),
+                ('No Tumor',    prediction.prob_notumor,     '#059669', '#ecfdf5'),
+              ] %}
+              {% for label, prob, color, bg in bars %}
+              <div class="prob-row">
+                <div class="prob-label">
+                  <span>{{ label }}</span>
+                  <span style="color:{{ color }};">{{ '%.1f'|format(prob * 100) }}%</span>
+                </div>
+                <div class="prob-bar-bg">
+                  <div class="prob-bar" style="width:{{ (prob * 100)|round(1) }}%;background:{{ color }};"></div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Admin action panel -->
+    <div class="action-panel">
+      <div class="action-panel-title"><i class="bi bi-shield-check"></i> Admin Actions</div>
+      <div class="action-row">
+
+        <a href="{{ url_for('admin.user_scans', user_id=user.id) }}" class="btn-admin-action btn-view-user">
+          <i class="bi bi-person"></i> All Scans for {{ user.full_name.split()[0] }}
+        </a>
+
+        {% if prediction and prediction.model_version == 'pending' %}
+        <form method="POST" action="{{ url_for('admin.rerun_prediction', scan_id=scan.id) }}" style="display:inline;">
+          <button type="submit" class="btn-admin-action btn-rerun"
+            onclick="return confirm('Re-run AI prediction for Scan #{{ scan.id }}?')">
+            <i class="bi bi-arrow-clockwise"></i> Re-run Prediction
+          </button>
+        </form>
+        {% endif %}
+
+        <button class="btn-admin-action btn-del-scan" onclick="showConfirm()">
+          <i class="bi bi-trash3"></i> Delete This Scan
+        </button>
+
+      </div>
+
+      <p style="font-size:12px;color:#9070b0;margin-top:.85rem;margin-bottom:0;">
+        <i class="bi bi-info-circle"></i>
+        Deleting a scan permanently removes the MRI image, prediction, Grad-CAM heatmap, and any generated PDF reports.
+        {% if not (prediction and prediction.model_version == 'pending') %}
+        Re-run is only available for scans with a failed/pending prediction.
+        {% endif %}
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<!-- Confirm delete modal -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-modal">
+    <div class="confirm-icon"><i class="bi bi-trash3-fill"></i></div>
+    <h4>Delete Scan #{{ scan.id }}?</h4>
+    <p>This will permanently remove the MRI image, prediction data, Grad-CAM heatmap, and all PDF reports for this scan. This cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel-confirm" onclick="hideConfirm()">Cancel</button>
+      <form method="POST" action="{{ url_for('admin.delete_scan', scan_id=scan.id) }}" style="flex:1;">
+        <button type="submit" class="btn-do-confirm" style="width:100%;">
+          <i class="bi bi-trash3"></i> Yes, Delete
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function showConfirm() { document.getElementById('confirmOverlay').classList.add('show'); }
+function hideConfirm() { document.getElementById('confirmOverlay').classList.remove('show'); }
+document.getElementById('confirmOverlay').addEventListener('click', function(e) {
+  if (e.target === this) hideConfirm();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideConfirm(); });
+</script>
+{% endblock %}

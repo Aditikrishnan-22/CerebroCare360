@@ -21,6 +21,7 @@ def create_app():
         from app.models.report import Report
         from app.models.hospital import Hospital
         from app.models.symptom_rule import SymptomRule
+        from app.models.chat_session import ChatSession, ChatMessage
         db.create_all()
 
     from app.blueprints.auth import auth_bp

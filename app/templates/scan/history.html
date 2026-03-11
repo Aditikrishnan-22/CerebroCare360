@@ -1,310 +1,529 @@
 {% extends "base.html" %}
 {% block title %}Scan History — CerebroCare360{% endblock %}
+
 {% block extra_css %}
 <style>
-  .history-row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
+  :root {
+    --hp:#7c3aed;--hp-dark:#5b21b6;--hp-light:#f5f3ff;--hp-mid:#ddd6fe;
+    --pk:#db2777;--pk-light:#fdf2f8;--pk-mid:#fbcfe8;
+    --grad:linear-gradient(135deg,#7c3aed 0%,#db2777 100%);
+    --grad-soft:linear-gradient(135deg,rgba(124,58,237,.07) 0%,rgba(219,39,119,.07) 100%);
   }
 
-  .history-row:hover {
-    background: var(--surface-2);
-  }
+  .history-page { background:#faf9ff;padding:2.5rem 0 4rem; }
 
-  .history-row:last-child {
-    border-bottom: none;
+  .page-header {
+    margin-bottom:2rem;padding-bottom:1.75rem;border-bottom:1px solid #ede9fe;
+    display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
   }
-
-  .history-thumb {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #000;
-    flex-shrink: 0;
-    border: 1px solid var(--border);
+  .page-eyebrow {
+    display:inline-flex;align-items:center;gap:7px;
+    background:var(--hp-light);color:var(--hp);border:1px solid var(--hp-mid);
+    border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase;margin-bottom:1rem;
   }
-
-  .history-meta {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .history-date {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
-
-  .history-result {
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .history-conf {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-left: 8px;
-  }
-
-  .badge-tumor {
-    background: #fee2e2;
-    color: #dc2626;
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-
-  .badge-clear {
-    background: #d1fae5;
-    color: #059669;
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-
-  .badge-pending {
-    background: var(--primary-light);
-    color: var(--primary);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 11.5px;
-    font-weight: 600;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--text-muted);
-  }
-
-  .empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    display: block;
-  }
+  .page-title { font-family:'Fraunces',serif;font-size:2rem;color:#1a0533;letter-spacing:-.4px; }
+  .page-sub   { color:#9070b0;font-size:14.5px; }
 
   .filter-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 1rem 1.25rem;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.25rem 1.5rem;
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:1.75rem;
   }
+  .search-wrap { position:relative;flex:1;min-width:200px; }
+  .search-wrap i { position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#c4b5d4;font-size:15px;pointer-events:none; }
+  .search-input {
+    width:100%;padding:9px 12px 9px 36px;border:1.5px solid #ede9fe;border-radius:10px;
+    font-size:14px;color:#1a0533;background:white;outline:none;font-family:inherit;transition:border-color .15s;
+  }
+  .search-input:focus { border-color:var(--hp);box-shadow:0 0 0 3px rgba(124,58,237,.1); }
+  .filter-select {
+    padding:9px 14px;border:1.5px solid #ede9fe;border-radius:10px;
+    font-size:14px;color:#5b4f72;background:white;outline:none;font-family:inherit;cursor:pointer;
+  }
+  .filter-select:focus { border-color:var(--hp); }
+  .btn-filter {
+    background:var(--grad);color:white;border:none;padding:9px 20px;border-radius:10px;
+    font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;
+    font-family:inherit;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .18s;
+  }
+  .btn-filter:hover { transform:translateY(-1px);box-shadow:0 7px 20px rgba(219,39,119,.35); }
 
-  .filter-bar input,
-  .filter-bar select {
-    flex: 1;
-    min-width: 140px;
+  /* bulk bar */
+  .bulk-bar {
+    display:none;background:#fff0f0;border:1.5px solid #fecaca;border-radius:12px;
+    padding:10px 16px;margin-bottom:1.25rem;align-items:center;gap:12px;flex-wrap:wrap;
+    animation:slideDown .2s ease;
   }
+  .bulk-bar.show { display:flex; }
+  @keyframes slideDown { from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);} }
+  .bulk-count { font-size:13.5px;font-weight:700;color:#991b1b;flex:1; }
+  .btn-bulk-del {
+    background:#dc2626;color:white;border:none;padding:8px 18px;border-radius:8px;
+    font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;
+    font-family:inherit;transition:all .15s;
+  }
+  .btn-bulk-del:hover { background:#b91c1c; }
+  .btn-bulk-del:disabled { opacity:.45;cursor:not-allowed; }
+  .btn-bulk-cancel {
+    background:none;color:#6b7280;border:1px solid #d1d5db;padding:8px 14px;
+    border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;
+  }
+  .btn-bulk-cancel:hover { border-color:#9ca3af;color:#374151; }
 
-  .hidden {
-    display: none !important;
+  /* stat cards */
+  .stat-mini {
+    background:white;border:1px solid #ede9fe;border-radius:14px;
+    padding:1rem 1.25rem;display:flex;align-items:center;gap:14px;
   }
+  .stat-mini-icon {
+    width:42px;height:42px;border-radius:12px;background:var(--grad-soft);color:var(--hp);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    border:1px solid var(--hp-mid);flex-shrink:0;
+  }
+  .stat-mini-val   { font-family:'Fraunces',serif;font-size:1.6rem;color:#1a0533;line-height:1; }
+  .stat-mini-label { font-size:11.5px;color:#9070b0;font-weight:600;text-transform:uppercase;letter-spacing:.4px; }
+
+  /* scan cards */
+  .scan-card {
+    background:white;border:1px solid #ede9fe;border-radius:18px;
+    overflow:hidden;transition:all .22s ease;position:relative;
+  }
+  .scan-card:hover { transform:translateY(-4px);box-shadow:0 16px 40px rgba(124,58,237,.12); }
+  .scan-card.selected { border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.15); }
+
+  .scan-select-cb {
+    position:absolute;top:10px;right:10px;z-index:10;
+    width:22px;height:22px;cursor:pointer;accent-color:#dc2626;display:none;
+  }
+  .select-mode .scan-select-cb { display:block; }
+
+  .scan-card-thumb {
+    height:160px;background:#0f0520;
+    display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;
+  }
+  .scan-card-thumb img { width:100%;height:100%;object-fit:cover;opacity:.85; }
+  .scan-card-thumb-placeholder {
+    width:70px;height:70px;border-radius:50%;background:rgba(124,58,237,.15);
+    border:1.5px solid rgba(124,58,237,.3);display:flex;align-items:center;
+    justify-content:center;font-size:28px;color:#a78bfa;
+  }
+  .result-badge {
+    position:absolute;top:10px;left:10px;
+    padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:700;
+  }
+  .rb-tumor { background:rgba(220,38,38,.9);color:white; }
+  .rb-clear { background:rgba(5,150,105,.9);color:white; }
+  .rb-low   { background:rgba(245,158,11,.9);color:white; }
+
+  .scan-card-body { padding:1.25rem; }
+  .scan-date {
+    font-size:11.5px;color:#9070b0;font-weight:600;text-transform:uppercase;
+    letter-spacing:.4px;margin-bottom:.5rem;display:flex;align-items:center;gap:5px;
+  }
+  .scan-label  { font-weight:700;font-size:1rem;color:#1a0533;margin-bottom:.3rem; }
+  .scan-conf   { font-size:13px;color:#9070b0;margin-bottom:1rem;display:flex;align-items:center;gap:6px; }
+  .conf-bar-wrap { background:#f3e8ff;border-radius:10px;height:5px;margin-bottom:1rem;overflow:hidden; }
+  .conf-bar { height:100%;border-radius:10px;background:var(--grad);transition:width .6s ease; }
+
+  .scan-actions { display:flex;gap:8px;flex-wrap:wrap;align-items:center; }
+  .btn-sm-view {
+    background:var(--hp-light);color:var(--hp);border:1px solid var(--hp-mid);
+    padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:700;
+    text-decoration:none;display:flex;align-items:center;gap:5px;transition:all .15s;
+  }
+  .btn-sm-view:hover { background:var(--hp);color:white; }
+  .btn-sm-report {
+    background:var(--pk-light);color:var(--pk);border:1px solid var(--pk-mid);
+    padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:700;
+    text-decoration:none;display:flex;align-items:center;gap:5px;transition:all .15s;
+  }
+  .btn-sm-report:hover { background:var(--pk);color:white; }
+  .btn-sm-del {
+    background:#fff0f0;color:#dc2626;border:1px solid #fecaca;
+    padding:6px 10px;border-radius:8px;font-size:13px;font-weight:700;
+    cursor:pointer;display:flex;align-items:center;transition:all .15s;
+    margin-left:auto;font-family:inherit;
+  }
+  .btn-sm-del:hover { background:#dc2626;color:white;border-color:transparent; }
+
+  /* empty state */
+  .empty-state {
+    text-align:center;padding:5rem 2rem;background:white;
+    border:1px solid #ede9fe;border-radius:20px;
+  }
+  .empty-orb {
+    width:90px;height:90px;border-radius:50%;background:var(--grad-soft);
+    border:1.5px solid var(--hp-mid);display:flex;align-items:center;
+    justify-content:center;font-size:38px;color:var(--hp);margin:0 auto 1.5rem;
+  }
+  .empty-state h3 { font-family:'Fraunces',serif;font-size:1.5rem;color:#1a0533;margin-bottom:.5rem; }
+  .empty-state p  { color:#9070b0;font-size:14.5px;margin-bottom:1.5rem; }
+  .btn-upload-now {
+    background:var(--grad);color:white;border:none;padding:12px 28px;border-radius:50px;
+    font-size:14.5px;font-weight:700;display:inline-flex;align-items:center;gap:8px;
+    text-decoration:none;box-shadow:0 6px 20px rgba(124,58,237,.3);transition:all .2s;
+  }
+  .btn-upload-now:hover { transform:translateY(-2px);box-shadow:0 10px 28px rgba(219,39,119,.4);color:white; }
+
+  /* tumor labels */
+  .tc-glioma    { background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700; }
+  .tc-meningioma{ background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700; }
+  .tc-pituitary { background:#faf5ff;color:#7c3aed;border:1px solid #ddd6fe;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700; }
+
+  /* modal */
+  .modal-overlay {
+    display:none;position:fixed;inset:0;background:rgba(15,5,32,.55);
+    backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:1rem;
+  }
+  .modal-overlay.show { display:flex; }
+  .del-modal {
+    background:white;border-radius:20px;padding:2rem;max-width:420px;width:100%;
+    box-shadow:0 24px 60px rgba(0,0,0,.25);animation:modalPop .2s ease;
+  }
+  @keyframes modalPop { from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);} }
+  .del-modal-icon {
+    width:60px;height:60px;border-radius:50%;background:#fef2f2;border:1.5px solid #fecaca;
+    display:flex;align-items:center;justify-content:center;font-size:26px;color:#dc2626;
+    margin:0 auto 1.25rem;
+  }
+  .del-modal h3 { font-family:'Fraunces',serif;font-size:1.35rem;color:#1a0533;text-align:center;margin-bottom:.5rem; }
+  .del-modal p  { font-size:14px;color:#6b7280;text-align:center;line-height:1.6;margin-bottom:1.5rem; }
+  .del-modal-warn {
+    background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;
+    font-size:12.5px;color:#78350f;display:flex;gap:8px;align-items:flex-start;
+    margin-bottom:1.5rem;line-height:1.5;
+  }
+  .del-modal-actions { display:flex;gap:10px; }
+  .btn-modal-cancel {
+    flex:1;background:white;color:#374151;border:1.5px solid #d1d5db;padding:11px;
+    border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;
+  }
+  .btn-modal-cancel:hover { border-color:#9ca3af;background:#f9fafb; }
+  .btn-modal-confirm {
+    flex:1;background:#dc2626;color:white;border:none;padding:11px;border-radius:10px;
+    font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+    box-shadow:0 4px 14px rgba(220,38,38,.3);transition:all .15s;
+  }
+  .btn-modal-confirm:hover { background:#b91c1c; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container" style="max-width:860px;">
-  <div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-      <h1 class="cc-section-title">Scan History</h1>
-      <p class="cc-section-sub mb-0">All your uploaded MRI scans and results</p>
-    </div>
-    <a href="/scan/upload" class="btn-cc-primary">
-      <i class="bi bi-plus-lg"></i> New Scan
-    </a>
-  </div>
+{# ── Pre-compute stats using has_tumor field ── #}
+{% set tumor_count = scans | selectattr('prediction') | selectattr('prediction.has_tumor') | list | length if scans else 0 %}
+{% set clear_count = scans | length - tumor_count if scans else 0 %}
+{% set report_count = scans | selectattr('prediction') | map(attribute='prediction.reports') | map('length') | sum if scans else 0 %}
 
-  {% if scans %}
-  <div class="row g-3 mb-4">
-    <div class="col-4">
-      <div class="cc-stat">
-        <div class="cc-stat-value">{{ scans | length }}</div>
-        <div class="cc-stat-label">Total Scans</div>
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="cc-stat">
-        <div class="cc-stat-value">{{ scans | selectattr('prediction') | selectattr('prediction.has_tumor') | list |
-          length }}</div>
-        <div class="cc-stat-label">Tumor Detected</div>
-      </div>
-    </div>
-    <div class="col-4">
-      <div class="cc-stat">
-        <div class="cc-stat-value">{{ scans | selectattr('prediction') | rejectattr('prediction.has_tumor') | list |
-          length }}</div>
-        <div class="cc-stat-label">Clear Scans</div>
-      </div>
-    </div>
-  </div>
+<div class="history-page">
+  <div class="container">
 
-  <!-- Filter bar -->
-  <div class="filter-bar">
-    <input type="text" class="cc-input" id="searchInput" placeholder="🔍  Search by scan ID or date..."
-      style="max-width:280px;" />
-    <select class="cc-input" id="filterResult" style="max-width:180px;">
-      <option value="all">All Results</option>
-      <option value="tumor">Tumor Detected</option>
-      <option value="clear">Clear</option>
-      <option value="pending">Pending</option>
-    </select>
-    <button class="btn-cc-secondary py-2 px-3" style="font-size:13px;" onclick="clearFilters()">
-      <i class="bi bi-x-circle"></i> Clear
-    </button>
-    <span id="filterCount" style="font-size:13px;color:var(--text-muted);margin-left:auto;"></span>
-  </div>
-
-  <div class="cc-card" id="historyList">
-    {% for scan in scans %}
-    <div class="history-row" data-id="{{ scan.id }}" data-date="{{ scan.upload_date.strftime('%d %b %Y') }}"
-      data-result="{% if scan.prediction %}{% if scan.prediction.has_tumor %}tumor{% else %}clear{% endif %}{% else %}pending{% endif %}">
-      <img class="history-thumb" src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}" alt="MRI" />
-      <div class="history-meta">
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-          <span class="history-result">
-            {% if scan.prediction %}
-            {% if scan.prediction.has_tumor %}
-            {{ scan.prediction.tumor_type | capitalize }} Tumor
-            {% else %}
-            No Tumor
-            {% endif %}
-            {% else %}
-            Pending
-            {% endif %}
-          </span>
-          {% if scan.prediction %}
-          {% if scan.prediction.has_tumor %}
-          <span class="badge-tumor">Tumor</span>
-          {% else %}
-          <span class="badge-clear">Clear</span>
-          {% endif %}
-          <span class="history-conf">
-            {{ "%.1f"|format(scan.prediction.confidence * 100) }}% confidence
-          </span>
-          {% else %}
-          <span class="badge-pending">Pending</span>
-          {% endif %}
-        </div>
-        <div class="history-date">
-          <i class="bi bi-calendar3"></i>
-          {{ scan.upload_date.strftime('%d %b %Y at %H:%M') }}
-          &nbsp;·&nbsp; Scan #{{ scan.id }}
-        </div>
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-eyebrow"><i class="bi bi-clock-history"></i> Scan History</div>
+        <h1 class="page-title">Your MRI Scans</h1>
+        <p class="page-sub">Review, re-download reports, and manage your past analyses.</p>
       </div>
-      <div class="d-flex gap-2">
-        {% if scan.prediction %}
-        <a href="/scan/result/{{ scan.id }}" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
-          <i class="bi bi-eye"></i> View
-        </a>
-        <a href="/report/generate/{{ scan.prediction.id }}" class="btn-cc-primary py-2 px-3" style="font-size:13px;">
-          <i class="bi bi-download"></i>
-        </a>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+        {% if scans %}
+        <button onclick="toggleSelectMode()" id="btnSelectMode"
+          style="background:white;color:#dc2626;border:1.5px solid #fecaca;padding:10px 18px;border-radius:50px;font-size:13.5px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .15s;font-family:inherit;">
+          <i class="bi bi-check2-square"></i> Select
+        </button>
         {% endif %}
+        <a href="{{ url_for('scan.upload') }}"
+          style="background:var(--grad);color:white;padding:11px 24px;border-radius:50px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;gap:7px;text-decoration:none;box-shadow:0 5px 18px rgba(124,58,237,.3);transition:all .2s;"
+          onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+          <i class="bi bi-plus-lg"></i> New Scan
+        </a>
       </div>
     </div>
-    {% endfor %}
-  </div>
 
-  <div id="noResults" class="cc-card hidden">
-    <div class="empty-state">
-      <div
-        style="width: 80px; height: 80px; margin: 0 auto 1rem; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2); animation: floatEmpty 4s ease-in-out infinite alternate;">
-        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot"
-          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);">
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-mini">
+          <div class="stat-mini-icon"><i class="bi bi-images"></i></div>
+          <div>
+            <div class="stat-mini-val">{{ scans|length if scans else 0 }}</div>
+            <div class="stat-mini-label">Total Scans</div>
+          </div>
+        </div>
       </div>
-      <style>
-        @keyframes floatEmpty {
-          from {
-            transform: translateY(0);
-          }
-
-          to {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 35px rgba(124, 58, 237, 0.4);
-          }
-        }
-      </style>
-      <h5 style="font-weight:600;">No matching scans</h5>
-      <p style="font-size:14px;">I couldn't find any scans matching that filter.</p>
+      <div class="col-6 col-md-3">
+        <div class="stat-mini">
+          <div class="stat-mini-icon" style="color:var(--pk);background:var(--pk-light);border-color:var(--pk-mid);"><i class="bi bi-exclamation-circle"></i></div>
+          <div>
+            <div class="stat-mini-val">{{ tumor_count }}</div>
+            <div class="stat-mini-label">Tumor Found</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-mini">
+          <div class="stat-mini-icon" style="color:#059669;background:#ecfdf5;border-color:#a7f3d0;"><i class="bi bi-check-circle"></i></div>
+          <div>
+            <div class="stat-mini-val">{{ clear_count }}</div>
+            <div class="stat-mini-label">Clear Scans</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-mini">
+          <div class="stat-mini-icon" style="color:#f59e0b;background:#fffbeb;border-color:#fde68a;"><i class="bi bi-file-earmark-medical"></i></div>
+          <div>
+            <div class="stat-mini-val">{{ report_count }}</div>
+            <div class="stat-mini-label">Reports</div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 
-  {% else %}
-  <div class="cc-card">
-    <div class="empty-state">
-      <div
-        style="width: 90px; height: 90px; margin: 0 auto 1.5rem; border-radius: 50%; overflow: hidden; border: 3px solid white; box-shadow: 0 10px 25px rgba(124, 58, 237, 0.2); animation: floatEmpty 4s ease-in-out infinite alternate;">
-        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot"
-          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);">
+    <!-- Bulk bar -->
+    <div class="bulk-bar" id="bulkBar">
+      <i class="bi bi-trash3-fill" style="color:#dc2626;font-size:16px;"></i>
+      <span class="bulk-count" id="bulkCount">No scans selected</span>
+      <button class="btn-bulk-cancel" onclick="toggleSelectMode()">Cancel</button>
+      <button class="btn-bulk-del" id="btnBulkDel" onclick="confirmBulkDelete()" disabled>
+        <i class="bi bi-trash3"></i> Delete Selected
+      </button>
+    </div>
+
+    <!-- Search & filter -->
+    <form method="GET" action="{{ url_for('scan.history') }}">
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input type="text" name="q" class="search-input" placeholder="Search by date or result…"
+                 value="{{ request.args.get('q','') }}">
+        </div>
+        <select name="result" class="filter-select">
+          <option value="">All Results</option>
+          <option value="tumor"      {% if request.args.get('result')=='tumor'      %}selected{% endif %}>Tumor Detected</option>
+          <option value="notumor"    {% if request.args.get('result')=='notumor'    %}selected{% endif %}>No Tumor</option>
+          <option value="glioma"     {% if request.args.get('result')=='glioma'     %}selected{% endif %}>Glioma</option>
+          <option value="meningioma" {% if request.args.get('result')=='meningioma' %}selected{% endif %}>Meningioma</option>
+          <option value="pituitary"  {% if request.args.get('result')=='pituitary'  %}selected{% endif %}>Pituitary</option>
+        </select>
+        <select name="sort" class="filter-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest" {% if request.args.get('sort')=='oldest' %}selected{% endif %}>Oldest First</option>
+        </select>
+        <button type="submit" class="btn-filter"><i class="bi bi-funnel"></i> Filter</button>
       </div>
-      <h5 style="font-weight:700;">No scans yet</h5>
-      <p style="font-size:15px; color: var(--text-secondary); max-width: 300px; margin: 0 auto 1.5rem;">Upload your
-        first MRI scan and I'll analyze it for you in seconds.</p>
-      <a href="/scan/upload" class="btn-cc-primary">
-        <i class="bi bi-cloud-arrow-up"></i> Upload MRI
+    </form>
+
+    <!-- Scan grid -->
+    {% if scans %}
+    <div class="row g-4" id="scanGrid">
+      {% for scan in scans %}
+      <div class="col-md-6 col-lg-4">
+        <div class="scan-card" id="card-{{ scan.id }}">
+          <input type="checkbox" class="scan-select-cb" id="cb-{{ scan.id }}"
+                 onchange="onCheckboxChange({{ scan.id }})">
+
+          <div class="scan-card-thumb">
+            {% if scan.image_filename %}
+            <img src="{{ url_for('static', filename='uploads/' + scan.image_filename) }}" alt="MRI Scan">
+            {% else %}
+            <div class="scan-card-thumb-placeholder"><i class="bi bi-image"></i></div>
+            {% endif %}
+
+            {% if scan.prediction %}
+              {% if not scan.prediction.has_tumor %}
+              <div class="result-badge rb-clear">✓ Clear</div>
+              {% elif scan.prediction.confidence < 0.5 %}
+              <div class="result-badge rb-low">⚠ Low Confidence</div>
+              {% else %}
+              <div class="result-badge rb-tumor">⚠ Tumor Detected</div>
+              {% endif %}
+            {% endif %}
+          </div>
+
+          <div class="scan-card-body">
+            <div class="scan-date">
+              <i class="bi bi-calendar3"></i>
+              {{ scan.upload_date.strftime('%d %b %Y, %H:%M') if scan.upload_date else 'Unknown date' }}
+              · <span style="opacity:.7;">Scan #{{ scan.id }}</span>
+            </div>
+
+            {% if scan.prediction %}
+              <div class="scan-label">
+                {% if not scan.prediction.has_tumor %}
+                  No Tumor Detected
+                {% elif scan.prediction.tumor_type == 'glioma' %}
+                  <span class="tc-glioma">Glioma</span> Tumor
+                {% elif scan.prediction.tumor_type == 'meningioma' %}
+                  <span class="tc-meningioma">Meningioma</span> Tumor
+                {% elif scan.prediction.tumor_type == 'pituitary' %}
+                  <span class="tc-pituitary">Pituitary</span> Tumor
+                {% else %}
+                  {{ scan.prediction.tumor_type|capitalize if scan.prediction.tumor_type else 'Unknown' }} Tumor
+                {% endif %}
+              </div>
+              <div class="scan-conf">
+                <i class="bi bi-graph-up"></i>
+                Confidence: <strong style="color:#1a0533;">{{ '%.1f'|format(scan.prediction.confidence * 100) }}%</strong>
+              </div>
+              <div class="conf-bar-wrap">
+                <div class="conf-bar" style="width:{{ (scan.prediction.confidence * 100)|round(1) }}%;"></div>
+              </div>
+            {% else %}
+              <div class="scan-label" style="color:#9070b0;">Processing…</div>
+            {% endif %}
+
+            <div class="scan-actions">
+              <a href="{{ url_for('scan.result', scan_id=scan.id) }}" class="btn-sm-view">
+                <i class="bi bi-eye"></i> View
+              </a>
+              {% if scan.prediction and scan.prediction.reports %}
+              <a href="{{ url_for('report.generate', prediction_id=scan.prediction.id) }}" class="btn-sm-report">
+                <i class="bi bi-download"></i> PDF
+              </a>
+              {% endif %}
+              <button class="btn-sm-del"
+                onclick="confirmDelete({{ scan.id }}, '{{ scan.upload_date.strftime('%d %b %Y') if scan.upload_date else 'this scan' }}')">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-orb"><i class="bi bi-images"></i></div>
+      <h3>No scans yet</h3>
+      <p>Upload your first brain MRI scan to see your analysis history here.</p>
+      <a href="{{ url_for('scan.upload') }}" class="btn-upload-now">
+        <i class="bi bi-cloud-arrow-up"></i> Upload Your First Scan
       </a>
     </div>
+    {% endif %}
+
   </div>
-  {% endif %}
+</div>
+
+<!-- Single delete modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="del-modal">
+    <div class="del-modal-icon"><i class="bi bi-trash3-fill"></i></div>
+    <h3>Delete this scan?</h3>
+    <p id="modalDesc">This will permanently remove the scan and all associated data.</p>
+    <div class="del-modal-warn">
+      <i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;flex-shrink:0;margin-top:1px;"></i>
+      <span>This action <strong>cannot be undone</strong>. The MRI image, prediction result, and any PDF reports will be deleted.</span>
+    </div>
+    <div class="del-modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <form id="deleteForm" method="POST" style="flex:1;">
+        <button type="submit" class="btn-modal-confirm" style="width:100%;">
+          <i class="bi bi-trash3"></i> Yes, Delete
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk delete modal -->
+<div class="modal-overlay" id="bulkDeleteModal">
+  <div class="del-modal">
+    <div class="del-modal-icon"><i class="bi bi-trash3-fill"></i></div>
+    <h3 id="bulkModalTitle">Delete selected scans?</h3>
+    <p id="bulkModalDesc">This will permanently delete all selected scans, predictions, and reports.</p>
+    <div class="del-modal-warn">
+      <i class="bi bi-exclamation-triangle-fill" style="color:#f59e0b;flex-shrink:0;margin-top:1px;"></i>
+      <span>This action <strong>cannot be undone</strong>. All selected MRI images, results, and PDF reports will be deleted permanently.</span>
+    </div>
+    <div class="del-modal-actions">
+      <button class="btn-modal-cancel" onclick="closeBulkModal()">Cancel</button>
+      <form id="bulkDeleteForm" method="POST" style="flex:1;">
+        <input type="hidden" name="scan_ids" id="bulkIdsInput" value="">
+        <button type="submit" class="btn-modal-confirm" style="width:100%;">
+          <i class="bi bi-trash3"></i> Yes, Delete All
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  const searchInput = document.getElementById('searchInput');
-  const filterSelect = document.getElementById('filterResult');
-  const filterCount = document.getElementById('filterCount');
-  const noResults = document.getElementById('noResults');
+// ── Use url_for to build correct URLs regardless of blueprint prefix ──
+const URL_DELETE_BASE = "{{ url_for('scan.delete_scan', scan_id=0) }}".replace('/0', '/');
+const URL_BULK_DELETE = "{{ url_for('scan.delete_scans_bulk') }}";
 
-  function applyFilters() {
-    const query = searchInput.value.toLowerCase().trim();
-    const filter = filterSelect.value;
-    const rows = document.querySelectorAll('.history-row');
-    let visible = 0;
+// Set bulk form action immediately
+document.getElementById('bulkDeleteForm').action = URL_BULK_DELETE;
 
-    rows.forEach(row => {
-      const id = row.dataset.id;
-      const date = row.dataset.date.toLowerCase();
-      const result = row.dataset.result;
+let selectMode  = false;
+let selectedIds = new Set();
 
-      const matchSearch = !query || id.includes(query) || date.includes(query);
-      const matchFilter = filter === 'all' || result === filter;
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  const grid   = document.getElementById('scanGrid');
+  const bar    = document.getElementById('bulkBar');
+  const btnSel = document.getElementById('btnSelectMode');
 
-      if (matchSearch && matchFilter) {
-        row.classList.remove('hidden');
-        visible++;
-      } else {
-        row.classList.add('hidden');
-      }
-    });
-
-    filterCount.textContent = visible + ' scan' + (visible !== 1 ? 's' : '') + ' shown';
-    noResults.classList.toggle('hidden', visible > 0);
-    document.getElementById('historyList').classList.toggle('hidden', visible === 0);
+  if (selectMode) {
+    grid.classList.add('select-mode');
+    bar.classList.add('show');
+    btnSel.innerHTML = '<i class="bi bi-x-lg"></i> Cancel';
+    btnSel.style.cssText += ';border-color:#9ca3af;color:#374151;';
+  } else {
+    grid.classList.remove('select-mode');
+    bar.classList.remove('show');
+    btnSel.innerHTML = '<i class="bi bi-check2-square"></i> Select';
+    btnSel.style.cssText += ';border-color:#fecaca;color:#dc2626;';
+    selectedIds.clear();
+    document.querySelectorAll('.scan-select-cb').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.scan-card').forEach(c => c.classList.remove('selected'));
+    updateBulkBar();
   }
+}
 
-  function clearFilters() {
-    searchInput.value = '';
-    filterSelect.value = 'all';
-    applyFilters();
-  }
+function onCheckboxChange(scanId) {
+  const cb   = document.getElementById('cb-' + scanId);
+  const card = document.getElementById('card-' + scanId);
+  if (cb.checked) { selectedIds.add(scanId);    card.classList.add('selected'); }
+  else            { selectedIds.delete(scanId); card.classList.remove('selected'); }
+  updateBulkBar();
+}
 
-  searchInput.addEventListener('input', applyFilters);
-  filterSelect.addEventListener('change', applyFilters);
+function updateBulkBar() {
+  const n = selectedIds.size;
+  document.getElementById('bulkCount').textContent =
+    n === 0 ? 'No scans selected' : n === 1 ? '1 scan selected' : n + ' scans selected';
+  document.getElementById('btnBulkDel').disabled = n === 0;
+}
 
-  // Init count
-  applyFilters();
+// ── Single delete ──
+function confirmDelete(scanId, scanDate) {
+  document.getElementById('modalDesc').textContent =
+    `Scan from ${scanDate} — this will permanently delete the image, prediction, and any reports.`;
+  document.getElementById('deleteForm').action = URL_DELETE_BASE + scanId;
+  document.getElementById('deleteModal').classList.add('show');
+}
+function closeModal() { document.getElementById('deleteModal').classList.remove('show'); }
+
+// ── Bulk delete ──
+function confirmBulkDelete() {
+  if (selectedIds.size === 0) return;
+  const n = selectedIds.size;
+  document.getElementById('bulkModalTitle').textContent = `Delete ${n} scan${n > 1 ? 's' : ''}?`;
+  document.getElementById('bulkModalDesc').textContent =
+    `You are about to permanently delete ${n} scan${n > 1 ? 's' : ''} and all their data.`;
+  document.getElementById('bulkIdsInput').value = Array.from(selectedIds).join(',');
+  document.getElementById('bulkDeleteModal').classList.add('show');
+}
+function closeBulkModal() { document.getElementById('bulkDeleteModal').classList.remove('show'); }
+
+// Close on overlay click or Escape
+document.getElementById('deleteModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
+document.getElementById('bulkDeleteModal').addEventListener('click', e => { if (e.target===e.currentTarget) closeBulkModal(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal(); closeBulkModal(); } });
 </script>
 {% endblock %}

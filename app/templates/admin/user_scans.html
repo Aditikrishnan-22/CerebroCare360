@@ -6,7 +6,7 @@
 
   <!-- Header -->
   <div class="d-flex align-items-center gap-3 mb-4">
-    <a href="/admin/dashboard" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
+    <a href="{{ url_for('admin.dashboard') }}" class="btn-cc-secondary py-2 px-3" style="font-size:13px;">
       <i class="bi bi-arrow-left"></i> Back to Admin
     </a>
     <div>
@@ -41,7 +41,7 @@
             <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Date</th>
             <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Result</th>
             <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Confidence</th>
-            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Action</th>
+            <th style="padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--surface-2);">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -69,8 +69,8 @@
               </span>
             </td>
             <td style="padding:12px 16px;">
-              {% if scan.predictions %}
-                {% set pred = scan.predictions[0] %}
+              {% if scan.prediction %}
+                {% set pred = scan.prediction %}
                 {% if pred.has_tumor %}
                   <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background:#fee2e2;color:#dc2626;">
                     <i class="bi bi-exclamation-circle" style="font-size:10px;"></i>
@@ -87,8 +87,8 @@
               {% endif %}
             </td>
             <td style="padding:12px 16px;">
-              {% if scan.predictions %}
-                {% set pred = scan.predictions[0] %}
+              {% if scan.prediction %}
+                {% set pred = scan.prediction %}
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div style="width:70px;height:6px;background:var(--border);border-radius:4px;overflow:hidden;">
                     <div style="width:{{ (pred.confidence * 100)|round }}%;height:100%;border-radius:4px;
@@ -101,15 +101,23 @@
               {% else %}—{% endif %}
             </td>
             <td style="padding:12px 16px;">
-              {% if scan.predictions %}
-              <a href="/scan/result/{{ scan.predictions[0].id }}"
-                 style="padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;
-                        border:1.5px solid var(--primary);color:var(--primary);
-                        background:var(--primary-light);text-decoration:none;
-                        display:inline-flex;align-items:center;gap:4px;">
-                <i class="bi bi-eye"></i> View
-              </a>
-              {% endif %}
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <a href="{{ url_for('admin.view_scan', scan_id=scan.id) }}"
+                   style="padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;
+                          border:1.5px solid #7c3aed;color:#7c3aed;background:#f5f3ff;
+                          text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                  <i class="bi bi-shield-check"></i> Detail
+                </a>
+                <form method="POST" action="{{ url_for('admin.delete_scan', scan_id=scan.id) }}"
+                      onsubmit="return confirm('Delete Scan #{{ scan.id }}? This cannot be undone.')">
+                  <button type="submit"
+                    style="padding:5px 11px;border-radius:7px;font-size:12px;font-weight:600;
+                           border:1.5px solid #dc2626;color:#dc2626;background:#fef2f2;
+                           cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </form>
+              </div>
             </td>
           </tr>
           {% endfor %}

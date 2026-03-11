@@ -4,10 +4,11 @@ from app.blueprints.chat import chat_bp
 from flask import current_app
 from groq import Groq
 from app.models.mri_scan import MRIScan
-from app.models.prediction import Prediction
+from app.models.chat_session import ChatSession, ChatMessage
+from app.extensions import db
 
 
-def build_system_prompt(scan_context: dict = None) -> str:
+def build_system_prompt(all_scans):
     base = """You are CerebroBot, a helpful medical information assistant
 for CerebroCare360 — an AI-powered brain tumor detection platform.
 
@@ -29,101 +30,126 @@ Important rules:
 
 CRITICAL — IMAGE ACCESS LIMITATION:
 - You CANNOT see or analyse any MRI scan image. You do NOT have image-viewing capability.
-- If a user asks you to "look at", "check", or "analyse" their scan image, clearly explain
-  you cannot see images, but you CAN discuss the result data the platform has shared with you.
-- Never pretend to analyse an image. Direct users to their Results page for visual output.
+- If asked to look at or analyse a scan image, clarify you cannot see images but CAN
+  discuss the result data provided below.
+- You CAN reference any scan by its Scan ID when the user asks about it.
 """
 
-    if not scan_context or not scan_context.get('hasScan'):
-        base += """
-USER SCAN STATUS: This user has not uploaded any MRI scan yet.
-If they ask about results, guide them to upload a scan first.
-"""
+    if not all_scans:
+        base += "\nUSER SCAN HISTORY: This user has not uploaded any MRI scans yet.\n"
         return base
 
-    has_tumor   = scan_context.get('hasTumor', False)
-    tumor_type  = scan_context.get('tumorType', 'Unknown')
-    confidence  = scan_context.get('confidence', 0)
-    scan_date   = scan_context.get('scanDate', '')
-    p_glioma    = scan_context.get('probGlioma', 0)
-    p_mening    = scan_context.get('probMeningioma', 0)
-    p_pituitary = scan_context.get('probPituitary', 0)
-    p_notumor   = scan_context.get('probNotumor', 0)
+    base += f"\nUSER SCAN HISTORY ({len(all_scans)} total scans — reference any by Scan ID):\n"
+    base += "-" * 60 + "\n"
 
-    result_str = f"Tumor detected — {tumor_type}" if has_tumor else "No tumor detected"
-    conf_note  = (
-        f"High confidence ({confidence}%) — but always stress AI results are not a clinical diagnosis."
-        if confidence >= 75 else
-        f"Moderate confidence ({confidence}%) — emphasise the importance of specialist review."
-    )
-    edu_note = (
-        f"Explain what {tumor_type} means educationally, typical symptoms, and that specialist review is essential."
-        if has_tumor else
-        "Reassure the user appropriately. Note that a clear result does not rule out all conditions — "
-        "if they have symptoms, they should still see a neurologist."
-    )
+    for scan in all_scans:
+        p        = scan.prediction
+        date_str = scan.upload_date.strftime('%d %b %Y') if scan.upload_date else 'Unknown'
 
-    base += f"""
-USER'S LATEST SCAN RESULT (from the platform AI model — you did NOT see the image):
-- Scan date: {scan_date}
-- Result: {result_str}
-- Confidence: {confidence}%
-- Class probabilities: Glioma {p_glioma}% | Meningioma {p_mening}% | Pituitary {p_pituitary}% | No Tumor {p_notumor}%
+        if not p:
+            base += f"Scan ID #{scan.id} | Date: {date_str} | Status: No prediction yet\n"
+            continue
 
-When discussing this result:
-- Make clear this data came from the CerebroCare360 AI model, not from you viewing the scan.
-- {edu_note}
-- {conf_note}
-"""
+        if p.has_tumor:
+            result_str = f"TUMOR DETECTED — {p.tumor_type.capitalize() if p.tumor_type else 'Unknown'}"
+            probs = (f"Glioma={p.prob_glioma*100:.1f}% "
+                     f"Meningioma={p.prob_meningioma*100:.1f}% "
+                     f"Pituitary={p.prob_pituitary*100:.1f}% "
+                     f"NoTumor={p.prob_notumor*100:.1f}%")
+        else:
+            result_str = "NO TUMOR DETECTED"
+            probs = (f"NoTumor={p.prob_notumor*100:.1f}% "
+                     f"Glioma={p.prob_glioma*100:.1f}% "
+                     f"Meningioma={p.prob_meningioma*100:.1f}% "
+                     f"Pituitary={p.prob_pituitary*100:.1f}%")
+
+        base += (f"Scan ID #{scan.id} | Date: {date_str} | Result: {result_str} | "
+                 f"Confidence: {p.confidence*100:.1f}% | Probs: {probs} | "
+                 f"Model: {p.model_version}\n")
+
+    base += "-" * 60 + "\n"
+    base += (f"When the user asks about a specific scan (e.g. 'scan 5', 'my second scan'), "
+             f"refer to the matching Scan ID above and discuss that result specifically.\n"
+             f"The LATEST scan is Scan ID #{all_scans[0].id}.\n")
+
     return base
 
 
 @chat_bp.route('/chat')
 @login_required
 def index():
+    # New session per page visit
+    session = ChatSession(user_id=current_user.id)
+    db.session.add(session)
+    db.session.commit()
+
     latest_scan = (MRIScan.query
                    .filter_by(user_id=current_user.id)
                    .order_by(MRIScan.upload_date.desc())
                    .first())
 
-    latest_prediction = None
-    if latest_scan:
-        latest_prediction = (Prediction.query
-                             .filter_by(scan_id=latest_scan.id)
-                             .filter(Prediction.model_version != 'pending')
-                             .first())
-
     return render_template(
         'chat/index.html',
+        session_id=session.id,
         latest_scan=latest_scan,
-        latest_prediction=latest_prediction
+        latest_prediction=latest_scan.prediction if latest_scan else None
     )
 
 
 @chat_bp.route('/chat/send', methods=['POST'])
 @login_required
 def send():
-    data         = request.get_json()
-    messages     = data.get('messages', [])
-    scan_context = data.get('scan_context', {})
+    data       = request.get_json()
+    user_msg   = data.get('message', '').strip()
+    session_id = data.get('session_id')
 
-    if not messages:
-        return jsonify({'error': 'No messages provided'}), 400
+    if not user_msg:
+        return jsonify({'error': 'Empty message'}), 400
+
+    session = ChatSession.query.filter_by(
+        id=session_id, user_id=current_user.id
+    ).first()
+
+    if not session:
+        return jsonify({'error': 'Invalid session'}), 400
+
+    # Save user message
+    db.session.add(ChatMessage(session_id=session.id, role='user', content=user_msg))
+    db.session.commit()
+
+    # Last 10 messages chronologically
+    recent = (ChatMessage.query
+              .filter_by(session_id=session.id)
+              .order_by(ChatMessage.created_at.desc())
+              .limit(10)
+              .all())
+    recent = list(reversed(recent))
+
+    groq_messages = [{'role': m.role, 'content': m.content} for m in recent]
+
+    # All user scans for system prompt
+    all_scans = (MRIScan.query
+                 .filter_by(user_id=current_user.id)
+                 .order_by(MRIScan.upload_date.desc())
+                 .all())
 
     try:
         client = Groq(api_key=current_app.config['GROQ_API_KEY'])
-
         response = client.chat.completions.create(
             model='llama-3.1-8b-instant',
             messages=[
-                {'role': 'system', 'content': build_system_prompt(scan_context)},
-                *messages
+                {'role': 'system', 'content': build_system_prompt(all_scans)},
+                *groq_messages
             ],
             max_tokens=600,
             temperature=0.7
         )
-
         reply = response.choices[0].message.content
+
+        # Save bot reply
+        db.session.add(ChatMessage(session_id=session.id, role='assistant', content=reply))
+        db.session.commit()
+
         return jsonify({'reply': reply})
 
     except Exception as e:
