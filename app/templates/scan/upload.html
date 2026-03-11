@@ -198,11 +198,234 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
+  /* ── Ambient Side Structures ───────────────────────────────────────────── */
+  .ambient-side-wrapper {
+    position: absolute;
+    top: 100px;
+    width: 380px;
+    height: 500px;
+    z-index: 0;
+    pointer-events: none;
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .ambient-side-wrapper { display: block; }
+  }
+
+  .ambient-left {
+    left: 0;
+  }
+
+  .ambient-right {
+    right: 0;
+  }
+
+  .abs-float {
+    position: absolute;
+    filter: blur(1px);
+  }
+
+  /* Left Side: Advanced Neural Network Concept */
+  .neural-system {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%; height: 100%;
+  }
+
+  .neural-blob-1 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 60%);
+    top: 5%; left: 0%;
+    border-radius: 50%;
+    animation: floatAmbient 10s ease-in-out infinite alternate;
+  }
+
+  .neural-blob-2 {
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(219, 39, 119, 0.08) 0%, transparent 65%);
+    bottom: 0%; left: 20%;
+    border-radius: 50%;
+    animation: floatAmbient 12s ease-in-out infinite alternate-reverse;
+  }
+
+  .neural-core {
+    position: absolute;
+    top: 45%; left: 42%;
+    width: 60px; height: 60px;
+    background: var(--gradient);
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.6), inset 0 0 15px rgba(255, 255, 255, 0.5);
+    animation: corePulse 4s ease-in-out infinite alternate;
+    z-index: 2;
+  }
+
+  .neural-node {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+    border: 2px solid var(--primary);
+    z-index: 2;
+    animation: nodeFloat 6s ease-in-out infinite alternate;
+  }
+  
+  .node-a { width: 18px; height: 18px; top: 18%; left: 23%; animation-delay: 0s; }
+  .node-b { width: 14px; height: 14px; top: 25%; left: 75%; animation-delay: 1s; border-color: var(--accent); box-shadow: 0 0 15px rgba(219, 39, 119, 0.5); }
+  .node-c { width: 22px; height: 22px; top: 75%; left: 25%; animation-delay: 2s; }
+  .node-d { width: 12px; height: 12px; top: 65%; left: 80%; animation-delay: 3s; border-color: var(--accent); box-shadow: 0 0 15px rgba(219, 39, 119, 0.5); }
+  .node-e { width: 16px; height: 16px; top: 85%; left: 55%; animation-delay: 0.5s; }
+
+  .neural-path {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.5), rgba(219, 39, 119, 0.5));
+    transform-origin: 0% 50%;
+    z-index: 1;
+    opacity: 0.6;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
+  }
+
+  .path-1 { top: 51%; left: 49%; width: 140px; transform: rotate(-130deg); animation: pathGlow 3s infinite alternate 0s; }
+  .path-2 { top: 51%; left: 49%; width: 120px; transform: rotate(-35deg); animation: pathGlow 3s infinite alternate 1s; }
+  .path-3 { top: 51%; left: 49%; width: 135px; transform: rotate(135deg); animation: pathGlow 3s infinite alternate 2s; }
+  .path-4 { top: 51%; left: 49%; width: 130px; transform: rotate(20deg); animation: pathGlow 3s infinite alternate 0.5s; }
+  .path-5 { top: 51%; left: 49%; width: 170px; transform: rotate(75deg); animation: pathGlow 3s infinite alternate 1.5s; }
+  
+  .path-6 { top: 20%; left: 26%; width: 180px; transform: rotate(8deg); height: 1px; opacity: 0.3; }
+  .path-7 { top: 78%; left: 28%; width: 110px; transform: rotate(-10deg); height: 1px; opacity: 0.3; }
+
+  .data-spark {
+    position: absolute;
+    top: -2px; left: 0;
+    width: 6px; height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--primary);
+    animation: sparkTravel 3s linear infinite;
+  }
+  .delay-1 { animation-delay: 1s; }
+  .delay-2 { animation-delay: 2s; }
+  .delay-3 { animation-delay: 1.5s; background: var(--accent-light); box-shadow: 0 0 10px #fff, 0 0 20px var(--accent); }
+
+  /* Right Side: Cloud / Upload Scan Concept */
+  .scan-blob-1 {
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, transparent 70%);
+    top: 15%; right: 5%;
+    border-radius: 50%;
+    animation: floatAmbient 8s ease-in-out infinite alternate;
+  }
+
+  .scan-ring {
+    position: absolute;
+    top: 25%; right: 20%;
+    width: 180px; height: 180px;
+    border: 2px dashed rgba(124, 58, 237, 0.15);
+    border-radius: 50%;
+    animation: spinRing 20s linear infinite;
+  }
+
+  .scan-ring-2 {
+    position: absolute;
+    top: 31%; right: 26%;
+    width: 130px; height: 130px;
+    border: 2px solid rgba(219, 39, 119, 0.1);
+    border-radius: 50%;
+    animation: spinRing 15s linear infinite reverse;
+  }
+
+  .scan-scanner {
+    position: absolute;
+    top: 31%; right: 26%;
+    width: 130px; height: 3px;
+    background: rgba(124, 58, 237, 0.4);
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0.6);
+    border-radius: 4px;
+    animation: scanMove 3.5s ease-in-out infinite alternate;
+  }
+
+  .scan-icon-bg {
+    position: absolute;
+    top: 41%; right: 34%;
+    font-size: 50px;
+    color: rgba(124, 58, 237, 0.15);
+    animation: floatAmbient 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes floatAmbient {
+    from { transform: translateY(0px) scale(1); }
+    to { transform: translateY(-25px) scale(1.05); }
+  }
+
+  @keyframes corePulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 20px rgba(124, 58, 237, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.3); }
+    100% { transform: scale(1.1); box-shadow: 0 0 40px rgba(124, 58, 237, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.8); }
+  }
+
+  @keyframes nodeFloat {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(10px, -15px); }
+  }
+
+  @keyframes pathGlow {
+    0% { opacity: 0.3; filter: brightness(0.8); }
+    100% { opacity: 0.8; filter: brightness(1.3); box-shadow: 0 0 12px rgba(219, 39, 119, 0.6); }
+  }
+
+  @keyframes sparkTravel {
+    0% { left: 0%; opacity: 0; transform: scale(0.5); }
+    10% { opacity: 1; transform: scale(1); }
+    90% { opacity: 1; transform: scale(1); }
+    100% { left: 100%; opacity: 0; transform: scale(0.5); }
+  }
+
+  @keyframes spinRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes scanMove {
+    from { transform: translateY(0px); opacity: 0.8; }
+    to { transform: translateY(130px); opacity: 0.1; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container" style="max-width:960px;">
+<!-- Ambient Side Structures -->
+<div class="ambient-side-wrapper ambient-left">
+  <div class="abs-float neural-blob-1"></div>
+  <div class="abs-float neural-blob-2"></div>
+  <div class="neural-system">
+    <div class="neural-path path-1"><div class="data-spark"></div></div>
+    <div class="neural-path path-2"><div class="data-spark delay-1"></div></div>
+    <div class="neural-path path-3"><div class="data-spark delay-2"></div></div>
+    <div class="neural-path path-4"><div class="data-spark delay-3"></div></div>
+    <div class="neural-path path-5"><div class="data-spark"></div></div>
+    <div class="neural-path path-6"></div>
+    <div class="neural-path path-7"></div>
+    <div class="neural-core"></div>
+    <div class="neural-node node-a"></div>
+    <div class="neural-node node-b"></div>
+    <div class="neural-node node-c"></div>
+    <div class="neural-node node-d"></div>
+    <div class="neural-node node-e"></div>
+  </div>
+</div>
+
+<div class="ambient-side-wrapper ambient-right">
+  <div class="abs-float scan-blob-1"></div>
+  <div class="scan-ring"></div>
+  <div class="scan-ring-2"></div>
+  <div class="scan-scanner"></div>
+  <div class="scan-icon-bg"><i class="bi bi-cloud-arrow-up"></i></div>
+</div>
+
+<div class="container" style="max-width:960px; position:relative; z-index:10;">
   <div class="mb-4">
     <h1 class="cc-section-title"><i class="bi bi-cloud-arrow-up title-highlight" style="margin-right: 8px;"></i> Upload
       <span class="title-highlight">MRI Scan</span>

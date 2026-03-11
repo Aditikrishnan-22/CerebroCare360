@@ -224,6 +224,62 @@
     0%,100% { opacity: 1; } 50% { opacity: 0.3; }
   }
 
+  /* ── New Advanced Background Orbits & Nodes ── */
+  .hero-orbit {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-orbit.inner {
+    width: 380px; height: 380px;
+    border: 1px dashed rgba(124, 58, 237, 0.2);
+    animation: spinOrbit 25s linear infinite;
+  }
+
+  .hero-orbit.outer {
+    width: 520px; height: 520px;
+    border: 1px solid rgba(219, 39, 119, 0.1);
+    animation: spinOrbit 35s linear infinite reverse;
+  }
+
+  @keyframes spinOrbit {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .orbit-node {
+    position: absolute;
+    background: var(--gradient);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+  }
+  .orbit-node.n1 { width: 8px; height: 8px; top: 10%; left: 15%; animation: blinkDot 3s infinite; }
+  .orbit-node.n2 { width: 12px; height: 12px; bottom: 20%; right: 10%; background: var(--pk); box-shadow: 0 0 10px rgba(219, 39, 119, 0.5); animation: blinkDot 2s infinite 1s; }
+  .orbit-node.n3 { width: 6px; height: 6px; top: 40%; right: -5%; animation: blinkDot 4s infinite 0.5s; }
+
+  /* Connecting Neural Lines */
+  .hero-connection {
+    position: absolute;
+    top: 50%; left: 50%;
+    height: 1.5px;
+    background: linear-gradient(90deg, rgba(124, 58, 237, 0.5), transparent);
+    transform-origin: 0 50%;
+    z-index: 1;
+  }
+  .conn-1 { width: 180px; transform: rotate(-35deg); animation: drawLine 4s infinite; }
+  .conn-2 { width: 150px; transform: rotate(145deg); animation: drawLine 3s infinite 1s; }
+  .conn-3 { width: 160px; transform: rotate(45deg); animation: drawLine 5s infinite 2s; }
+
+  @keyframes drawLine {
+    0% { opacity: 0; width: 0; }
+    50% { opacity: 0.8; width: 180px; }
+    100% { opacity: 0; width: 180px; border-image: linear-gradient(90deg, transparent, rgba(124,58,237,0.5)) 1; }
+  }
+
   /* floating chips */
   .floating-chip {
     position: absolute;
@@ -605,6 +661,20 @@
       <div class="col-lg-6 d-none d-lg-block">
         <div class="hero-visual">
           <div class="mri-glow"></div>
+
+          <!-- New Orbital Background -->
+          <div class="hero-orbit inner">
+            <div class="orbit-node n1"></div>
+          </div>
+          <div class="hero-orbit outer">
+            <div class="orbit-node n2"></div>
+            <div class="orbit-node n3"></div>
+          </div>
+
+          <!-- New Neural Connections -->
+          <div class="hero-connection conn-1"></div>
+          <div class="hero-connection conn-2"></div>
+          <div class="hero-connection conn-3"></div>
 
           <!-- Floating medical icons -->
           <div class="med-icon mi-1"><i class="bi bi-heart-pulse-fill"></i></div>

@@ -726,11 +726,205 @@
     color: var(--text-muted);
     margin-bottom: 0.75rem;
   }
+
+  /* ── Ambient Side Structures ───────────────────────────────────────────── */
+  .ambient-side-wrapper {
+    position: absolute;
+    top: 100px;
+    width: 380px;
+    height: 500px;
+    z-index: 0;
+    pointer-events: none;
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .ambient-side-wrapper { display: block; }
+  }
+
+  .ambient-left {
+    left: 0;
+  }
+
+  .ambient-right {
+    right: 0;
+    top: 150px;
+  }
+
+  .abs-float {
+    position: absolute;
+    filter: blur(1px);
+  }
+
+  /* Left Side: Pulse & Health */
+  .pulse-blob-1 {
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.08) 0%, transparent 65%);
+    top: 25%; left: 10%;
+    border-radius: 50%;
+    animation: floatPulse 8s ease-in-out infinite alternate;
+  }
+
+  .pulse-blob-2 {
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(219, 39, 119, 0.06) 0%, transparent 65%);
+    top: 60%; left: 45%;
+    border-radius: 50%;
+    animation: floatPulse 10s ease-in-out infinite alternate-reverse;
+  }
+  
+  .ecg-line {
+    position: absolute;
+    top: 35%; left: 0%;
+    width: 100%; height: 120px;
+    opacity: 0.6;
+    animation: floatPulse 6s ease-in-out infinite alternate;
+  }
+  
+  .ecg-path {
+    stroke: url(#ecgGrad);
+    stroke-width: 3.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawEcg 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .medical-cross-1 {
+    position: absolute;
+    top: 20%; left: 60%;
+    width: 40px; height: 40px;
+    opacity: 0.4;
+    animation: floatCross 6s ease-in-out infinite alternate;
+  }
+  .medical-cross-1::before, .medical-cross-1::after {
+    content: '';
+    position: absolute;
+    background: var(--gradient);
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(219, 39, 119, 0.3);
+  }
+  .medical-cross-1::before { width: 10px; height: 40px; top: 0; left: 15px; }
+  .medical-cross-1::after { width: 40px; height: 10px; top: 15px; left: 0; }
+
+  /* Right Side: Shield & Scan */
+  .shield-blob-1 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.07) 0%, transparent 70%);
+    top: 15%; right: 5%;
+    border-radius: 50%;
+    animation: floatPulse 9s ease-in-out infinite alternate;
+  }
+
+  .scan-radar {
+    position: absolute;
+    top: 25%; right: 25%;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    box-shadow: 0 0 25px rgba(124, 58, 237, 0.08);
+    background: repeating-radial-gradient(
+      circle at center,
+      transparent 0,
+      transparent 25px,
+      rgba(124, 58, 237, 0.06) 26px,
+      rgba(124, 58, 237, 0.06) 27px
+    );
+    animation: floatPulse 10s ease-in-out infinite alternate-reverse;
+  }
+  
+  .radar-sweep {
+    position: absolute;
+    top: 0; left: 50%;
+    width: 50%; height: 50%;
+    background: linear-gradient(35deg, transparent 40%, rgba(219, 39, 119, 0.15) 100%);
+    transform-origin: 0% 100%;
+    border-right: 1.5px solid rgba(219, 39, 119, 0.25);
+    animation: radarSweep 4s linear infinite;
+  }
+  
+  .radar-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--primary);
+  }
+
+  .medical-cross-2 {
+    position: absolute;
+    top: 15%; right: 65%;
+    width: 26px; height: 26px;
+    opacity: 0.3;
+    animation: floatCross 5s ease-in-out infinite alternate-reverse;
+  }
+  .medical-cross-2::before, .medical-cross-2::after {
+    content: '';
+    position: absolute;
+    background: var(--gradient);
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+  }
+  .medical-cross-2::before { width: 8px; height: 26px; top: 0; left: 9px; }
+  .medical-cross-2::after { width: 26px; height: 8px; top: 9px; left: 0; }
+
+  @keyframes floatPulse {
+    0% { transform: translateY(0px) scale(1); }
+    100% { transform: translateY(-20px) scale(1.03); }
+  }
+
+  @keyframes floatCross {
+    0% { transform: translateY(0px) rotate(-10deg); opacity: 0.2; }
+    100% { transform: translateY(15px) rotate(15deg); opacity: 0.6; }
+  }
+  
+  @keyframes radarSweep {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes drawEcg {
+    0% { stroke-dashoffset: 1000; opacity: 1; }
+    60% { stroke-dashoffset: 0; opacity: 1; }
+    80% { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="checker-wrap">
+<!-- Ambient Side Structures -->
+<div class="ambient-side-wrapper ambient-left">
+  <div class="abs-float pulse-blob-1"></div>
+  <div class="abs-float pulse-blob-2"></div>
+  <div class="medical-cross-1"></div>
+  <svg class="ecg-line" viewBox="0 0 380 120" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="ecgGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="rgba(124, 58, 237, 0)" />
+        <stop offset="20%" stop-color="rgba(124, 58, 237, 0.7)" />
+        <stop offset="70%" stop-color="rgba(219, 39, 119, 0.9)" />
+        <stop offset="100%" stop-color="rgba(219, 39, 119, 0)" />
+      </linearGradient>
+    </defs>
+    <path class="ecg-path" d="M0,60 L80,60 L100,20 L130,105 L150,60 L240,60 L250,45 L260,75 L270,60 L380,60" />
+  </svg>
+</div>
+
+<div class="ambient-side-wrapper ambient-right">
+  <div class="abs-float shield-blob-1"></div>
+  <div class="medical-cross-2"></div>
+  <div class="scan-radar">
+    <div class="radar-sweep"></div>
+    <div class="radar-center"></div>
+  </div>
+</div>
+
+<div class="checker-wrap" style="position:relative; z-index:10;">
 
   <div class="mb-4 d-flex align-items-center gap-3">
     <div
