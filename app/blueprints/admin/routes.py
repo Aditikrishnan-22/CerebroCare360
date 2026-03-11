@@ -2,13 +2,12 @@ from flask import render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from functools import wraps
 from app.blueprints.admin import admin_bp
-from app.extensions import db
+from app.extensions import db, bcrypt
 from app.models.hospital import Hospital
 from app.models.user import User
 from app.models.mri_scan import MRIScan
 from app.models.prediction import Prediction
 from app.models.report import Report
-from werkzeug.security import generate_password_hash
 from app.models.password_reset_request import PasswordResetRequest
 import os
 from flask import current_app
@@ -191,6 +190,11 @@ def delete_user(user_id):
         flash('You cannot delete your own account.', 'warning')
         return redirect(url_for('admin.dashboard'))
     name = user.full_name
+    
+    # Delete related password reset requests to avoid NOT NULL constraint errors
+    from app.models.password_reset_request import PasswordResetRequest
+    PasswordResetRequest.query.filter_by(user_id=user.id).delete()
+    
     db.session.delete(user)
     db.session.commit()
     flash(f'User "{name}" deleted.', 'success')
@@ -220,7 +224,7 @@ def reset_password(user_id):
         flash('Password must be at least 6 characters.', 'danger')
         return redirect(url_for('admin.dashboard'))
 
-    user.password_hash = generate_password_hash(new_pass)
+    user.password_hash = bcrypt.generate_password_hash(new_pass).decode('utf-8')
     db.session.commit()
     flash(f'Password for {user.full_name} has been reset successfully.', 'success')
     return redirect(url_for('admin.dashboard'))
@@ -330,8 +334,6 @@ def delete_scan(scan_id):
 from app.models.password_reset_request import PasswordResetRequest
 from app.extensions import mail
 from flask_mail import Message
-from werkzeug.security import generate_password_hash
-from app.models.password_reset_request import PasswordResetRequest
 import random, string
 from datetime import datetime
 
@@ -440,7 +442,7 @@ def resolve_reset_request(req_id):
     temp_pass = _generate_temp_password()
 
     # Update user password
-    req.user.password_hash = generate_password_hash(temp_pass)
+    req.user.password_hash = bcrypt.generate_password_hash(temp_pass).decode('utf-8')
 
     # Update request record
     req.status       = 'resolved'

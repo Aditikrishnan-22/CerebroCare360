@@ -144,6 +144,7 @@
   .btn-close-modal:hover { background: var(--surface-2); }
   .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 560px) { .form-grid-2 { grid-template-columns: 1fr; } }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.6;} }
 </style>
 {% endblock %}
 
@@ -216,6 +217,11 @@
     <button class="admin-tab-btn" onclick="switchTab('users', this)">
       <i class="bi bi-people"></i> Users
       <span style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:1px 7px;font-size:11px;">{{ users|length }}</span>
+      {% if stats.pending_resets > 0 %}
+      <span style="background:#dc2626;color:white;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700;animation:pulse 2s infinite;">
+        {{ stats.pending_resets }} reset{{ 's' if stats.pending_resets != 1 }}
+      </span>
+      {% endif %}
     </button>
   </div>
 
@@ -322,6 +328,101 @@
   <!-- TAB: USERS                                                 -->
   <!-- ══════════════════════════════════════════════════════════ -->
   <div id="tab-users" class="tab-panel">
+
+    <!-- ── PENDING RESET REQUESTS ── -->
+    {% if reset_requests %}
+    <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+        <div style="width:36px;height:36px;background:#fef3c7;border:1px solid #fde68a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#d97706;">
+          <i class="bi bi-key-fill"></i>
+        </div>
+        <div>
+          <div style="font-weight:700;color:#1a0533;font-size:14.5px;">
+            Password Reset Requests
+            <span style="background:#dc2626;color:white;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;margin-left:6px;">
+              {{ reset_requests|length }} pending
+            </span>
+          </div>
+          <div style="font-size:12px;color:#9070b0;">Users waiting for a temporary password</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        {% for req in reset_requests %}
+        <div style="background:white;border:1px solid #fde68a;border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+
+          <!-- User avatar -->
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#db2777);color:white;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;">
+            {{ req.user.full_name[0]|upper }}
+          </div>
+
+          <!-- Info -->
+          <div style="flex:1;min-width:180px;">
+            <div style="font-weight:700;color:#1a0533;font-size:13.5px;">{{ req.user.full_name }}</div>
+            <div style="font-size:12px;color:#9070b0;">{{ req.user.email }}</div>
+            {% if req.reason %}
+            <div style="font-size:12.5px;color:#5b4f72;margin-top:4px;background:#fffbeb;border-radius:6px;padding:5px 10px;border-left:3px solid #fde68a;">
+              "{{ req.reason }}"
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Time -->
+          <div style="font-size:12px;color:#9070b0;white-space:nowrap;">
+            <i class="bi bi-clock"></i>
+            {{ req.requested_at.strftime('%d %b %Y, %H:%M') }}
+          </div>
+
+          <!-- Actions -->
+          <div style="display:flex;gap:8px;">
+            <form method="POST" action="{{ url_for('admin.resolve_reset_request', req_id=req.id) }}"
+                  onsubmit="return confirm('Approve reset for {{ req.user.full_name }}? A temporary password will be generated and emailed to {{ req.user.email }}.')">
+              <button type="submit"
+                style="padding:7px 16px;border-radius:8px;font-size:12.5px;font-weight:700;
+                       background:#059669;color:white;border:none;cursor:pointer;
+                       font-family:inherit;display:inline-flex;align-items:center;gap:6px;">
+                <i class="bi bi-check-lg"></i> Approve & Email
+              </button>
+            </form>
+            <form method="POST" action="{{ url_for('admin.reject_reset_request', req_id=req.id) }}"
+                  onsubmit="return confirm('Reject reset request from {{ req.user.full_name }}?')">
+              <button type="submit"
+                style="padding:7px 14px;border-radius:8px;font-size:12.5px;font-weight:700;
+                       background:#fef2f2;color:#dc2626;border:1.5px solid #fecaca;
+                       cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;">
+                <i class="bi bi-x-lg"></i> Reject
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── RECENTLY RESOLVED (collapsed) ── -->
+    {% if resolved_requests %}
+    <div style="margin-bottom:1.25rem;">
+      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'"
+        style="background:none;border:none;font-size:12.5px;color:#9070b0;font-weight:600;cursor:pointer;padding:0;display:flex;align-items:center;gap:6px;font-family:inherit;">
+        <i class="bi bi-chevron-down"></i> Show last {{ resolved_requests|length }} resolved requests
+      </button>
+      <div style="display:none;margin-top:.75rem;background:white;border:1px solid #ede9fe;border-radius:12px;overflow:hidden;">
+        {% for req in resolved_requests %}
+        <div style="padding:.75rem 1.1rem;border-bottom:1px solid #f3e8ff;display:flex;align-items:center;gap:12px;font-size:12.5px;{% if loop.last %}border-bottom:none;{% endif %}">
+          <span style="font-weight:600;color:#1a0533;">{{ req.user.full_name }}</span>
+          <span style="color:#9070b0;">{{ req.user.email }}</span>
+          <span style="margin-left:auto;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;
+            {% if req.status == 'resolved' %}background:#ecfdf5;color:#059669;{% else %}background:#fef2f2;color:#dc2626;{% endif %}">
+            {{ req.status|capitalize }}
+          </span>
+          <span style="color:#9070b0;white-space:nowrap;">{{ req.resolved_at.strftime('%d %b %Y') if req.resolved_at else '—' }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     <div class="cc-card">
       <div class="cc-card-header">
         <div class="cc-card-icon"><i class="bi bi-people"></i></div>

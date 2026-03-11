@@ -212,7 +212,13 @@
           <input type="email" name="email" class="auth-input" placeholder="you@example.com" required autocomplete="email">
         </div>
         <div class="auth-form-group">
-          <label class="auth-label">Password</label>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <label class="auth-label" style="margin-bottom:0;">Password</label>
+            <a href="{{ url_for('auth.forgot_password') }}"
+               style="font-size:12.5px;color:#7c3aed;font-weight:600;text-decoration:none;">
+              Forgot password?
+            </a>
+          </div>
           <input type="password" name="password" class="auth-input" placeholder="••••••••" required autocomplete="current-password">
         </div>
         <button type="submit" class="btn-auth">

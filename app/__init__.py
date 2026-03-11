@@ -1,6 +1,8 @@
 from flask import Flask, app, render_template
 from app.config import Config
 from app.extensions import db, login_manager, bcrypt, migrate
+from app.models.password_reset_request import PasswordResetRequest
+from app.extensions import mail
 import json
 
 
@@ -13,6 +15,7 @@ def create_app():
     login_manager.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
 
     with app.app_context():
         from app.models.user import User
