@@ -3,460 +3,924 @@
 
 {% block extra_css %}
 <style>
-  .chat-wrapper {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 1rem;
+  :root {
+    --hp:#7c3aed;--hp-dark:#5b21b6;--hp-light:#f5f3ff;--hp-mid:#ddd6fe;
+    --pk:#db2777;--pk-light:#fdf2f8;--pk-mid:#fbcfe8;
+    --grad:linear-gradient(135deg,#7c3aed 0%,#db2777 100%);
+    --grad-soft:linear-gradient(135deg,rgba(124,58,237,.08) 0%,rgba(219,39,119,.08) 100%);
   }
+
+  /* ── Layout ─────────────────────────────────── */
+  .bot-page { background:#faf9ff; padding:2rem 0 3rem; }
+
+  .bot-layout {
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:1.5rem;
+    align-items:start;
+  }
+
+  /* ── Sidebar ────────────────────────────────── */
+  .bot-sidebar {
+    position:sticky;
+    top:82px;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+
+  .bot-profile-card {
+    background:linear-gradient(160deg,#2d0066 0%,#6b0050 100%);
+    border-radius:20px;
+    padding:1.75rem;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .bot-profile-card::before {
+    content:'';position:absolute;inset:0;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:20px 20px;pointer-events:none;
+  }
+
+  .bot-avatar-wrap {
+    width:76px;height:76px;border-radius:50%;
+    background:rgba(255,255,255,.15);
+    border:2.5px solid rgba(255,255,255,.3);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 1rem;
+    overflow:hidden;
+    animation:botFloat 5s ease-in-out infinite alternate;
+    position:relative;z-index:1;
+  }
+
+  .bot-avatar-wrap img {
+    width:100%;height:100%;object-fit:cover;transform:scale(1.15);
+  }
+
+  @keyframes botFloat {
+    from{transform:translateY(0) rotate(-2deg);}
+    to{transform:translateY(-8px) rotate(2deg);}
+  }
+
+  /* speaking ring */
+  .bot-avatar-wrap.speaking::after {
+    content:'';position:absolute;inset:-5px;border-radius:50%;
+    border:2px solid rgba(219,39,119,.7);
+    animation:speakRing 1s ease-in-out infinite;
+  }
+
+  @keyframes speakRing {
+    0%{transform:scale(1);opacity:.8;}
+    100%{transform:scale(1.2);opacity:0;}
+  }
+
+  .bot-name {
+    font-family:'Fraunces',serif;font-size:1.2rem;color:white;
+    margin-bottom:.2rem;position:relative;z-index:1;
+  }
+
+  .bot-tagline {
+    font-size:12px;color:rgba(255,255,255,.65);
+    line-height:1.5;position:relative;z-index:1;margin-bottom:1rem;
+  }
+
+  .bot-status {
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+    border-radius:20px;padding:4px 12px;
+    font-size:11.5px;color:rgba(255,255,255,.85);font-weight:600;
+    position:relative;z-index:1;
+  }
+
+  .status-dot {
+    width:7px;height:7px;border-radius:50%;background:#4ade80;
+    animation:statusPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes statusPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  /* scan context card */
+  .scan-ctx-card {
+    background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.25rem;
+  }
+
+  .scan-ctx-title {
+    font-size:11.5px;font-weight:700;color:#9070b0;
+    text-transform:uppercase;letter-spacing:.5px;
+    margin-bottom:.85rem;display:flex;align-items:center;gap:6px;
+  }
+
+  .scan-ctx-result {
+    border-radius:10px;padding:10px 14px;
+    font-size:13px;font-weight:600;margin-bottom:.85rem;
+    display:flex;align-items:center;gap:8px;
+  }
+
+  .scr-tumor { background:#fef2f2;color:#dc2626;border:1px solid #fecaca; }
+  .scr-clear { background:#ecfdf5;color:#059669;border:1px solid #a7f3d0; }
+  .scr-none  { background:#f5f3ff;color:#7c3aed;border:1px solid #ddd6fe; }
+
+  .scan-ctx-detail {
+    font-size:12px;color:#9070b0;line-height:1.6;
+    border-top:1px solid #f3e8ff;padding-top:.75rem;
+    margin-top:.5rem;
+  }
+
+  /* TTS toggle card */
+  .tts-card {
+    background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.1rem 1.25rem;
+  }
+
+  .tts-toggle-row {
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:13.5px;font-weight:600;color:#1a0533;
+  }
+
+  .tts-toggle-row span { display:flex;align-items:center;gap:7px;color:#5b4f72; }
+
+  /* toggle switch */
+  .toggle-switch {
+    position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer;
+  }
+
+  .toggle-switch input { display:none; }
+
+  .toggle-track {
+    position:absolute;inset:0;border-radius:12px;
+    background:#e5e7eb;transition:background .2s;
+  }
+
+  .toggle-switch input:checked ~ .toggle-track { background:var(--grad); }
+
+  .toggle-thumb {
+    position:absolute;width:18px;height:18px;border-radius:50%;
+    background:white;top:3px;left:3px;transition:transform .2s;
+    box-shadow:0 1px 4px rgba(0,0,0,.2);
+  }
+
+  .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(18px); }
+
+  /* quick actions */
+  .quick-actions { background:white;border:1px solid #ede9fe;border-radius:16px;padding:1.1rem 1.25rem; }
+
+  .qa-title {
+    font-size:11.5px;font-weight:700;color:#9070b0;
+    text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;
+  }
+
+  .qa-btn {
+    display:flex;align-items:center;gap:8px;
+    width:100%;background:none;border:1px solid #ede9fe;
+    border-radius:9px;padding:8px 12px;
+    font-size:12.5px;font-weight:600;color:#5b4f72;
+    cursor:pointer;transition:all .15s;text-align:left;
+    margin-bottom:6px;font-family:inherit;
+  }
+
+  .qa-btn:last-child { margin-bottom:0; }
+  .qa-btn i { color:var(--hp);font-size:13px;flex-shrink:0; }
+  .qa-btn:hover { border-color:var(--hp);background:var(--hp-light);color:var(--hp); }
+
+  /* ── Chat area ──────────────────────────────── */
+  .chat-main { display:flex;flex-direction:column;gap:1rem; }
 
   .chat-window {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(247, 248, 252, 0.9));
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 12px 40px rgba(59, 79, 216, 0.08);
-    height: 520px;
-    overflow-y: auto;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    scroll-behavior: smooth;
-    position: relative;
+    background:white;
+    border:1px solid #ede9fe;
+    border-radius:20px;
+    height:520px;
+    overflow-y:auto;
+    padding:1.5rem;
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    scroll-behavior:smooth;
+    position:relative;
+    box-shadow:0 4px 24px rgba(124,58,237,.06);
   }
 
+  /* watermark brain */
   .chat-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 280px;
-    height: 280px;
-    opacity: 0.12;
-    pointer-events: none;
-    z-index: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    animation: floatWatermark 6s ease-in-out infinite alternate;
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    width:220px;height:220px;
+    opacity:.05;pointer-events:none;z-index:0;
+    animation:wmFloat 8s ease-in-out infinite alternate;
   }
 
-  @keyframes floatWatermark {
-    from {
-      transform: translate(-50%, -50%) scale(1) rotate(-1deg);
-      filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0));
-    }
-
-    to {
-      transform: translate(-50%, -53%) scale(1.05) rotate(1deg);
-      filter: drop-shadow(0 0 25px rgba(124, 58, 237, 0.8));
-    }
+  @keyframes wmFloat {
+    from{transform:translate(-50%,-50%) scale(1);}
+    to{transform:translate(-50%,-54%) scale(1.05);}
   }
 
-  .chat-watermark svg path {
-    stroke-dasharray: 80;
-    animation: drawPath 4s linear infinite alternate;
-  }
-
-  @keyframes drawPath {
-    from {
-      stroke-dashoffset: 80;
-    }
-
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-
+  /* messages */
   .msg {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-    animation: fadeUp 0.2s ease;
-    position: relative;
-    z-index: 2;
+    display:flex;gap:10px;align-items:flex-start;
+    animation:msgIn .22s ease;position:relative;z-index:2;
   }
 
-  @keyframes fadeUp {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  @keyframes msgIn {
+    from{opacity:0;transform:translateY(8px);}
+    to{opacity:1;transform:translateY(0);}
   }
+
+  .msg.user { flex-direction:row-reverse; }
 
   .msg-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-    margin-top: 2px;
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;flex-shrink:0;margin-top:2px;
+    overflow:hidden;
   }
 
   .msg-avatar.bot {
-    background: var(--gradient);
-    color: white;
-    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-    animation: pulseBot 3s infinite alternate;
+    background:none;
+    border:2px solid rgba(124,58,237,.2);
+    padding:0;
+    box-shadow:0 3px 12px rgba(124,58,237,.2);
   }
 
-  @keyframes pulseBot {
-    from {
-      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
-    }
-
-    to {
-      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.5);
-    }
+  .msg-avatar.bot img {
+    width:100%;height:100%;object-fit:cover;transform:scale(1.15);
   }
 
   .msg-avatar.user {
-    background: var(--surface);
-    color: var(--primary);
-    border: 1.5px solid var(--border);
+    background:var(--grad);color:white;font-size:13px;font-weight:700;
+    flex-shrink:0;
   }
 
   .msg-bubble {
-    max-width: 75%;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 14px;
-    line-height: 1.6;
+    max-width:75%;padding:11px 15px;border-radius:14px;
+    font-size:14px;line-height:1.65;
   }
 
   .msg.bot .msg-bubble {
-    background: #ffffff;
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    color: var(--text-primary);
-    border-top-left-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    background:white;border:1px solid rgba(124,58,237,.12);
+    color:#1a0533;border-top-left-radius:4px;
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
   }
 
   .msg.user .msg-bubble {
-    background: var(--gradient);
-    color: white;
-    margin-left: auto;
-    border-top-right-radius: 4px;
-    box-shadow: 0 4px 15px rgba(59, 79, 216, 0.25);
+    background:var(--grad);color:white;
+    border-top-right-radius:4px;
+    box-shadow:0 4px 14px rgba(124,58,237,.25);
   }
 
-  .msg.user {
-    flex-direction: row-reverse;
+  /* TTS play button on bot messages */
+  .msg-tts-btn {
+    display:inline-flex;align-items:center;gap:5px;
+    background:none;border:1px solid #ede9fe;border-radius:20px;
+    padding:3px 10px;font-size:11px;font-weight:600;color:#9070b0;
+    cursor:pointer;margin-top:6px;transition:all .15s;font-family:inherit;
   }
 
+  .msg-tts-btn:hover { border-color:var(--hp);color:var(--hp);background:var(--hp-light); }
+  .msg-tts-btn.playing { border-color:var(--pk);color:var(--pk);background:var(--pk-light); }
+
+  .msg-actions { display:flex;align-items:center;gap:6px;margin-top:5px; }
+
+  /* typing indicator */
+  .typing-indicator {
+    display:flex;gap:4px;padding:11px 15px;
+    background:white;border:1px solid rgba(124,58,237,.12);
+    border-radius:14px;border-top-left-radius:4px;width:fit-content;
+  }
+
+  .t-dot {
+    width:7px;height:7px;border-radius:50%;background:#c4b5d4;
+    animation:tBounce 1.2s infinite;
+  }
+
+  .t-dot:nth-child(2){animation-delay:.2s;}
+  .t-dot:nth-child(3){animation-delay:.4s;}
+
+  @keyframes tBounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+
+  /* ── Input area ─────────────────────────────── */
   .chat-input-area {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(124, 58, 237, 0.15);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-    padding: 1rem;
-    display: flex;
-    gap: 10px;
-    align-items: flex-end;
-    margin-top: 1rem;
+    background:white;border:1px solid #ede9fe;border-radius:16px;
+    padding:1rem;display:flex;flex-direction:column;gap:.75rem;
+    box-shadow:0 4px 20px rgba(124,58,237,.07);
   }
+
+  .chat-input-row { display:flex;gap:10px;align-items:flex-end; }
 
   .chat-input {
-    flex: 1;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    resize: none;
-    outline: none;
-    min-height: 44px;
-    max-height: 120px;
-    transition: border-color 0.18s;
-    color: var(--text-primary);
-    background: var(--surface-2);
+    flex:1;border:1.5px solid #ede9fe;border-radius:12px;
+    padding:11px 14px;font-size:14px;font-family:inherit;
+    resize:none;outline:none;min-height:46px;max-height:120px;
+    color:#1a0533;background:#faf9ff;transition:border-color .15s,box-shadow .15s;
+    line-height:1.5;
   }
 
   .chat-input:focus {
-    border-color: var(--primary);
+    border-color:var(--hp);box-shadow:0 0 0 3px rgba(124,58,237,.1);background:white;
   }
 
-  .typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 10px 14px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    border-top-left-radius: 4px;
-    width: fit-content;
+  .chat-input::placeholder { color:#c4b5d4; }
+
+  /* voice button */
+  .btn-voice {
+    width:46px;height:46px;border-radius:50%;
+    background:var(--hp-light);border:1.5px solid var(--hp-mid);
+    color:var(--hp);font-size:18px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .2s;flex-shrink:0;position:relative;
   }
 
-  .typing-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--text-muted);
-    animation: bounce 1.2s infinite;
+  .btn-voice:hover { background:var(--hp);color:white;border-color:transparent; }
+
+  .btn-voice.recording {
+    background:var(--pk);color:white;border-color:transparent;
+    box-shadow:0 0 0 6px rgba(219,39,119,.2);
+    animation:recPulse 1s ease-in-out infinite;
   }
 
-  .typing-dot:nth-child(2) {
-    animation-delay: 0.2s;
+  @keyframes recPulse {
+    0%,100%{box-shadow:0 0 0 4px rgba(219,39,119,.2);}
+    50%{box-shadow:0 0 0 10px rgba(219,39,119,.05);}
   }
 
-  .typing-dot:nth-child(3) {
-    animation-delay: 0.4s;
+  /* send button */
+  .btn-send {
+    background:var(--grad);color:white;border:none;
+    padding:11px 22px;border-radius:12px;font-size:14px;font-weight:700;
+    cursor:pointer;display:flex;align-items:center;gap:7px;
+    box-shadow:0 4px 14px rgba(124,58,237,.3);transition:all .2s;
+    font-family:inherit;flex-shrink:0;height:46px;
   }
 
-  @keyframes bounce {
+  .btn-send:hover { transform:translateY(-1px);box-shadow:0 7px 20px rgba(219,39,119,.4); }
+  .btn-send:disabled { opacity:.5;cursor:not-allowed;transform:none; }
 
-    0%,
-    60%,
-    100% {
-      transform: translateY(0);
-    }
-
-    30% {
-      transform: translateY(-6px);
-    }
+  /* voice status bar */
+  .voice-status {
+    display:none;align-items:center;gap:8px;
+    background:var(--pk-light);border:1px solid var(--pk-mid);border-radius:10px;
+    padding:8px 14px;font-size:13px;color:var(--pk);font-weight:600;
   }
 
-  .suggested-questions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 1rem;
+  .voice-status.show { display:flex; }
+
+  .voice-wave { display:flex;align-items:center;gap:2px;height:16px; }
+  .voice-wave span {
+    width:3px;border-radius:3px;background:var(--pk);
+    animation:waveBar 0.8s ease-in-out infinite alternate;
+    transform-origin:bottom;
+  }
+  .voice-wave span:nth-child(1){height:4px;animation-delay:0s;}
+  .voice-wave span:nth-child(2){height:10px;animation-delay:.1s;}
+  .voice-wave span:nth-child(3){height:14px;animation-delay:.2s;}
+  .voice-wave span:nth-child(4){height:8px;animation-delay:.15s;}
+  .voice-wave span:nth-child(5){height:4px;animation-delay:.05s;}
+
+  @keyframes waveBar{from{transform:scaleY(.4);}to{transform:scaleY(1);}}
+
+  /* suggested questions */
+  .suggested-wrap {
+    display:flex;flex-wrap:wrap;gap:7px;
+    padding:.75rem 0 .25rem;
   }
 
-  .suggested-q {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--primary);
-    font-weight: 500;
-    transition: all 0.15s;
+  .sq-btn {
+    background:white;border:1.5px solid #ede9fe;border-radius:20px;
+    padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--hp);
+    cursor:pointer;transition:all .15s;font-family:inherit;
   }
 
-  .suggested-q:hover {
-    background: var(--primary-light);
-    border-color: var(--primary);
+  .sq-btn:hover { background:var(--hp-light);border-color:var(--hp); }
+
+  /* ── Disclaimer ─────────────────────────────── */
+  .bot-disclaimer {
+    background:#fffbeb;border:1px solid #fde68a;border-left:3px solid #f59e0b;
+    border-radius:10px;padding:10px 14px;
+    font-size:12.5px;color:#78350f;
+    display:flex;gap:9px;align-items:flex-start;line-height:1.5;
+  }
+
+  /* responsive */
+  @media(max-width:900px) {
+    .bot-layout { grid-template-columns:1fr; }
+    .bot-sidebar { position:static; }
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="chat-wrapper">
-  <div class="mb-4 d-flex align-items-center gap-3">
-    <div class="header-bot-icon" style="
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: var(--surface);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.35);
-      animation: floatBotMascot 5s ease-in-out infinite alternate;
-      border: 3px solid white;
-      overflow: hidden;
-    ">
-      <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}"
-        style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.1);" alt="CerebroBot Mascot">
-    </div>
-    <style>
-      @keyframes floatBotMascot {
-        from {
-          transform: translateY(0) rotate(-3deg);
-          box-shadow: 0 8px 20px rgba(124, 58, 237, 0.2);
-        }
+<div class="bot-page">
+<div class="container">
 
-        to {
-          transform: translateY(-8px) rotate(3deg);
-          box-shadow: 0 16px 40px rgba(124, 58, 237, 0.5);
-        }
-      }
-    </style>
+  <!-- Header -->
+  <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
     <div>
-      <h1 class="cc-section-title" style="margin-bottom:0;">CerebroBot</h1>
-      <p class="cc-section-sub" style="margin-bottom:0; margin-top: 4px;">Ask me anything about brain tumors, MRI scans,
-        or how to use CerebroCare360</p>
-    </div>
-  </div>
-
-  <!-- Suggested questions -->
-  <div class="suggested-questions" id="suggestedQuestions">
-    <button class="suggested-q" onclick="askSuggested(this)">What is a glioma?</button>
-    <button class="suggested-q" onclick="askSuggested(this)">What do my results mean?</button>
-    <button class="suggested-q" onclick="askSuggested(this)">What symptoms should I watch for?</button>
-    <button class="suggested-q" onclick="askSuggested(this)">How accurate is the AI?</button>
-    <button class="suggested-q" onclick="askSuggested(this)">When should I see a doctor?</button>
-  </div>
-
-  <!-- Chat window -->
-  <div class="chat-window" id="chatWindow">
-    <div class="chat-watermark">
-      <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 24 24" fill="none"
-        stroke="url(#watermarkGrad)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-        <defs>
-          <linearGradient id="watermarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#7c3aed" />
-            <stop offset="100%" stop-color="#3b4fd8" />
-          </linearGradient>
-        </defs>
-        <!-- Brain structural outlines -->
-        <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z" />
-        <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z" />
-        <!-- Internal neural nodes/folds -->
-        <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4" />
-        <path d="M17.599 6.5a3 3 0 0 0 .399-1.375" />
-        <path d="M6.401 6.5a3 3 0 0 1-.399-1.375" />
-        <path d="M12 12v3" />
-        <path d="M10 11l-2 1" />
-        <path d="M14 11l2 1" />
-      </svg>
-    </div>
-
-    <!-- Welcome message -->
-    <div class="msg bot">
-      <div class="msg-avatar bot" style="overflow: hidden; padding: 0; background: none; border: 2px solid white;">
-        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}"
-          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);" alt="Bot">
+      <div style="display:inline-flex;align-items:center;gap:7px;background:var(--hp-light);color:var(--hp);border:1px solid var(--hp-mid);border-radius:20px;padding:4px 13px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:.75rem;">
+        <i class="bi bi-robot"></i> AI Assistant
       </div>
-      <div class="msg-bubble">
-        👋 Hi {{ current_user.full_name.split()[0] }}! I'm CerebroBot, your brain health assistant.<br /><br />
-        I can help you understand brain tumor types, interpret your scan results, explain symptoms,
-        and guide you on when to seek medical attention.<br /><br />
-        <strong>How can I help you today?</strong>
-      </div>
+      <h1 style="font-family:'Fraunces',serif;font-size:2rem;color:#1a0533;letter-spacing:-.4px;margin:0;">CerebroBot</h1>
+      <p style="color:#9070b0;font-size:14.5px;margin:.2rem 0 0;">Your brain health assistant — ask anything about tumors, MRI, or symptoms</p>
     </div>
   </div>
 
-  <!-- Input area -->
-  <div class="chat-input-area">
-    <textarea class="chat-input" id="chatInput" placeholder="Ask me about brain tumors, your results, symptoms..."
-      rows="1" onkeydown="handleKey(event)"></textarea>
-    <button class="btn-cc-primary" id="sendBtn" onclick="sendMessage()" style="padding:10px 20px;flex-shrink:0;">
-      <i class="bi bi-send"></i> Send
-    </button>
-  </div>
+  <div class="bot-layout">
 
-  <div class="cc-disclaimer mt-3">
-    <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;"></i>
-    <span>CerebroBot provides general information only and is not a substitute for professional medical advice. Always
-      consult a qualified neurologist for medical decisions.</span>
+    <!-- ══ SIDEBAR ════════════════════════════ -->
+    <div class="bot-sidebar">
+
+      <!-- Bot profile -->
+      <div class="bot-profile-card">
+        <div class="bot-avatar-wrap" id="botAvatarWrap">
+          <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot">
+        </div>
+        <div class="bot-name">CerebroBot</div>
+        <div class="bot-tagline">Powered by Claude AI · Specialised in neurological education</div>
+        <div class="bot-status"><div class="status-dot"></div> Online &amp; Ready</div>
+      </div>
+
+      <!-- Scan context card -->
+      <div class="scan-ctx-card">
+        <div class="scan-ctx-title"><i class="bi bi-cpu"></i> Your Latest Scan</div>
+
+        {% if latest_scan and latest_prediction %}
+          {% if latest_prediction.has_tumor %}
+          <div class="scan-ctx-result scr-tumor">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <div>
+              <div style="font-weight:700;">{{ latest_prediction.tumor_type|capitalize }} Detected</div>
+              <div style="font-size:11.5px;font-weight:500;opacity:.8;">{{ '%.1f'|format(latest_prediction.confidence * 100) }}% confidence</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="scan-ctx-result scr-clear">
+            <i class="bi bi-check-circle-fill"></i>
+            <div>
+              <div style="font-weight:700;">No Tumor Detected</div>
+              <div style="font-size:11.5px;font-weight:500;opacity:.8;">{{ '%.1f'|format(latest_prediction.confidence * 100) }}% confidence</div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="scan-ctx-detail">
+            <div style="margin-bottom:4px;"><strong style="color:#5b4f72;">Scan date:</strong> {{ latest_scan.upload_date.strftime('%d %b %Y') }}</div>
+            <div><strong style="color:#5b4f72;">Model:</strong> {{ latest_prediction.model_version }}</div>
+          </div>
+          <a href="/scan/result/{{ latest_scan.id }}" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:.85rem;background:var(--grad);color:white;padding:9px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+            <i class="bi bi-eye"></i> View Full Result
+          </a>
+        {% else %}
+          <div class="scan-ctx-result scr-none">
+            <i class="bi bi-image"></i>
+            <div>
+              <div style="font-weight:700;">No scan yet</div>
+              <div style="font-size:11.5px;font-weight:500;opacity:.8;">Upload an MRI to get started</div>
+            </div>
+          </div>
+          <a href="/scan/upload" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:.85rem;background:var(--grad);color:white;padding:9px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(124,58,237,.25);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+            <i class="bi bi-cloud-arrow-up"></i> Upload MRI Scan
+          </a>
+        {% endif %}
+      </div>
+
+      <!-- TTS toggle -->
+      <div class="tts-card">
+        <div class="tts-toggle-row">
+          <span><i class="bi bi-volume-up" style="color:var(--hp);"></i> Auto-read replies</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autoReadToggle" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div style="font-size:12px;color:#c4b5d4;margin-top:6px;">
+          Bot will speak each reply automatically. Toggle off for silent mode.
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <div class="qa-title">Quick Questions</div>
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-question-circle"></i> What is a glioma?</button>
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-thermometer-half"></i> What does Grad-CAM show?</button>
+        {% if latest_prediction and latest_prediction.has_tumor %}
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-info-circle"></i> What does my result mean?</button>
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-hospital"></i> Should I see a specialist?</button>
+        {% else %}
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-shield-check"></i> What symptoms to watch for?</button>
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-activity"></i> How accurate is the AI?</button>
+        {% endif %}
+        <button class="qa-btn" onclick="askQ(this)"><i class="bi bi-heart-pulse"></i> When should I see a doctor?</button>
+      </div>
+
+    </div>
+
+    <!-- ══ CHAT MAIN ═══════════════════════════ -->
+    <div class="chat-main">
+
+      <!-- Chat window -->
+      <div class="chat-window" id="chatWindow">
+        <div class="chat-watermark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="url(#wmGrad)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+            <defs>
+              <linearGradient id="wmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed"/>
+                <stop offset="100%" stop-color="#db2777"/>
+              </linearGradient>
+            </defs>
+            <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+            <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+            <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+            <path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/>
+            <path d="M12 12v3"/><path d="M10 11l-2 1"/><path d="M14 11l2 1"/>
+          </svg>
+        </div>
+
+        <!-- Welcome message -->
+        <div class="msg bot" id="welcomeMsg">
+          <div class="msg-avatar bot">
+            <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="CerebroBot">
+          </div>
+          <div>
+            <div class="msg-bubble">
+              👋 Hi <strong>{{ current_user.full_name.split()[0] }}</strong>! I'm CerebroBot, your neurological AI assistant.<br><br>
+              {% if latest_scan and latest_prediction %}
+                {% if latest_prediction.has_tumor %}
+                I can see your latest scan from <strong>{{ latest_scan.upload_date.strftime('%d %b %Y') }}</strong> showed a <strong>{{ latest_prediction.tumor_type|capitalize }}</strong> result with <strong>{{ '%.1f'|format(latest_prediction.confidence * 100) }}%</strong> confidence. I can help you understand what this means, what questions to ask your doctor, and what next steps to consider.<br><br>
+                {% else %}
+                I can see your latest scan from <strong>{{ latest_scan.upload_date.strftime('%d %b %Y') }}</strong> came back <strong>clear — no tumor detected</strong> ({{ '%.1f'|format(latest_prediction.confidence * 100) }}% confidence). I'm happy to answer any questions you have about this result or brain health in general.<br><br>
+                {% endif %}
+                Remember: I'm here to <strong>educate and guide</strong>, not to diagnose. Always follow up with your neurologist for medical advice.<br><br>
+              {% else %}
+                I can help you understand brain tumor types, MRI scans, symptoms, and when to seek medical care. You haven't uploaded a scan yet — <a href="/scan/upload" style="color:var(--hp);font-weight:700;">upload one here</a> for AI analysis.<br><br>
+              {% endif %}
+              <strong>How can I help you today?</strong>
+            </div>
+            <div class="msg-actions">
+              <button class="msg-tts-btn" onclick="speakMessage(this, document.querySelector('#welcomeMsg .msg-bubble').innerText)">
+                <i class="bi bi-volume-up"></i> Listen
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice status bar -->
+      <div class="voice-status" id="voiceStatus">
+        <div class="voice-wave">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <span id="voiceStatusText">Listening… speak now</span>
+        <button onclick="stopVoice()" style="margin-left:auto;background:none;border:none;color:var(--pk);font-size:13px;cursor:pointer;font-weight:700;font-family:inherit;">✕ Cancel</button>
+      </div>
+
+      <!-- Input area -->
+      <div class="chat-input-area">
+        <!-- Suggested questions (disappear after first message) -->
+        <div class="suggested-wrap" id="suggestedWrap">
+          <button class="sq-btn" onclick="askSuggested(this)">What is a glioma?</button>
+          <button class="sq-btn" onclick="askSuggested(this)">What do my results mean?</button>
+          <button class="sq-btn" onclick="askSuggested(this)">What symptoms should I watch?</button>
+          <button class="sq-btn" onclick="askSuggested(this)">How accurate is the AI?</button>
+          <button class="sq-btn" onclick="askSuggested(this)">When should I see a doctor?</button>
+        </div>
+
+        <div class="chat-input-row">
+          <!-- Voice button -->
+          <button class="btn-voice" id="voiceBtn" onclick="toggleVoice()" title="Voice input">
+            <i class="bi bi-mic" id="voiceIcon"></i>
+          </button>
+
+          <textarea class="chat-input" id="chatInput"
+            placeholder="Type your question, or tap the mic to speak…"
+            rows="1" onkeydown="handleKey(event)"></textarea>
+
+          <button class="btn-send" id="sendBtn" onclick="sendMessage()">
+            <i class="bi bi-send-fill"></i> Send
+          </button>
+        </div>
+      </div>
+
+      <div class="bot-disclaimer">
+        <i class="bi bi-shield-exclamation" style="flex-shrink:0;margin-top:1px;color:#f59e0b;"></i>
+        <span>CerebroBot provides general educational information only. It cannot access your scan images directly. For a full result breakdown, visit your <a href="/scan/history" style="color:#78350f;font-weight:700;">scan history</a>. Always consult a qualified neurologist for medical decisions.</span>
+      </div>
+
+    </div>
   </div>
+</div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-  const chatWindow = document.getElementById('chatWindow');
-  const chatInput = document.getElementById('chatInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const suggestedQ = document.getElementById('suggestedQuestions');
+// ═══════════════════════════════════════════════════
+//  SCAN CONTEXT (injected from Flask)
+// ═══════════════════════════════════════════════════
+const SCAN_CONTEXT = {
+  hasScan: {{ 'true' if latest_scan else 'false' }},
+  hasTumor: {{ 'true' if latest_prediction and latest_prediction.has_tumor else 'false' }},
+  tumorType: "{{ latest_prediction.tumor_type|capitalize if latest_prediction and latest_prediction.has_tumor else 'None' }}",
+  confidence: {{ '%.1f'|format(latest_prediction.confidence * 100) if latest_prediction else 0 }},
+  scanDate: "{{ latest_scan.upload_date.strftime('%d %b %Y') if latest_scan else '' }}",
+  modelVersion: "{{ latest_prediction.model_version if latest_prediction else '' }}",
+  probGlioma: {{ '%.1f'|format(latest_prediction.prob_glioma * 100) if latest_prediction else 0 }},
+  probMeningioma: {{ '%.1f'|format(latest_prediction.prob_meningioma * 100) if latest_prediction else 0 }},
+  probPituitary: {{ '%.1f'|format(latest_prediction.prob_pituitary * 100) if latest_prediction else 0 }},
+  probNotumor: {{ '%.1f'|format(latest_prediction.prob_notumor * 100) if latest_prediction else 0 }},
+  gradcam: {{ 'true' if latest_prediction and latest_prediction.heatmap_filename else 'false' }}
+};
 
-  let conversationHistory = [];
+const USER_NAME = "{{ current_user.full_name.split()[0] }}";
 
-  function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let conversationHistory = [];
+let currentUtterance = null;
+let isRecording = false;
+let recognition = null;
+let activeTtsBtn = null;
+
+const chatWindow = document.getElementById('chatWindow');
+const chatInput  = document.getElementById('chatInput');
+const sendBtn    = document.getElementById('sendBtn');
+const voiceBtn   = document.getElementById('voiceBtn');
+const voiceIcon  = document.getElementById('voiceIcon');
+const voiceStatus= document.getElementById('voiceStatus');
+const voiceStatusText = document.getElementById('voiceStatusText');
+const autoReadToggle  = document.getElementById('autoReadToggle');
+const botAvatarWrap   = document.getElementById('botAvatarWrap');
+const suggestedWrap   = document.getElementById('suggestedWrap');
+
+// ═══════════════════════════════════════════════════
+//  TTS HELPERS
+// ═══════════════════════════════════════════════════
+function buildTTSText(text) {
+  // Strip HTML tags for TTS
+  const tmp = document.createElement('div');
+  tmp.innerHTML = text;
+  return tmp.innerText.replace(/\s+/g,' ').trim();
+}
+
+function speakMessage(btn, text) {
+  // If same button clicked while playing — stop
+  if (activeTtsBtn === btn && currentUtterance) {
+    window.speechSynthesis.cancel();
+    stopTTS();
+    return;
+  }
+
+  // Stop any current speech
+  window.speechSynthesis.cancel();
+  if (activeTtsBtn) stopTTSBtn(activeTtsBtn);
+
+  const clean = buildTTSText(text);
+  const utter = new SpeechSynthesisUtterance(clean);
+  utter.lang = 'en-IN';
+  utter.rate = 0.95;
+  utter.pitch = 1.05;
+
+  // Prefer a female voice if available
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v =>
+    v.lang.startsWith('en') && v.name.toLowerCase().includes('female')
+  ) || voices.find(v => v.lang.startsWith('en'));
+  if (preferred) utter.voice = preferred;
+
+  currentUtterance = utter;
+  activeTtsBtn = btn;
+
+  btn.innerHTML = '<i class="bi bi-stop-circle-fill"></i> Stop';
+  btn.classList.add('playing');
+  botAvatarWrap.classList.add('speaking');
+
+  utter.onend = utter.onerror = () => {
+    stopTTSBtn(btn);
+    botAvatarWrap.classList.remove('speaking');
+    currentUtterance = null;
+    activeTtsBtn = null;
+  };
+
+  window.speechSynthesis.speak(utter);
+}
+
+function stopTTSBtn(btn) {
+  btn.innerHTML = '<i class="bi bi-volume-up"></i> Listen';
+  btn.classList.remove('playing');
+}
+
+function stopTTS() {
+  window.speechSynthesis.cancel();
+  if (activeTtsBtn) stopTTSBtn(activeTtsBtn);
+  botAvatarWrap.classList.remove('speaking');
+  currentUtterance = null;
+  activeTtsBtn = null;
+}
+
+// Preload voices
+if (window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices());
+}
+
+// ═══════════════════════════════════════════════════
+//  VOICE INPUT
+// ═══════════════════════════════════════════════════
+function initRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return null;
+
+  const rec = new SpeechRecognition();
+  rec.continuous = false;
+  rec.interimResults = true;
+  rec.lang = ''; // auto-detect
+
+  rec.onstart = () => {
+    isRecording = true;
+    voiceBtn.classList.add('recording');
+    voiceIcon.className = 'bi bi-stop-fill';
+    voiceStatus.classList.add('show');
+    voiceStatusText.textContent = 'Listening… speak now';
+  };
+
+  rec.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
     }
-  }
+    chatInput.value = final || interim;
+    voiceStatusText.textContent = interim ? `Hearing: "${interim}"` : 'Listening… speak now';
+    autoResize();
+  };
 
-  function askSuggested(btn) {
-    chatInput.value = btn.textContent;
-    suggestedQ.style.display = 'none';
-    sendMessage();
-  }
+  rec.onend = () => {
+    isRecording = false;
+    voiceBtn.classList.remove('recording');
+    voiceIcon.className = 'bi bi-mic';
+    voiceStatus.classList.remove('show');
+    if (chatInput.value.trim()) sendMessage();
+  };
 
-  function appendMessage(role, text) {
-    const isBot = role === 'assistant';
-    const div = document.createElement('div');
-    div.className = `msg ${isBot ? 'bot' : 'user'}`;
-    div.innerHTML = `
-      <div class="msg-avatar ${isBot ? 'bot' : 'user'}" ${isBot ? 'style="overflow: hidden; padding: 0; background: none; border: 2px solid white;"' : ''}>
-        ${isBot ? `
-        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);" alt="Bot">
-        ` : `<i class="bi bi-person"></i>`}
-      </div>
-      <div class="msg-bubble">${text.replace(/\n/g, '<br/>')}</div>
-    `;
-    chatWindow.appendChild(div);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }
-
-  function showTyping() {
-    const div = document.createElement('div');
-    div.className = 'msg bot';
-    div.id = 'typingIndicator';
-    div.innerHTML = `
-      <div class="msg-avatar bot" style="overflow: hidden; padding: 0; background: none; border: 2px solid white;">
-        <img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.15);" alt="Bot">
-      </div>
-      <div class="typing-indicator">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      </div>
-    `;
-    chatWindow.appendChild(div);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }
-
-  function removeTyping() {
-    const indicator = document.getElementById('typingIndicator');
-    if (indicator) indicator.remove();
-  }
-
-  async function sendMessage() {
-    const text = chatInput.value.trim();
-    if (!text) return;
-
-    // Hide suggested questions after first message
-    suggestedQ.style.display = 'none';
-
-    // Add user message
-    appendMessage('user', text);
-    conversationHistory.push({ role: 'user', content: text });
-    chatInput.value = '';
-    chatInput.style.height = 'auto';
-    sendBtn.disabled = true;
-    showTyping();
-
-    try {
-      const response = await fetch('/chat/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: conversationHistory })
-      });
-
-      const data = await response.json();
-      removeTyping();
-
-      if (data.reply) {
-        appendMessage('assistant', data.reply);
-        conversationHistory.push({ role: 'assistant', content: data.reply });
-      } else {
-        appendMessage('assistant', 'Sorry, I encountered an error. Please try again.');
-      }
-    } catch (err) {
-      removeTyping();
-      appendMessage('assistant', 'Sorry, I could not connect. Please check your connection and try again.');
+  rec.onerror = (e) => {
+    isRecording = false;
+    voiceBtn.classList.remove('recording');
+    voiceIcon.className = 'bi bi-mic';
+    voiceStatus.classList.remove('show');
+    if (e.error === 'not-allowed') {
+      appendMessage('bot', '⚠️ Microphone access was denied. Please allow microphone permissions in your browser settings to use voice input.');
     }
+  };
 
-    sendBtn.disabled = false;
-    chatInput.focus();
+  return rec;
+}
+
+function toggleVoice() {
+  // Stop TTS before recording
+  stopTTS();
+
+  if (isRecording) {
+    stopVoice();
+    return;
   }
 
-  // Auto-resize textarea
-  chatInput.addEventListener('input', function () {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-  });
+  if (!recognition) recognition = initRecognition();
+
+  if (!recognition) {
+    appendMessage('bot', '⚠️ Your browser doesn\'t support voice input. Please type your question instead. (Supported browsers: Chrome, Edge)');
+    return;
+  }
+
+  try { recognition.start(); }
+  catch(e) {
+    voiceStatusText.textContent = 'Error starting microphone';
+  }
+}
+
+function stopVoice() {
+  if (recognition && isRecording) recognition.stop();
+}
+
+// ═══════════════════════════════════════════════════
+//  CHAT FUNCTIONS
+// ═══════════════════════════════════════════════════
+function appendMessage(role, html, rawText) {
+  const isBot = role === 'bot' || role === 'assistant';
+  const div = document.createElement('div');
+  div.className = `msg ${isBot ? 'bot' : 'user'}`;
+
+  const avatarHTML = isBot
+    ? `<div class="msg-avatar bot"><img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="Bot"></div>`
+    : `<div class="msg-avatar user">${USER_NAME[0].toUpperCase()}</div>`;
+
+  const ttsBtn = isBot
+    ? `<div class="msg-actions"><button class="msg-tts-btn" onclick="speakMessage(this, this.closest('.msg').querySelector('.msg-bubble').innerText)"><i class="bi bi-volume-up"></i> Listen</button></div>`
+    : '';
+
+  div.innerHTML = `
+    ${avatarHTML}
+    <div>
+      <div class="msg-bubble">${html.replace(/\n/g,'<br>')}</div>
+      ${ttsBtn}
+    </div>
+  `;
+
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  // Auto-read if enabled and it's a bot message
+  if (isBot && autoReadToggle.checked) {
+    setTimeout(() => {
+      const btn = div.querySelector('.msg-tts-btn');
+      const text = rawText || div.querySelector('.msg-bubble').innerText;
+      if (btn) speakMessage(btn, text);
+    }, 300);
+  }
+
+  return div;
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = 'typingIndicator';
+  div.innerHTML = `
+    <div class="msg-avatar bot"><img src="{{ url_for('static', filename='img/cerebro_bot.png') }}" alt="Bot"></div>
+    <div class="typing-indicator">
+      <div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div>
+    </div>
+  `;
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  // Hide suggestions
+  suggestedWrap.style.display = 'none';
+
+  appendMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  sendBtn.disabled = true;
+  showTyping();
+
+  try {
+    const res = await fetch('/chat/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: conversationHistory,
+        scan_context: SCAN_CONTEXT
+      })
+    });
+
+    const data = await res.json();
+    removeTyping();
+
+    const reply = data.reply || 'Sorry, I encountered an error. Please try again.';
+    appendMessage('bot', reply);
+    conversationHistory.push({ role: 'assistant', content: reply });
+
+  } catch(err) {
+    removeTyping();
+    appendMessage('bot', 'Sorry, I could not connect. Please check your connection and try again.');
+  }
+
+  sendBtn.disabled = false;
+  chatInput.focus();
+}
+
+function askQ(btn) {
+  chatInput.value = btn.textContent.trim();
+  autoResize();
+  sendMessage();
+}
+
+function askSuggested(btn) {
+  chatInput.value = btn.textContent.trim();
+  autoResize();
+  sendMessage();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize() {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+}
+
+chatInput.addEventListener('input', autoResize);
 </script>
 {% endblock %}

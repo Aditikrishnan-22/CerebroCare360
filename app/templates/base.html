@@ -9,26 +9,26 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
     :root {
-      --primary:        #2f4bd4;
-      --primary-dark:   #1e34a8;
-      --primary-light:  #eef0fd;
-      --primary-mid:    #c7d0f8;
-      --accent:         #6d28d9;
-      --accent-light:   #f3f0ff;
-      --gradient:       linear-gradient(135deg, #2f4bd4 0%, #6d28d9 100%);
-      --gradient-soft:  linear-gradient(135deg, rgba(47,75,212,0.07) 0%, rgba(109,40,217,0.07) 100%);
+      --primary:        #7c3aed;
+      --primary-dark:   #5b21b6;
+      --primary-light:  #f5f3ff;
+      --primary-mid:    #ddd6fe;
+      --accent:         #db2777;
+      --accent-light:   #fdf2f8;
+      --gradient:       linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+      --gradient-soft:  linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(219,39,119,0.08) 100%);
 
       --surface:        #ffffff;
-      --surface-2:      #f5f6fb;
-      --surface-3:      #edf0fb;
-      --surface-4:      #e2e6f8;
+      --surface-2:      #faf9ff;
+      --surface-3:      #f3e8ff;
+      --surface-4:      #ede9fe;
 
-      --border:         #dde1f0;
-      --border-strong:  #c5cbe8;
+      --border:         #ede9fe;
+      --border-strong:  #ddd6fe;
 
-      --text-primary:   #0c1330;
-      --text-secondary: #4a5270;
-      --text-muted:     #8892b0;
+      --text-primary:   #1a0533;
+      --text-secondary: #5b4f72;
+      --text-muted:     #9070b0;
 
       --success:        #059669;
       --success-light:  #ecfdf5;
@@ -42,11 +42,11 @@
       --radius-lg:  18px;
       --radius-xl:  24px;
 
-      --shadow-xs: 0 1px 3px rgba(12,19,48,0.06);
-      --shadow-sm: 0 2px 8px rgba(12,19,48,0.07);
-      --shadow:    0 8px 24px rgba(47,75,212,0.10);
-      --shadow-lg: 0 16px 40px rgba(47,75,212,0.14);
-      --shadow-xl: 0 24px 60px rgba(109,40,217,0.18);
+      --shadow-xs: 0 1px 3px rgba(124,58,237,0.06);
+      --shadow-sm: 0 2px 8px rgba(124,58,237,0.07);
+      --shadow:    0 8px 24px rgba(124,58,237,0.10);
+      --shadow-lg: 0 16px 40px rgba(124,58,237,0.14);
+      --shadow-xl: 0 24px 60px rgba(219,39,119,0.18);
 
       --navbar-h:    66px;
       --font-serif:  'Fraunces', Georgia, serif;
@@ -70,9 +70,31 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(47,75,212,0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(47,75,212,0.022) 1px, transparent 1px);
+        linear-gradient(rgba(124,58,237,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.022) 1px, transparent 1px);
       background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -150px; right: -150px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(219,39,119,0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Additional blob for the opposite corner */
+    .global-blob {
+      position: fixed;
+      bottom: -150px; left: -100px;
+      width: 450px; height: 450px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 60%);
       pointer-events: none;
       z-index: 0;
     }
@@ -117,7 +139,7 @@
       justify-content: center;
       color: white;
       flex-shrink: 0;
-      box-shadow: 0 3px 10px rgba(47,75,212,0.35);
+      box-shadow: 0 3px 10px rgba(124,58,237,0.35);
     }
 
     .cc-logo-mark svg { width: 18px; height: 18px; }
@@ -212,7 +234,7 @@
       font-size: 12px;
       font-weight: 700;
       text-decoration: none;
-      box-shadow: 0 2px 8px rgba(47,75,212,0.3);
+      box-shadow: 0 2px 8px rgba(124,58,237,0.3);
       transition: transform 0.15s;
     }
 
@@ -233,13 +255,13 @@
       align-items: center;
       gap: 7px;
       text-decoration: none;
-      box-shadow: 0 3px 12px rgba(47,75,212,0.28);
+      box-shadow: 0 3px 12px rgba(124,58,237,0.28);
       letter-spacing: 0.1px;
     }
 
     .btn-cc-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(109,40,217,0.38);
+      box-shadow: 0 6px 20px rgba(219,39,119,0.38);
       color: white;
     }
 
@@ -341,7 +363,7 @@
 
     .cc-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(47,75,212,0.1);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
     }
 
     .cc-input::placeholder { color: var(--text-muted); }
@@ -531,6 +553,7 @@
 </head>
 
 <body>
+  <div class="global-blob"></div>
   <nav class="cc-navbar">
     <div class="container-fluid">
       <a href="/" class="cc-logo">

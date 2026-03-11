@@ -34,12 +34,8 @@
   }
 
   .detail-hero-image {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.25);
-    overflow: hidden;
+    width: 330px;
+    height: auto;
     flex-shrink: 0;
     animation: floatHospital 6s ease-in-out infinite alternate;
   }
@@ -437,7 +433,7 @@
       </div>
       <div class="detail-hero-image d-none d-lg-block">
         <img src="{{ url_for('static', filename='img/hospital_banner_alt.png') }}" alt="Medical Facility Illustration"
-          style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.1);">
+          style="width: 100%; height: auto; object-fit: contain;">
       </div>
     </div>
   </div>
