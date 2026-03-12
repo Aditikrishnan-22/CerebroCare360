@@ -97,6 +97,18 @@
 
   .auth-form-group{margin-bottom:1.1rem;}
 
+  /* ── Password strength ── */
+  .pw-strength-bar{display:flex;gap:4px;margin-top:7px;height:4px;}
+  .pw-bar-seg{flex:1;border-radius:4px;background:#e5e7eb;transition:background .3s;}
+  .pw-strength-label{font-size:11.5px;font-weight:600;margin-top:5px;min-height:16px;transition:color .3s;}
+
+  .pw-rules{margin-top:7px;display:flex;flex-direction:column;gap:3px;}
+  .pw-rule{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#9070b0;transition:color .2s;}
+  .pw-rule.ok{color:#16a34a;}
+  .pw-rule i{font-size:12px;}
+
+  .pw-match{font-size:11.5px;font-weight:600;margin-top:5px;min-height:16px;}
+
   .btn-auth{
     width:100%;background:var(--grad);color:white;border:none;
     padding:13px;border-radius:10px;font-size:15px;font-weight:700;
@@ -165,27 +177,50 @@
       </div>
       {% endfor %}{% endif %}{% endwith %}
 
-      <form method="POST" action="/auth/register">
+      <form method="POST" action="/auth/register" id="registerForm">
         {{ form.hidden_tag() if form }}
+
         <div class="auth-form-group">
           <label class="auth-label">Full Name</label>
           <input type="text" name="full_name" class="auth-input" placeholder="Your full name" required autocomplete="name">
         </div>
+
         <div class="auth-form-group">
           <label class="auth-label">Email address</label>
           <input type="email" name="email" class="auth-input" placeholder="you@example.com" required autocomplete="email">
         </div>
-        <div class="form-row">
-          <div class="auth-form-group">
-            <label class="auth-label">Password</label>
-            <input type="password" name="password" class="auth-input" placeholder="••••••••" required>
+
+        <!-- Password with strength indicator -->
+        <div class="auth-form-group">
+          <label class="auth-label">Password</label>
+          <input type="password" name="password" id="pwInput" class="auth-input"
+                 placeholder="••••••••" required autocomplete="new-password">
+
+          <div class="pw-strength-bar">
+            <div class="pw-bar-seg" id="seg1"></div>
+            <div class="pw-bar-seg" id="seg2"></div>
+            <div class="pw-bar-seg" id="seg3"></div>
+            <div class="pw-bar-seg" id="seg4"></div>
           </div>
-          <div class="auth-form-group">
-            <label class="auth-label">Confirm Password</label>
-            <input type="password" name="confirm_password" class="auth-input" placeholder="••••••••" required>
+          <div class="pw-strength-label" id="pwLabel" style="color:#c4b5d4;">Enter a password</div>
+
+          <div class="pw-rules" id="pwRules" style="display:none;">
+            <div class="pw-rule" id="r-len"><i class="bi bi-circle"></i> At least 8 characters</div>
+            <div class="pw-rule" id="r-upper"><i class="bi bi-circle"></i> One uppercase letter (A–Z)</div>
+            <div class="pw-rule" id="r-num"><i class="bi bi-circle"></i> One number (0–9)</div>
+            <div class="pw-rule" id="r-special"><i class="bi bi-circle"></i> One special character (!@#$...)</div>
           </div>
         </div>
-        <button type="submit" class="btn-auth">
+
+        <!-- Confirm password -->
+        <div class="auth-form-group">
+          <label class="auth-label">Confirm Password</label>
+          <input type="password" name="confirm_password" id="pwConfirm" class="auth-input"
+                 placeholder="••••••••" required autocomplete="new-password">
+          <div class="pw-match" id="pwMatch"></div>
+        </div>
+
+        <button type="submit" class="btn-auth" id="submitBtn">
           <i class="bi bi-person-check"></i> Create Free Account
         </button>
       </form>
@@ -203,4 +238,90 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const pwInput   = document.getElementById('pwInput');
+  const pwConfirm = document.getElementById('pwConfirm');
+  const pwLabel   = document.getElementById('pwLabel');
+  const pwRules   = document.getElementById('pwRules');
+  const pwMatch   = document.getElementById('pwMatch');
+  const segs      = ['seg1','seg2','seg3','seg4'].map(id => document.getElementById(id));
+  const ruleEls   = {
+    len:     document.getElementById('r-len'),
+    upper:   document.getElementById('r-upper'),
+    num:     document.getElementById('r-num'),
+    special: document.getElementById('r-special')
+  };
+
+  const COLORS = ['#ef4444','#f97316','#eab308','#22c55e'];
+  const LABELS = ['Weak — try adding numbers or symbols',
+                  'Fair — add uppercase or special chars',
+                  'Good — almost there!',
+                  'Strong ✓'];
+
+  function setRule(el, ok) {
+    el.classList.toggle('ok', ok);
+    el.querySelector('i').className = ok ? 'bi bi-check-circle-fill' : 'bi bi-circle';
+  }
+
+  pwInput.addEventListener('input', function () {
+    const v = this.value;
+    if (!v) {
+      segs.forEach(s => s.style.background = '#e5e7eb');
+      pwLabel.textContent = 'Enter a password';
+      pwLabel.style.color = '#c4b5d4';
+      pwRules.style.display = 'none';
+      checkMatch();
+      return;
+    }
+
+    pwRules.style.display = 'flex';
+
+    const checks = {
+      len:     v.length >= 8,
+      upper:   /[A-Z]/.test(v),
+      num:     /[0-9]/.test(v),
+      special: /[^A-Za-z0-9]/.test(v)
+    };
+
+    Object.entries(checks).forEach(([k, ok]) => setRule(ruleEls[k], ok));
+
+    const score = Object.values(checks).filter(Boolean).length; // 0–4
+    segs.forEach((s, i) => {
+      s.style.background = i < score ? COLORS[score - 1] : '#e5e7eb';
+    });
+
+    pwLabel.textContent = score > 0 ? LABELS[score - 1] : 'Too weak';
+    pwLabel.style.color = score > 0 ? COLORS[score - 1] : '#ef4444';
+
+    checkMatch();
+  });
+
+  pwConfirm.addEventListener('input', checkMatch);
+
+  function checkMatch() {
+    const p = pwInput.value;
+    const c = pwConfirm.value;
+    if (!c) { pwMatch.textContent = ''; return; }
+    if (p === c) {
+      pwMatch.textContent = '✓ Passwords match';
+      pwMatch.style.color = '#16a34a';
+    } else {
+      pwMatch.textContent = '✗ Passwords do not match';
+      pwMatch.style.color = '#dc2626';
+    }
+  }
+
+  // Block submit if passwords don't match
+  document.getElementById('registerForm').addEventListener('submit', function (e) {
+    if (pwInput.value !== pwConfirm.value) {
+      e.preventDefault();
+      pwMatch.textContent = '✗ Passwords do not match — please fix before submitting';
+      pwMatch.style.color = '#dc2626';
+      pwConfirm.focus();
+    }
+  });
+</script>
 {% endblock %}
