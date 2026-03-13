@@ -319,8 +319,8 @@ def delete_scan(scan_id):
         if scan.prediction.heatmap_filename:
             _remove_file(os.path.join(base, 'static', 'heatmaps', scan.prediction.heatmap_filename))
         for report in scan.prediction.reports:
-            if report.filename:
-                _remove_file(os.path.join(base, 'static', 'reports', report.filename))
+            if report.file_path:
+                _remove_file(os.path.join(base, 'static', report.file_path))
 
     db.session.delete(scan)
     db.session.commit()
